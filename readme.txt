@@ -22,28 +22,28 @@ The Constant Contact Wordpress plugin integrates features from the Constant Cont
     * Add extra fields to your signup form
     * Uses the REST API
 
-http://integrationservic.es/constant-contact/wordpress-plugin.php
+See http://integrationservic.es/constant-contact/wordpress-plugin.php
 
 
 == Installation ==
 
 To install the plugin follow the steps below:
 
-1.) Upload `constant-contact-api` to the `/wp-content/plugins/` directory.
-2.) Activate the plugin through the 'Plugins' menu in WordPress.
-3.) Click the new main menu item called "Constant Contact".
-4.) You'll need to enter your username and password on the settings page.
-5.) Also configure the "Register Page Settings" to get the checkbox or list selection displayed on the user register page.
-6.) Alternatively configure the signup widget and display a dynamic sidebar (enable on the admin widgets page) or place the code below directly into your template and it will output the signup form wherever you like:
+1. Upload `constant-contact-api` to the `/wp-content/plugins/` directory.
+2. Activate the plugin through the 'Plugins' menu in WordPress.
+3. Click the new main menu item called "Constant Contact".
+4. You'll need to enter your username and password on the settings page.
+5. Also configure the "Register Page Settings" to get the checkbox or list selection displayed on the user register page.
+6. Alternatively configure the signup widget and display a dynamic sidebar (enable on the admin widgets page) or place the code below directly into your template and it will output the signup form wherever you like:
 
-&lt;&amp;php
+`<?php
 	$sbw = new constant_contact_api_widget();
 	$sbw->widget();
-&amp;&gt;
+?>`
 
 You can include widget arguments if you need to, the code below shows how to use all arguments:
 
-&lt;&amp;php
+`<?php
 	$sbw = new constant_contact_api_widget();
 	$args = array(
 		'title' => 'My Signup Widget', 
@@ -54,6 +54,5 @@ You can include widget arguments if you need to, the code below shows how to use
 		'after_widget' => '',
 	);
 	$sbw->widget($args);
-&amp;&gt;
-
+?>`
 
