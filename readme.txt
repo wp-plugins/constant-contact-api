@@ -10,14 +10,15 @@ This plugin integrates the Constant Contact API into your wordpress blog.
 
 == Description ==
 
-The Constant Contact Wordpress plugin integrates features from the Constant Contact REST API into your wordpress blog, it's the only module you need if you use the constantcontact.com service and wordpress.
+The Constant Contact Wordpress plugin integrates features from the Constant Contact REST API into your wordpress blog, it's the only plugin you need if you use the constantcontact.com service and wordpress.
 
     * Add signup checkbox and list selection to your register page and update profile page
     * Add / edit / delete contact lists without visiting constantcontact.com
     * Show contact list selection on register page with ability to exclude certain lists
     * Automatically subscribe your user to one or more contact lists on the register page
     * Customize the register page signup box (and list selection) title and description
-    * Add / edit / delete users from your constant contact account using your drupal website
+    * Add / edit / delete users from your constant contact account
+	* Add a signup widget to your sidebar or anywhere in your template
     * Ability to insert extra fields when you subscribe a user, eg. first name and lastname can be gathered and used in your newsletters
     * Uses the REST API
 
