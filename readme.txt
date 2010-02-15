@@ -18,7 +18,7 @@ The Constant Contact Wordpress plugin integrates features from the Constant Cont
     * Automatically subscribe your user to one or more contact lists on the register page
     * Customize the register page signup box (and list selection) title and description
     * Add / edit / delete users from your constant contact account
-	* Add a signup widget to your sidebar or anywhere in your template
+    * Add a signup widget to your sidebar or anywhere in your template
     * Add extra fields to your signup form
     * Uses the REST API
 
