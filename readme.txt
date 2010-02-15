@@ -1,0 +1,58 @@
+=== Constant Contact API ===
+Contributors: justphp
+Donate link: http://integrationservic.es/donate.php
+Tags: mail, email, newsletter, Constant Contact, API, REST
+Requires at least: 2.9
+Tested up to: 2.9
+Stable tag: trunk
+
+This plugin integrates the Constant Contact API into your wordpress blog.
+
+== Description ==
+
+The Constant Contact Wordpress plugin integrates features from the Constant Contact REST API into your wordpress blog, it's the only module you need if you use the constantcontact.com service and wordpress.
+
+    * Add signup checkbox and list selection to your register page and update profile page
+    * Add / edit / delete contact lists without visiting constantcontact.com
+    * Show contact list selection on register page with ability to exclude certain lists
+    * Automatically subscribe your user to one or more contact lists on the register page
+    * Customize the register page signup box (and list selection) title and description
+    * Add / edit / delete users from your constant contact account using your drupal website
+    * Ability to insert extra fields when you subscribe a user, eg. first name and lastname can be gathered and used in your newsletters
+    * Uses the REST API
+
+http://integrationservic.es/constant-contact/wordpress-plugin.php
+
+
+== Installation ==
+
+To install the plugin follow the steps below:
+
+1.) Upload `constant-contact-api` to the `/wp-content/plugins/` directory.
+2.) Activate the plugin through the 'Plugins' menu in WordPress.
+3.) Click the new main menu item called "Constant Contact".
+4.) You'll need to enter your username and password on the settings page.
+5.) Also configure the "Register Page Settings" to get the checkbox or list selection displayed on the user register page.
+6.) Alternatively configure the signup widget and display a dynamic sidebar (enable on the admin widgets page) or place the code below directly into your template and it will output the signup form wherever you like:
+
+<?php
+	$sbw = new constant_contact_api_widget();
+	$sbw->widget();
+?>
+
+You can include widget arguments if you need to, the code below shows how to use all arguments:
+
+<?php
+	$sbw = new constant_contact_api_widget();
+	$args = array(
+		'title' => 'My Signup Widget', 
+		'description' => 'My Signup Widget Description', 
+		'before_title' => '<h4>', 
+		'after_title' => '</h4>',
+		'before_widget' => '', 
+		'after_widget' => '',
+	);
+	$sbw->widget($args);
+?>
+
+
