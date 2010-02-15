@@ -1,5 +1,5 @@
 === Constant Contact API ===
-Contributors: justphp
+Contributors: jamesbenson
 Donate link: http://integrationservic.es/donate.php
 Tags: mail, email, newsletter, Constant Contact, API, REST
 Requires at least: 2.9
