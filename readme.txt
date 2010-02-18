@@ -3,7 +3,7 @@ Contributors: jamesbenson
 Donate link: http://integrationservic.es/donate.php
 Tags: mail, email, newsletter, Constant Contact, API, REST
 Requires at least: 2.9
-Tested up to: 2.9
+Tested up to: 2.9.2
 Stable tag: 1.0.0
 
 This plugin integrates the Constant Contact API into your wordpress blog.
