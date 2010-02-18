@@ -41,7 +41,6 @@ To install the plugin follow the steps below:
 	// place this anywhere in your theme and it will output a signup form
 	$sbw = new constant_contact_api_widget();
 	$sbw->widget();
-	
 	// optionaly set the following widget arguments
 	$args = array(
 		'title' => 'My Signup Widget', 
@@ -51,7 +50,6 @@ To install the plugin follow the steps below:
 		'before_widget' => '', 
 		'after_widget' => '',
 	);
-	
 	// call the widget like this when using arguments:
 	$sbw->widget($args);
 ?>`
