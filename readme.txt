@@ -4,7 +4,7 @@ Donate link: http://integrationservic.es/donate.php
 Tags: mail, email, newsletter, Constant Contact, API, REST
 Requires at least: 2.9
 Tested up to: 2.9
-Stable tag: trunk
+Stable tag: 1.0.0
 
 This plugin integrates the Constant Contact API into your wordpress blog.
 
@@ -21,8 +21,8 @@ The Constant Contact Wordpress plugin integrates features from the Constant Cont
     * Add a signup widget to your sidebar or anywhere in your template
     * Add extra fields to your signup form
     * Uses the REST API
-
-See http://integrationservic.es/constant-contact/wordpress-plugin.php
+	
+To obtain support please use the (http://wordpress.org/forums/ "wordpress forums").
 
 
 == Installation ==
@@ -32,8 +32,8 @@ To install the plugin follow the steps below:
 1. Upload `constant-contact-api` to the `/wp-content/plugins/` directory.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
 3. Click the new main menu item called "Constant Contact".
-4. You'll need to enter your username and password on the settings page.
-5. Also configure the "Register Page Settings" to get the checkbox or list selection displayed on the user register page.
+4. You'll need to enter your username and password on the settings page then save the page to see your contact lists.
+5. Now Configure the "Register Page Settings" to get the checkbox or list selection displayed on the user register page.
 6. Alternatively configure the signup widget and display a dynamic sidebar (enable on the admin widgets page) or place the code below directly into your template and it will output the signup form wherever you like:
 
 `<?php
@@ -55,4 +55,9 @@ You can include widget arguments if you need to, the code below shows how to use
 	);
 	$sbw->widget($args);
 ?>`
+
+
+== About ==
+The plugin is provided by (http://justphp.co.uk/ "James Benson").
+I also provide a (http://integrationservic.es/constant-contact/drupal-module.php "drupal module") and (http://integrationservic.es/constant-contact/php-developers-code.php "php developers code") for Constant Contact.
 
