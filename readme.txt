@@ -22,7 +22,7 @@ The Constant Contact Wordpress plugin integrates features from the Constant Cont
     * Add extra fields to your signup form
     * Uses the REST API
 	
-To obtain support please use the [wordpress forums](http://wordpress.org/forums/).
+To obtain support please be sure to use this link to the [wordpress forums](http://wordpress.org/tags/constant-contact-api).
 
 
 == Installation ==
