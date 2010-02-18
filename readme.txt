@@ -22,7 +22,7 @@ The Constant Contact Wordpress plugin integrates features from the Constant Cont
     * Add extra fields to your signup form
     * Uses the REST API
 	
-To obtain support please use the (http://wordpress.org/forums/ "wordpress forums").
+To obtain support please use the [wordpress forums](http://wordpress.org/forums/).
 
 
 == Installation ==
@@ -58,6 +58,7 @@ You can include widget arguments if you need to, the code below shows how to use
 
 
 == About ==
-The plugin is provided by (http://justphp.co.uk/ "James Benson").
-I also provide a (http://integrationservic.es/constant-contact/drupal-module.php "drupal module") and (http://integrationservic.es/constant-contact/php-developers-code.php "php developers code") for Constant Contact.
+The plugin is provided by [James Benson](http://justphp.co.uk/).
+
+I also provide a [drupal module](http://integrationservic.es/constant-contact/drupal-module.php) and [php developers code](http://integrationservic.es/constant-contact/php-developers-code.php) for Constant Contact.
 
