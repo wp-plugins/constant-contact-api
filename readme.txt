@@ -1,7 +1,7 @@
 === Constant Contact API ===
 Contributors: jamesbenson
 Donate link: http://integrationservic.es/donate.php
-Tags: mail, email, newsletter, Constant Contact, API, REST
+Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API
 Requires at least: 2.9
 Tested up to: 2.9.2
 Stable tag: 1.0.0
