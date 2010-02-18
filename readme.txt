@@ -22,7 +22,7 @@ The Constant Contact Wordpress plugin integrates features from the Constant Cont
     * Add extra fields to your signup form
     * Uses the REST API
 	
-To obtain support please be sure to use this link to the [wordpress forums](http://wordpress.org/tags/constant-contact-api).
+To obtain support please use this link to the [wordpress forums](http://wordpress.org/tags/constant-contact-api).
 
 
 == Installation ==
@@ -34,17 +34,15 @@ To install the plugin follow the steps below:
 3. Click the new main menu item called "Constant Contact".
 4. You'll need to enter your username and password on the settings page then save the page to see your contact lists.
 5. Now Configure the "Register Page Settings" to get the checkbox or list selection displayed on the user register page.
-6. Alternatively configure the signup widget and display a dynamic sidebar (enable on the admin widgets page) or place the code below directly into your template and it will output the signup form wherever you like:
+6. Alternatively configure the signup widget in the admin area, if widgets are not supported in your theme you'll have to place the code below into your theme:
+
 
 `<?php
+	// place this anywhere in your theme and it will output a signup form
 	$sbw = new constant_contact_api_widget();
 	$sbw->widget();
-?>`
-
-You can include widget arguments if you need to, the code below shows how to use all arguments:
-
-`<?php
-	$sbw = new constant_contact_api_widget();
+	
+	// optionaly set the following widget arguments
 	$args = array(
 		'title' => 'My Signup Widget', 
 		'description' => 'My Signup Widget Description', 
@@ -53,6 +51,8 @@ You can include widget arguments if you need to, the code below shows how to use
 		'before_widget' => '', 
 		'after_widget' => '',
 	);
+	
+	// call the widget like this when using arguments:
 	$sbw->widget($args);
 ?>`
 
