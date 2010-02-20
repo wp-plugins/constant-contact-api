@@ -4,7 +4,7 @@ Donate link: http://integrationservic.es/donate.php
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API
 Requires at least: 2.9
 Tested up to: 2.9.2
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 
 This plugin integrates the Constant Contact API into your wordpress blog.
 
@@ -38,20 +38,9 @@ To install the plugin follow the steps below:
 
 
 `<?php
-	// place this anywhere in your theme and it will output a signup form
+	// place this anywhere in your theme to output a signup form
 	$sbw = new constant_contact_api_widget();
 	$sbw->widget();
-	// optionaly set the following widget arguments
-	$args = array(
-		'title' => 'My Signup Widget', 
-		'description' => 'My Signup Widget Description', 
-		'before_title' => '<h4>', 
-		'after_title' => '</h4>',
-		'before_widget' => '', 
-		'after_widget' => '',
-	);
-	// call the widget like this when using arguments:
-	$sbw->widget($args);
 ?>`
 
 

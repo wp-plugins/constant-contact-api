@@ -1,4 +1,10 @@
 <?php
+/**
+ * Constant Contact PHP Class
+ *
+ * @package		wordpress
+ * @subackage	constant-contact-api
+ */
 // $Id$
 /**
  * @file
@@ -12,8 +18,8 @@ class cc {
 	var $http_user_agent = 'justphp 2.0';
 	
 	/**
-	 * The developers API key which is passed to the constructor
-	 * This is hardcoded as per instructions from CC staff
+	 * The developers API key which is associated with the application
+	 * PLEASE DO NOT CHANGE THIS API KEY
 	 */
 	var $api_key = '7cdd0bae-371d-4603-85f4-90be4757a7c7';
 	
@@ -237,6 +243,23 @@ class cc {
 	}
 	
 	/**
+	 * Shows the last request
+	 */
+	function request()
+	{
+		print_r($this->http_request);
+	}
+	
+	/**
+	 * Shows the last response
+	 */
+	function response()
+	{
+		print_r($this->http_response);
+	}
+	
+	
+	/**
 	 * Function which will do a print_r on whatever you pass it
 	 * Useful for viewing the raw output of various functions or the entire CC object
 	 *
@@ -270,7 +293,7 @@ class cc {
 	 *
 	 * @access 	public
 	 */
-	function get_all_lists($action = 'lists', $exclude = 3)
+	function get_all_lists($action = 'lists', $exclude = 3, $callback = '')
 	{
 		$lists = $this->get_lists($action, $exclude);
 		
@@ -278,11 +301,12 @@ class cc {
 			if(isset($this->list_meta_data->next_page)):
 				// grab all the other pages if they exist
 				while($this->list_meta_data->next_page != ''):
-					$lists = array_merge($lists, $this->get_lists($this->list_meta_data->next_page, 0));
+				$lists = array_merge($lists, $this->get_lists($this->list_meta_data->next_page, 0));
 				endwhile;
 			endif;
 			
-			usort($lists, array("cc", "sort_lists"));
+			$callback = ($callback) ? $callback : array("cc", "sort_lists");
+			usort($lists, $callback);
 			
 		endif;
 		
@@ -682,6 +706,7 @@ $xml_post .= '
     <Contact xmlns="http://ws.constantcontact.com/ns/1.0/" id="'.$url.'">
       <EmailAddress>'.$email.'</EmailAddress>
       <OptInSource>'.$this->action_type.'</OptInSource>
+	  <OptInTime>2009-11-19T14:48:41.761Z</OptInTime>
 ';
 		if($additional_fields):
 		foreach($additional_fields as $field => $value):
@@ -1427,7 +1452,7 @@ $xml_data .= '
 			$minute = $time_bits[1];
 			$second = $time_bits[2];
 			
-			return @mktime($hour,$minute,$second, $month, $day, $year);
+			return mktime($hour,$minute,$second, $month, $day, $year);
 		endif;
 		
 		return false;
@@ -1873,24 +1898,68 @@ $xml_data .= '
 			$port = 80;
 			$fsockurl = $the_host;
 		endif;
-		
-		// if no content-type heading variable is set we download the file instead
-		if($fp = fsockopen($fsockurl, $port, $errno, $errstr, $this->http_request_timeout)):
+
+		// if an error occurs we log that and break out of the function
+		if($fp = @fsockopen($fsockurl, $port, $errno, $errstr, $this->http_request_timeout)):
 			if(fwrite($fp, $request)):
-				while(!feof($fp)):
-					$this->http_response .= fread($fp, 4096);
+				$this->http_response = ''; 
+				while(($buf = fread( $fp, 8192 )) != ''):
+					$this->http_response .= $buf;
 				endwhile;
+			else:
+				$cc->last_error = "Failed to write to $fsockurl";
 			endif;
 			fclose($fp);
 		else:
+			$cc->last_error = "Failed to connect to $fsockurl $errstr ($errno)";
 			return false;
 		endif;
 		
 		$this->http_parse_response();
 	}
   
-  
-  
+	  
+    /**
+     * dechunk an http 'transfer-encoding: chunked' message
+     *
+     * @param string $chunk the encoded message
+     * @return string the decoded message.  If $chunk wasn't encoded properly it will be returned unmodified.
+     */
+    function http_chunked_decode($chunk) {
+        $pos = 0;
+        $len = strlen($chunk);
+        $dechunk = null;
+
+        while(($pos < $len)
+            && ($chunkLenHex = substr($chunk,$pos, ($newlineAt = strpos($chunk,"\n",$pos+1))-$pos)))
+        {
+            if (! $this->is_hex($chunkLenHex)) {
+                trigger_error('Value is not properly chunk encoded', E_USER_WARNING);
+                return $chunk;
+            }
+
+            $pos = $newlineAt + 1;
+            $chunkLen = hexdec(rtrim($chunkLenHex,"\r\n"));
+            $dechunk .= substr($chunk, $pos, $chunkLen);
+            $pos = strpos($chunk, "\n", $pos + $chunkLen) + 1;
+        }
+        return $dechunk;
+    }
+	
+    /**
+     * determine if a string can represent a number in hexadecimal
+     *
+     * @param string $hex
+     * @return boolean true if the string is a hex, otherwise false
+     */
+    function is_hex($hex) {
+        // regex is for weenies
+        $hex = strtolower(trim(ltrim($hex,"0")));
+        if (empty($hex)) { $hex = 0; };
+        $dec = hexdec($hex);
+        return ($hex == dechex($dec));
+    } 
+	
 	/**
 	 * This method calls other methods
 	 * It is mainly here so we can do everything in the correct order, according to HTTP spec
@@ -1905,7 +1974,6 @@ $xml_data .= '
 		$this->http_headers_add('Connection', "Close{$this->http_linebreak}");
 		$request = $this->http_headers_to_s($this->http_request_headers);
 		$this->http_request_headers = array();
-		
 		return $request;
 	}
 	
@@ -1916,19 +1984,47 @@ $xml_data .= '
 	 *
 	 * @access 	private
 	 */
-	function http_parse_response() {
-		$this->http_response = str_replace("\r\n", "\n", $this->http_response);
-		list($headers, $body) = explode("\n\n", $this->http_response, 2);
+	function http_parse_response()
+	{
+		list($headers, $body) = explode("\r\n\r\n", $this->http_response, 2);
+		$this->http_parse_headers($headers);
 		
-		$body_pos = strpos($body, "\n");
-		if(!is_null($this->http_content_type)):
-			$body = ($body_pos!==false) ? substr($body, $body_pos):$body; 
-			/* removes content-length value */
+		if(isset($this->http_response_headers['Transfer-Encoding']) && $this->http_response_headers['Transfer-Encoding'] == 'chunked'):
+    		$this->http_response_body = $this->http_chunked_decode($body);
+		else:
+			$this->http_response_body =  $body;
+		endif;
+			
+		$this->http_set_content_type($this->http_default_content_type);
+	}
+	
+	
+	/**
+	 * Parses the response headers and response code into a readable format
+	 *
+	 * @param	array	An associative array of headers to include in the HTTP request
+	 *
+	 * @access 	private
+	 */
+	function http_parse_headers($headers)
+	{
+		$replace = ($this->http_linebreak == "\n" ? "\r\n" : "\n");
+		$headers = str_replace($replace, $this->http_linebreak, trim($headers));
+		$headers = explode($this->http_linebreak, $headers);
+		$this->http_response_headers = array();
+		$this->http_response_code = 0;
+		
+		if(preg_match('/^HTTP\/\d\.\d (\d{3})/', $headers[0], $matches)):
+		  $this->http_response_code = intval($matches[1]);
+		  array_shift($headers);
 		endif;
 		
-		$this->http_response_body =  $body;
-		$this->http_parse_headers($headers);
-		$this->http_set_content_type($this->http_default_content_type);
+		if($headers):
+			foreach($headers as $string):
+			  list($header, $value) = explode(': ', $string, 2);
+			  $this->http_response_headers[trim($header)] = trim($value);
+			endforeach;
+		endif;
 	}
 	
 	
@@ -2008,31 +2104,6 @@ $xml_data .= '
 	}
 	
 	
-	/**
-	 * Parses the response headers and response code into a readable format
-	 *
-	 * @param	array	An associative array of headers to include in the HTTP request
-	 *
-	 * @access 	private
-	 */
-	function http_parse_headers($headers) {
-		$replace = ($this->http_linebreak == "\n" ? "\r\n" : "\n");
-		$headers = str_replace($replace, $this->http_linebreak, trim($headers));
-		$headers = explode($this->http_linebreak, $headers);
-		$this->http_response_headers = array();
-		if (preg_match('/^HTTP\/\d\.\d (\d{3})/', $headers[0], $matches)) {
-		  $this->http_response_code = intval($matches[1]);
-		  array_shift($headers);
-		}
-		if($headers):
-			foreach ($headers as $string) {
-			  list($header, $value) = explode(': ', $string, 2);
-			  $this->http_response_headers[$header] = $value;
-			}
-		endif;
-	}
-	
-	
 	
 	/**
 	 * Returns a friendly error message for the given HTTP status error code
@@ -2050,13 +2121,10 @@ $xml_data .= '
 		401 => 'Unauthorized - This is an authentication problem. Primary reason is that the API call has either not provided a valid API Key, Account Owner Name and Associated Password or the API call attempted to access a resource (URI) which does not match the same as the Account Owner provided in the login credientials.',
 		404 => 'URL Not Found - The URI which was provided was incorrect. Compare the URI you provided with the documented URIs. Start here.',
 		409 => 'Conflict - There is a problem with the action you are trying to perform. Commonly, you are trying to "Create" (POST) a resource which already exists such as a Contact List or Email Address that already exists. In general, if a resource already exists, an application can "Update" the resource with a "PUT" request for that resource.',
-		415 => 'Unsupported Media Type - The Media Type (Content Type) of the data you are sending does not match the expected Content Type for the specific action you are performing on the specific Resource you are acting on. Often this is due to an error in the content-type you define for your HTTP invocation (GET, PUT, POST). You will also get this error message if you are invoking a method (PUT, POST, DELETE) which is not supported for the Resource (URI) you are referencing.
-		To understand which methods are supported for each resource, and which content-type is expected, see the documentation for that Resource.',
-		500  => 'Server Error',
 		);
 		
-		if(array_key_exists($error, $errors)):
-			return $errors[$error];
+		if(array_key_exists($code, $errors)):
+			return $errors[$code];
 		endif;
 		
 		return '';
