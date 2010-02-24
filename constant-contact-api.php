@@ -4,7 +4,7 @@ Plugin Name: Constant Contact API
 Plugin URI: http://integrationservic.es/constant-contact/wordpress-plugin.php
 Description: Integrates the <a href="http://bit.ly/cctrial" target="_blank">Constant Contact API</a> into your wordpress blog.
 Author: James Benson
-Version: 1.0.5
+Version: 1.0.6
 Author URI: http://justphp.co.uk/
 */
 

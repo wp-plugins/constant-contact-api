@@ -4,7 +4,7 @@ Donate link: http://integrationservic.es/donate.php
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API
 Requires at least: 2.9
 Tested up to: 2.9
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 
 This plugin integrates the Constant Contact API into your wordpress blog.
 
@@ -28,6 +28,9 @@ Below are the main features provided in the plugin:
 	
 To obtain support please use this link to the [wordpress forums](http://wordpress.org/tags/constant-contact-api).
 
+If you use the plugin and find it useful please make sure to come back and vote so other users know it works and we get better placement in the wordpress.org search pages.
+
+
 == Installation ==
 
 To install the plugin follow the steps below:
@@ -43,10 +46,16 @@ To install the plugin follow the steps below:
 
 == Changelog ==
 
+= 0.0.6 =
+* No code changes have been made in this release
+
 = 0.0.5 =
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
+
+= 0.0.6 =
+This version simply updates the readme.txt file so the project description page is more useful.
 
 = 0.0.5 =
 This version fixes a major bug and all users should upgrade immediately.
