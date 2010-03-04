@@ -258,35 +258,6 @@ class cc {
 		$this->action_type = (strtolower($action_type)=='customer') ? 'ACTION_BY_CUSTOMER' : 'ACTION_BY_CONTACT';
 	}
 	
-	
-	/**
-	 * Loads a specific URL, this method is used by the user friendly methods
-	 *
-	 */
-	function load_url($action = '', $method = 'get', $params=array(), $expected_http_code = 200)
-	{
-		$method = "http_{$method}";
-		
-		if(!method_exists($this, $method)):
-			$this->last_error = "$method method does not exist";
-			return false;
-		endif;
-		
-		$this->$method($this->api_url . $action, $params);
-		
-		// handle status codes
-		if(intval($expected_http_code) === $this->http_response_code):
-			if($this->http_content_type):
-				return $this->xml_to_array($this->http_response_body);
-			else:
-				return $this->http_response_body; /* downloads the file */
-			endif;
-		else:
-			$this->last_error  = "Invalid status code {$this->http_response_code}"; 
-			return false;
-		endif;
-	}
-	
 	/**
 	 * This method does a print_r on the http_request and http_response variables
 	 * Useful for debugging the HTTP request
@@ -304,15 +275,17 @@ class cc {
 	 *
 	 * @access 	public
 	 */
-	function request()
+	function show_request()
 	{
 		print_r($this->http_request);
 	}
 	
 	/**
 	 * Shows the last response
+	 *
+	 * @access 	public
 	 */
-	function response()
+	function show_response()
 	{
 		print_r($this->http_response);
 	}
@@ -355,7 +328,7 @@ class cc {
 	function get_all_lists($action = 'lists', $exclude = 3, $callback = '')
 	{
 		$lists = $this->get_lists($action, $exclude);
-		
+			
 		if(count($lists) > 0):
 			if(isset($this->list_meta_data->next_page)):
 				// grab all the other pages if they exist
@@ -365,7 +338,9 @@ class cc {
 			endif;
 			
 			$callback = ($callback) ? $callback : array("cc", "sort_lists");
-			usort($lists, $callback);
+			if(is_array($lists)):
+				usort($lists, $callback);
+			endif;
 			
 		endif;
 		
@@ -1956,7 +1931,8 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
      * @param string $chunk the encoded message
      * @return string the decoded message.  If $chunk wasn't encoded properly it will be returned unmodified.
      */
-    function http_chunked_decode($chunk) {
+    function http_chunked_decode($chunk)
+	{
         $pos = 0;
         $len = strlen($chunk);
         $dechunk = null;
@@ -1965,7 +1941,7 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
             && ($chunkLenHex = substr($chunk,$pos, ($newlineAt = strpos($chunk,"\n",$pos+1))-$pos)))
         {
             if (! $this->is_hex($chunkLenHex)) {
-                trigger_error('Value is not properly chunk encoded', E_USER_WARNING);
+                trigger_error('Data is not properly chunk encoded', E_USER_ERROR);
                 return $chunk;
             }
 
@@ -2021,7 +1997,7 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
 		list($headers, $body) = explode("\r\n\r\n", $this->http_response, 2);
 		$this->http_parse_headers($headers);
 		
-		if(isset($this->http_response_headers['Transfer-Encoding']) && $this->http_response_headers['Transfer-Encoding'] == 'chunked'):
+		if(isset($this->http_response_headers['Transfer-Encoding']) && 'chunked' == $this->http_response_headers['Transfer-Encoding']):
     		$this->http_response_body = $this->http_chunked_decode($body);
 		else:
 			$this->http_response_body =  $body;
@@ -2127,7 +2103,7 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
 		if($headers):
 			foreach ($headers as $string) {
 			  list($header, $value) = explode(': ', $string, 2);
-			  $this->http_response_headers[$header] = $value;
+			  $this->http_response_headers[$header] = trim($value);
 			}
 		endif;
 	}
