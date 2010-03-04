@@ -14,6 +14,8 @@ class cc {
 	
 	/**
 	 * The user-agent header to send with all API requests
+	 *
+	 * @access 	public
 	 */
 	var $http_user_agent = 'justphp 2.0';
 	
@@ -24,34 +26,46 @@ class cc {
 	var $api_key = '7cdd0bae-371d-4603-85f4-90be4757a7c7';
 	
 	/**
-	 * The API username which is passed to the constructor
+	 * The API username which is passed to the constructor, always required
+	 *
+	 * @access 	public
 	 */
 	var $api_username = '';
 	
 	/**
-	 * The API password which is passed to the constructor
+	 * The API password which is passed to the constructor, always required
+	 *
+	 * @access 	public
 	 */
 	var $api_password = '';
 	
 	/**
 	 * The URL to use for all API calls, DO NOT INCLUDE A TRAILING SLASH!
+	 *
+	 * @access 	public
 	 */
 	var $api_url = 'https://api.constantcontact.com';
 	
 	/**
 	 * This will be constructed automatically, same as above without the full URL
+	 *
+	 * @access 	protected
 	 */
 	var $api_uri = '';
 	
 	/**
 	 * The last error message, can be used to provide a descriptive error if something goes wrong
+	 *
+	 * @access 	public
 	 */
 	var $last_error = '';
 	
 	/**
 	 * The action type used for API calls, action by customer or contact, important!
+	 * If you abuse this setting it violates the terms of the API
+	 * Do not edit this property directly, instead use the @see set_action_type() method
 	 *
-	 * @access 	public
+	 * @access 	protected
 	 */
 	var $action_type = 'ACTION_BY_CUSTOMER';
 	
@@ -71,86 +85,128 @@ class cc {
 	
 	/**
 	 * The HTTP host used for the API
+	 * This will be just the hostname of the API
+	 *
+	 * @access protected
 	 */
 	var $http_host;
 	
 	/**
 	 * The HTTP port used for the API
+	 * This will be port 443 if using HTTPS or 80 is using HTTP
+	 *
+	 * @access protected
 	 */
 	var $http_port;
 	
 	/**
-	 * The results from a call to the PHP function parse_url()
+	 * The results from a call to the PHP function @see parse_url()
+	 * Contains an array of all the URL bits parsed by @see parse_url()
+	 *
+	 * @access protected
 	 */
 	var $http_url_bits;
 	
 	/**
 	 * HTTP request timeout in seconds
+	 * This can be changed to any number you want
+	 *
+	 * @access public
 	 */
 	var $http_request_timeout = 120;
 	
 	/**
 	 * Username used for HTTP authentication
+	 * It contains the string used to authenticate
+	 * This will be built automatically from the API key and username
+	 *
+	 * @access protected
 	 */
 	var $http_user;
 	
 	/**
 	 * Password used for HTTP authentication
+	 *
+	 * @access protected
 	 */
 	var $http_pass;
 	
 	/**
 	 * The Content-Type header to use for all HTTP requests
+	 * Do not edit this directly instead use the @see set_content_type() method
+	 *
+	 * @access protected
 	 */
 	var $http_content_type;
 	
 	/**
 	 * The default Content-Type header to use for all HTTP requests
+	 * If no Content-Type header is set this is the default
+	 *
+	 * @access protected
 	 */
 	var $http_default_content_type = 'text/html';
 	
 	/**
 	 * The HTTP response code of the last HTTP request
+	 *
+	 * @access protected
 	 */
 	var $http_response_code;
 	
 	/**
 	 * The full HTTP response of the last HTTP request
+	 *
+	 * @access protected
 	 */
 	var $http_response;
 	
 	/**
 	 * The HTTP response body of the last HTTP request
+	 *
+	 * @access protected
 	 */
 	var $http_response_body;
 	
 	/**
 	 * The full HTTP request body of the last HTTP request
+	 *
+	 * @access protected
 	 */
 	var $http_request;
 	
 	/**
 	 * The method to use for the HTTP request
+	 *
+	 * @access protected
 	 */
 	var $http_method;
 	
 	/**
 	 * The line break used to separate HTTP headers
+	 *
+	 * @access public
 	 */
 	var $http_linebreak = "\r\n";
 	
 	/**
-	 * The HTTP requests headers
+	 * The HTTP requests headers, use @see http_headers_add() to add individual headers
+	 *
+	 * @access protected
 	 */
 	var $http_request_headers = array();
 	
 	/**
 	 * The HTTP response headers
+	 *
+	 * @access protected
 	 */
 	var $http_response_headers = array();
 	
 	/**
 	 * A list of encodings we support for the XML file
+	 *
+	 * @access public
 	 */
 	var $xml_known_encodings = array('UTF-8', 'US-ASCII', 'ISO-8859-1');
 	
@@ -160,7 +216,8 @@ class cc {
 	 * Constructor method
 	 * Sets default params
 	 * Constructs the correct API URL
-	 * Sets variables for the http_ methods
+	 * Sets variables for the http_* methods
+	 * If you want to change the APi key use the @see set_api_key() method
 	 *
 	 * @param string 	The username for your Constant Contact account
 	 * @param string 	The password for your Constant Contact account
@@ -244,6 +301,8 @@ class cc {
 	
 	/**
 	 * Shows the last request
+	 *
+	 * @access 	public
 	 */
 	function request()
 	{
@@ -260,15 +319,15 @@ class cc {
 	
 	
 	/**
-	 * Function which will do a print_r on whatever you pass it
-	 * Useful for viewing the raw output of various functions or the entire CC object
-	 *
+	 * This sets the API key to the given string
+	 * You do not need to use this method unless your bundling the code into your own application
+	 * If your application will be used by multiple users please create your own API key and call this
 	 *
 	 * @access 	public
 	 */
-	function output($content)
+	function set_api_key($api_key)
 	{
-		print_r($content);
+		$this->api_key = $api_key;
 	}
 	
 	
@@ -556,7 +615,7 @@ class cc {
 	
 	
 	/**
-	 * 
+	 * This returns the HTTP URL for the API
 	 *
 	 * @access 	private
 	 */
@@ -984,7 +1043,6 @@ $xml_data .= '
 	 *
 	 *
 	 * @param	array	An array of contact list ID's to clear of contacts
-	 *
 	 * @access 	public
 	 */
 	function clear_contacts($lists)
@@ -1012,6 +1070,8 @@ $xml_data .= '
 	
 	/**
 	 * Returns a list of the columns used in the export file
+	 *
+	 * @access 	public
 	 */
 	function get_export_file_columns()
 	{
@@ -1034,7 +1094,13 @@ $xml_data .= '
 			'SUB POSTAL CODE',
 		);
 		
-		return array_combine(array_values($columns), array_values($columns));
+		$new = array();
+		
+		foreach($columns as $column):
+			$new[$column] = $column;
+		endforeach;
+		
+		return $new;
 	}
 	
 	
@@ -1081,7 +1147,7 @@ $xml_data .= '
 	 * Pass this method an associative array of contact details
 	 * Alternatively you can give the path to a local or remote file
 	 * The file should be text or CSV format:
-	 * @see http://constantcontact.custhelp.com/cgi-bin/constantcontact.cfg/php/enduser/std_adp.php?p_faqid=2523
+	 * @link http://constantcontact.custhelp.com/cgi-bin/constantcontact.cfg/php/enduser/std_adp.php?p_faqid=2523
 	 * 
 	 *
 	 * @param	mixed	This can be an array or a path to a file
@@ -1227,82 +1293,37 @@ $xml_data .= '
 	 *
 	 * @access 	public
 	 */
-	function create_campaign($title, $email_subject, $email_html, $email_text, $contact_lists = array(),$options = array(), $content_type = 'HTML')
+	function create_campaign($title, $contact_lists = array(), $options = array())
 	{
-		$dynamic_fields = array(
-			'GreetingSalutation',
-			'GreetingName',
-			'GreetingString',
-			'OrganizationName',
-			'OrganizationAddress1',
-			'OrganizationAddress2',
-			'OrganizationAddress3',
-			'OrganizationCity',
-			'OrganizationInternationalState',
-			'OrganizationCountry',
-			'OrganizationPostalCode',
-			'StyleSheet',
-		);
-	  
-		// build the XML post data
-		$xml_post = '
-<?xml version="1.0" encoding="UTF-8"?>
+		$email = (isset($options['EmailAddress'])) ? $options['EmailAddress'] : '';
+		unset($options['EmailAddress']);
+		
+		$xml_post = '<?xml version="1.0" encoding="UTF-8"?>
 <entry xmlns="http://www.w3.org/2005/Atom">
-  <link href="/ws/customers/'.$this->api_username.'/campaigns" />
+  <link href="/ws/customers/'.$this->api_username.'/campaigns" rel="edit" />
   <id>'.$this->get_http_api_url().'campaigns</id>
   <title type="text">'.$title.'</title>
-  <updated>2009-10-28T14:11:40.881Z</updated>
-  <author/>
+  <updated>2009-10-19T18:34:53.105Z</updated>
+  <author>
+    <name>Constant Contact</name>
+  </author>
   <content type="application/vnd.ctct+xml">
-    <Campaign xmlns="http://ws.constantcontact.com/ns/1.0/" id="'.$this->get_http_api_url().'campaigns">
+    <Campaign xmlns="http://ws.constantcontact.com/ns/1.0/"
+id="'.$this->get_http_api_url().'campaigns/1100546096289">
       <Name>'.$title.'</Name>
       <Status>Draft</Status>
-      <Date>2009-10-28T14:11:40.881Z</Date>
-      <Subject>'.$email_subject.'</Subject>
-	  ';
-	  
-		if(isset($options['ViewAsWebpage'])):
-			$xml_post .= '
-			<ViewAsWebpage>YES</ViewAsWebpage>
-			<ViewAsWebpageLinkText>'.$options['ViewAsWebpageLinkText'].'</ViewAsWebpageLinkText>
-			<ViewAsWebpageText>'.$options['ViewAsWebpageLinkText'].'</ViewAsWebpageText>
-			';
-		endif;
-	  
-		if(isset($options['PermissionReminder'])):
-			$xml_post .= '
-			<PermissionReminder>YES</PermissionReminder>
-			<PermissionReminderText>'.$options['PermissionReminderText'].'</PermissionReminderText>
-			';
+      <Date>2009-10-19T18:34:53.105Z</Date>
+';
+		if(!is_array($options)):
+			trigger_error('Third argument to create_campaign() should be an array', E_USER_ERROR);
 		endif;
 		
-		if(isset($options['IncludeForwardEmail'])):
-			$xml_post .= '
-			<IncludeForwardEmail>YES</IncludeForwardEmail>
-			<ForwardEmailLinkText>'.$options['ForwardEmailLinkText'].'</ForwardEmailLinkText>
-			';
-		endif;
-		
-		if(isset($options['IncludeSubscribeLink'])):
-			$xml_post .= '
-			<IncludeSubscribeLink>YES</IncludeSubscribeLink>
-			<SubscribeLinkText>'.$options['SubscribeLinkText'].'</SubscribeLinkText>
-			';
-		endif;
-		
-		foreach($dynamic_fields as $field):
-		if(isset($options[$field])):
-			$xml_post .= "<$field>{$options[$field]}</$field>";
+		foreach($options as $fieldname => $fieldvalue):
+		if(isset($options[$fieldname])):
+			$xml_post .= "<$fieldname>$fieldvalue</$fieldname>\n";
 		endif;
 		endforeach;
-	  
-		$xml_post .= '
-			<EmailContentFormat>'.$content_type.'</EmailContentFormat>
-			<EmailContent>'.htmlentities($email_html).'</EmailContent>
-			<EmailTextContent>'.htmlentities($email_text).'</EmailTextContent>
-		';
-	  
-	  
+		
 		if(is_array($contact_lists)):
 			$xml_post  .= '<ContactLists>';
 			foreach($contact_lists as $id):
@@ -1314,32 +1335,48 @@ $xml_data .= '
 			endforeach;
 			$xml_post .= '</ContactLists>';
 		endif;
-	  
-		if(isset($options['FromName'])):
-			$xml_post .= '<FromName>'.$options['FromName'].'</FromName>';
-		endif;
 		
-		if(isset($options['EmailAddress'], $options['EmailID'])):
+		if($email):
+			$email = $this->get_emails($email);
+			
+			if(!isset($email['id'])):
+				$this->last_error = 'Invalid Email Address, the email address must exist in your constant contact account to be able to send an email from this address';
+				return false;
+			endif;
+			
 			$xml_post .= '
 			<FromEmail>
-			<Email id="'.$this->get_http_api_url().'settings/emailaddresses/'.$options['EmailID'].'">
-			<link xmlns="http://www.w3.org/2005/Atom" href="'.$this->api_uri.'settings/emailaddresses/'.$options['EmailID'].'" rel="self" />
+			<Email id="'.$this->get_http_api_url().'settings/emailaddresses/'.$email['id'].'">
+			<link xmlns="http://www.w3.org/2005/Atom" href="'.$this->api_uri.'settings/emailaddresses/'.$email['id'].'" rel="self" />
 			</Email>
-			<EmailAddress>'.$options['EmailAddress'].'</EmailAddress>
+			<EmailAddress>'.$email['EmailAddress'].'</EmailAddress>
 			</FromEmail>
 			<ReplyToEmail>
-			<Email id="'.$this->get_http_api_url().'settings/emailaddresses/'.$options['EmailID'].'">
-			<link xmlns="http://www.w3.org/2005/Atom" href="'.$this->api_uri.'settings/emailaddresses/'.$options['EmailID'].'" rel="self" />
+			<Email id="'.$this->get_http_api_url().'settings/emailaddresses/'.$email['id'].'">
+			<link xmlns="http://www.w3.org/2005/Atom" href="'.$this->api_uri.'settings/emailaddresses/'.$email['id'].'" rel="self" />
 			</Email>
-			<EmailAddress>'.$options['EmailAddress'].'</EmailAddress>
+			<EmailAddress>'.$email['EmailAddress'].'</EmailAddress>
 			</ReplyToEmail>
 			';
 		endif;
-	  
-		$xml_post .= '</Campaign></content></entry>';
+
+		$xml_post .= '
+	</Campaign>
+	</content>
+	<source>
+		<id>'.$this->get_http_api_url().'campaigns</id>
+		<title type="text">Campaigns for customer: '.$this->api_username.'</title>
+		<link href="campaigns" />
+		<link href="campaigns" rel="self" />
+		<author>
+			<name>'.$this->api_username.'</name>
+		</author>
+		<updated>2009-10-19T19:36:12.622Z</updated>
+	</source>
+</entry>';
+		
 		
 		$this->http_set_content_type('application/atom+xml');
-		
 		$xml = $this->load_url("campaigns", 'post', $xml_post, 201);
 		
 		if(isset($this->http_response_headers['Location']) && trim($this->http_response_headers['Location']) != ''):
@@ -1394,12 +1431,12 @@ $xml_data .= '
 	
 	
 	/**
-	 * Gets all account email addresses
+	 * Gets all account email addresses or a single email
 	 * These are used with the campaigns collection
 	 *
 	 * @access 	public
 	 */
-	function get_emails()
+	function get_emails($return_email = '')
 	{
 		$xml = $this->load_url("settings/emailaddresses");
 		
@@ -1417,6 +1454,12 @@ $xml_data .= '
 					$id = $this->get_id_from_link($v['link_attr']['href']);
 					$email = $v['content']['Email'];
 					$email['id'] = $id;
+					
+					if($return_email && $return_email == $v['content']['Email']['EmailAddress']):
+						// return single email
+						return $email;
+					endif;
+					
 					$emails[] = $email;
 				endforeach;
 			else:
@@ -1424,6 +1467,11 @@ $xml_data .= '
 				$email = $_emails['content']['Email'];
 				$email['id'] = $id;
 				$emails[] = $email;
+				
+				if($return_email && $return_email == $_emails['content']['Email']['EmailAddress']):
+					// return single email
+					return $email;
+				endif;
 			endif;
 			
 		endif;
@@ -1483,7 +1531,8 @@ $xml_data .= '
 		if(!$contents) return array();
 	
 		if(!function_exists('xml_parser_create')) {
-			$this->last_error = 'XML not supported';
+			trigger_error("XML not supported: " .
+                          "http://www.php.net/manual/en/ref.xml.php", E_USER_ERROR);
 			return array();
 		}
 		$output_encoding = 'ISO-8859-1';
@@ -1494,9 +1543,10 @@ $xml_data .= '
                 $output_encoding, $input_encoding, $detect_encoding);
         
         
-        if (!is_resource($parser)) {
-            exit( "Failed to create an instance of PHP's XML parser. " .
-                          "http://www.php.net/manual/en/ref.xml.php");
+        if (!is_resource($parser))
+		{
+			trigger_error("Failed to create an instance of PHP's XML parser. " .
+                          "http://www.php.net/manual/en/ref.xml.php", E_USER_ERROR);
         }
 			
 		xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
@@ -1665,7 +1715,7 @@ $xml_data .= '
      * and dangerous to know.
      *
      * The following code is based on SJM's work with FoF
-     * @see http://minutillo.com/steve/weblog/2004/6/17/php-xml-and-character-encodings-a-tale-of-sadness-rage-and-data-loss
+     * @link http://minutillo.com/steve/weblog/2004/6/17/php-xml-and-character-encodings-a-tale-of-sadness-rage-and-data-loss
      * if passed an empty string as the encoding. 
 	 *
 	 * @access 	private
@@ -1693,8 +1743,7 @@ $xml_data .= '
         
         // attempt to use the iconv extension to
         // cast the XML to a known encoding
-        // @see http://php.net/iconv
-       
+        // @link http://php.net/iconv
         if (function_exists('iconv'))  {
             $encoded_source = iconv($in_enc,'UTF-8', $source);
             if ($encoded_source) {
@@ -1703,7 +1752,7 @@ $xml_data .= '
         }
         
         // iconv didn't work, try mb_convert_encoding
-        // @see http://php.net/mbstring
+        // @link http://php.net/mbstring
         if(function_exists('mb_convert_encoding')) {
             $encoded_source = mb_convert_encoding($source, 'UTF-8', $in_enc );
             if ($encoded_source) {
@@ -1712,10 +1761,8 @@ $xml_data .= '
         }
         
         // else 
-        exit("Feed is in an unsupported character encoding. ($in_enc) " .
-                     "You may see strange artifacts, and mangled characters.");
-            
-        return array(xml_parser_create(), $source);
+        trigger_error("Feed is in an unsupported character encoding. ($in_enc) " .
+                     "You may see strange artifacts, and mangled characters.", E_USER_ERROR);
     }
     
 	/**
@@ -1737,6 +1784,30 @@ $xml_data .= '
 	
 	
 	/**
+	 * Loads a specific URL, this method is used by the user friendly methods
+	 *
+	 */
+	function load_url($action = '', $method = 'get', $params = array(), $expected_http_code = 200)
+	{
+		$this->http_send($this->api_url . $action, $method, $params);
+		
+		// handle status codes
+		if(intval($expected_http_code) === $this->http_response_code):
+			if($this->http_content_type):
+				return $this->xml_to_array($this->http_response_body);
+			else:
+				return $this->http_response_body; /* downloads the file */
+			endif;
+		else:
+			$this->last_error  = "Invalid status code {$this->http_response_code}";
+			
+			// if their was an error sometimes the body contains useful info 
+			return false;
+		endif;
+	}
+	
+	
+	/**
 	 * All methods below are prefixed with http_
 	 * These are all used to communicate with the CC server over HTTPS
 	 *
@@ -1754,53 +1825,13 @@ $xml_data .= '
 	}
   
 	/**
-	 * Simple method which calls PHP's parse_url function and saves the result to a variable
+	 * Simple method which calls PHP's @see parse_url function and saves the result to a variable
 	 *
 	 *
 	 * @access 	private
 	 */
 	function http_parse_request_url($url) {
 		$this->http_url_bits = parse_url($url);
-	}
-	
-	/**
-	 * Performs a HTTP GET
-	 *
-	 *
-	 * @access 	private
-	 */
-	function http_get($path, $params = array(), $headers = array()) {
-		$this->http_send($path, 'get', $params, $headers);
-	}
-  
-	/**
-	 * Performs a HTTP POST
-	 *
-	 *
-	 * @access 	private
-	 */
-	function http_post($path, $params = array(), $headers = array()) {
-		$this->http_send($path, 'post', $params, $headers);
-	}
-  
-	/**
-	 * Performs a HTTP PUT
-	 *
-	 *
-	 * @access 	private
-	 */
-	function http_put($path, $params = array(), $headers = array()) {
-		$this->http_send($path, 'put', $params, $headers);
-	}
-	
-	/**
-	 * Performs a HTTP DELETE
-	 *
-	 *
-	 * @access 	private
-	 */
-	function http_delete($path, $params = array(), $headers = array()) {
-		$this->http_send($path, 'delete', $params, $headers);
 	}
 	
 	
@@ -1907,11 +1938,11 @@ $xml_data .= '
 					$this->http_response .= $buf;
 				endwhile;
 			else:
-				$cc->last_error = "Failed to write to $fsockurl";
+				$this->last_error = "Failed to write to $fsockurl";
 			endif;
 			fclose($fp);
 		else:
-			$cc->last_error = "Failed to connect to $fsockurl $errstr ($errno)";
+			$this->last_error = "Failed to connect to $fsockurl $errstr ($errno)";
 			return false;
 		endif;
 		
@@ -1974,6 +2005,7 @@ $xml_data .= '
 		$this->http_headers_add('Connection', "Close{$this->http_linebreak}");
 		$request = $this->http_headers_to_s($this->http_request_headers);
 		$this->http_request_headers = array();
+		
 		return $request;
 	}
 	
@@ -1996,35 +2028,6 @@ $xml_data .= '
 		endif;
 			
 		$this->http_set_content_type($this->http_default_content_type);
-	}
-	
-	
-	/**
-	 * Parses the response headers and response code into a readable format
-	 *
-	 * @param	array	An associative array of headers to include in the HTTP request
-	 *
-	 * @access 	private
-	 */
-	function http_parse_headers($headers)
-	{
-		$replace = ($this->http_linebreak == "\n" ? "\r\n" : "\n");
-		$headers = str_replace($replace, $this->http_linebreak, trim($headers));
-		$headers = explode($this->http_linebreak, $headers);
-		$this->http_response_headers = array();
-		$this->http_response_code = 0;
-		
-		if(preg_match('/^HTTP\/\d\.\d (\d{3})/', $headers[0], $matches)):
-		  $this->http_response_code = intval($matches[1]);
-		  array_shift($headers);
-		endif;
-		
-		if($headers):
-			foreach($headers as $string):
-			  list($header, $value) = explode(': ', $string, 2);
-			  $this->http_response_headers[trim($header)] = trim($value);
-			endforeach;
-		endif;
 	}
 	
 	
@@ -2052,7 +2055,7 @@ $xml_data .= '
 	
 	
 	/**
-	 * This method allows us to add a specific header to the http_request_headers array
+	 * This method allows us to add a specific header to the @see $http_request_headers array
 	 *
 	 * @param	string		The name of the header to add
 	 * @param	string		The value of the header to add
@@ -2069,7 +2072,7 @@ $xml_data .= '
 	
 	
 	/**
-	 * This merges the given array with the http_request_headers array
+	 * This merges the given array with the @see $http_request_headers array
 	 *
 	 * @param	array		The associative array of headers to merge
 	 *
@@ -2080,8 +2083,9 @@ $xml_data .= '
 	}
 	  
 	  
+	
 	/**
-	 * This gets a specific request header from the http_request_headers array
+	 * This gets a specific request header from the @see $http_request_headers array
 	 *
 	 * @param	string		The name of the header to retrieve
 	 *
@@ -2104,6 +2108,31 @@ $xml_data .= '
 	}
 	
 	
+	/**
+	 * Parses the response headers and response code into a readable format
+	 *
+	 * @param	array	An associative array of headers to include in the HTTP request
+	 *
+	 * @access 	private
+	 */
+	function http_parse_headers($headers) {
+		$replace = ($this->http_linebreak == "\n" ? "\r\n" : "\n");
+		$headers = str_replace($replace, $this->http_linebreak, trim($headers));
+		$headers = explode($this->http_linebreak, $headers);
+		$this->http_response_headers = array();
+		if (preg_match('/^HTTP\/\d\.\d (\d{3})/', $headers[0], $matches)) {
+		  $this->http_response_code = intval($matches[1]);
+		  array_shift($headers);
+		}
+		if($headers):
+			foreach ($headers as $string) {
+			  list($header, $value) = explode(': ', $string, 2);
+			  $this->http_response_headers[$header] = $value;
+			}
+		endif;
+	}
+	
+	
 	
 	/**
 	 * Returns a friendly error message for the given HTTP status error code
@@ -2121,6 +2150,9 @@ $xml_data .= '
 		401 => 'Unauthorized - This is an authentication problem. Primary reason is that the API call has either not provided a valid API Key, Account Owner Name and Associated Password or the API call attempted to access a resource (URI) which does not match the same as the Account Owner provided in the login credientials.',
 		404 => 'URL Not Found - The URI which was provided was incorrect. Compare the URI you provided with the documented URIs. Start here.',
 		409 => 'Conflict - There is a problem with the action you are trying to perform. Commonly, you are trying to "Create" (POST) a resource which already exists such as a Contact List or Email Address that already exists. In general, if a resource already exists, an application can "Update" the resource with a "PUT" request for that resource.',
+		415 => 'Unsupported Media Type - The Media Type (Content Type) of the data you are sending does not match the expected Content Type for the specific action you are performing on the specific Resource you are acting on. Often this is due to an error in the content-type you define for your HTTP invocation (GET, PUT, POST). You will also get this error message if you are invoking a method (PUT, POST, DELETE) which is not supported for the Resource (URI) you are referencing.
+		To understand which methods are supported for each resource, and which content-type is expected, see the documentation for that Resource.',
+		500  => 'Server Error',
 		);
 		
 		if(array_key_exists($code, $errors)):
