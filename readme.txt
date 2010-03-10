@@ -1,5 +1,5 @@
-=== Constant Contact API ===
-Contributors: jamesbenson
+=== Constant Contact for Wordpress ===
+Contributors: jamesbenson, katzwebdesign
 Donate link: http://integrationservic.es/donate.php
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API
 Requires at least: 2.9
@@ -9,6 +9,8 @@ Stable tag: 1.0.8
 This plugin integrates the Constant Contact API into your wordpress blog.
 
 == Description ==
+
+__This plugin requires a <a href="http://bit.ly/cctrial" title="Sign up for Constant Contact" rel="nofollow">Constant Contact account</a>.__
 
 The Constant Contact Wordpress plugin integrates features from the Constant Contact REST API into your wordpress blog, it's the only plugin you need if you use the constantcontact.com service and wordpress.
 
