@@ -27,7 +27,7 @@ Below are the main features provided in the plugin:
 * Add a signup widget to your sidebar or anywhere in your template
 * Add extra fields to your signup form
 * Uses the REST API
-	
+
 To obtain support please use this link to the [wordpress forums](http://wordpress.org/tags/constant-contact-api).
 
 If you use the plugin and find it useful please make sure to come back and vote so other users know it works and we get better placement in the wordpress.org search pages.
@@ -45,6 +45,9 @@ To install the plugin follow the steps below:
 6. Alternatively configure the signup widget in the admin area, if widgets are not supported in your theme you'll have to place the code below somewhere into one of your PHP theme files:
 
 `<?php $sbw = new constant_contact_api_widget(); $sbw->widget(); ?>`
+
+Optionally, If you want to change the default plugin options you can you edit the config.php file before installing, this is not required because all the options are editable via the wp admin interface but doing so means you can install the plugin with your preferred settings or provide the plugin to clients using a default set of options.
+
 
 == Changelog ==
 
@@ -71,5 +74,5 @@ This version fixes a major bug and all users should upgrade immediately.
 
 == License ==
 
-Good news, this plugin is free for everyone! 
+Good news, this plugin is free for everyone!
 It's [licensed under the GPL](http://www.gnu.org/licenses/gpl-3.0.txt "View the GPL License").
