@@ -30,7 +30,7 @@ Below are the main features provided in the plugin:
 
 To obtain support please use this link to the [wordpress forums](http://wordpress.org/tags/constant-contact-api).
 
-If you use the plugin and find it useful please make sure to come back and vote so other users know it works and we get better placement in the wordpress.org search pages.
+If you use the plugin and find it useful please make sure to come back and vote so other users know it works.
 
 
 == Installation ==
@@ -51,24 +51,30 @@ Optionally, If you want to change the default plugin options you can you edit th
 
 == Changelog ==
 
-= 0.0.7 =
+= 1.0.10 =
+* This release fixes a problem with 1and1 servers
+
+= 1.0.7 =
 * Problem with files in last release
 
-= 0.0.6 =
+= 1.0.6 =
 * No code changes have been made in this release
 
-= 0.0.5 =
+= 1.0.5 =
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
 
-= 0.0.7 =
+= 1.0.10 =
+This release fixes a problem with 1and1 servers
+
+= 1.0.7 =
 This version fixes a bug introduced in version 0.0.5.
 
-= 0.0.6 =
+= 1.0.6 =
 This version simply updates the readme.txt file so the project description page is more useful.
 
-= 0.0.5 =
+= 1.0.5 =
 This version fixes a major bug and all users should upgrade immediately.
 
 
