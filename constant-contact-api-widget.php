@@ -2,6 +2,25 @@
 /**
  * constant_contact_api_widget Class
  */
+
+/*
+* Version 1.1
+* Changes made by Zack Katz; katzwebdesign on March 27, 2010
+* Replaced $_SESSION with $GLOBALS in case servers have register_globals issues, which mine was having
+* Converted trim() to tempty()
+* Converted errors to <LI>s
+* Converted errors to array for <LABEL>ing
+* Used add_query_args for ?cc_success on referral page instead of referring to home page
+* Added referral URL input in form using urlencode($this->curPageURL()) to generate current page
+* Added 
+*   apply_filters('constant_contact_form', $output); to widget output
+*   apply_filters('constant_contact_form_success', $success);
+*   apply_filters('constant_contact_form_description', $description);
+*   apply_filters('constant_contact_form_errors', $errors);
+*   apply_filters('constant_contact_form_submit', $submit_button);
+* Converted widget code from echo to $output .=
+*/
+
 class constant_contact_api_widget extends WP_Widget {
 
     /** constructor */
@@ -19,10 +38,11 @@ class constant_contact_api_widget extends WP_Widget {
     /** @see WP_Widget::widget */
     function widget($args = array(), $instance = array())
 	{
+		$output = '';
 		$errors = false;
-		if(isset($_SESSION['cc_errors'])):
-			$errors = $_SESSION['cc_errors'];
-			unset($_SESSION['cc_errors']);
+		if(isset($GLOBALS['cc_errors'])):
+			$errors = $GLOBALS['cc_errors'];
+			unset($GLOBALS['cc_errors']);
 		endif;
 		
 		$cc_lists = get_option('cc_widget_lists');
@@ -63,97 +83,129 @@ class constant_contact_api_widget extends WP_Widget {
 		$description = get_option('cc_signup_widget_description');
         extract( $args );
         ?>
-			<?php echo (isset($before_widget)) ? $before_widget : ''; ?>
-			<?php echo (isset($before_title, $after_title)) ? $before_title : '<h2>'; ?>
-			<?php echo (isset($title)) ? $title : ''; ?>
-			<?php echo (isset($after_title, $before_title)) ? $after_title : '</h2>'; ?>
+			<?php $output .= (isset($before_widget)) ? $before_widget : ''; ?>
+			<?php $output .= (isset($before_title, $after_title)) ? $before_title : '<h2>'; ?>
+			<?php $output .= (isset($title)) ? $title : ''; ?>
+			<?php $output .= (isset($after_title, $before_title)) ? $after_title : '</h2>'; ?>
 			
 			<?php
-			if($errors):
-				echo '<div id="constant-contact-signup-errors">';
-				echo implode("<br />\n", $errors);
-				echo '</div>';
+			if(!empty($errors)):
+				$error_output = '';
+				$error_output .= '<div id="constant-contact-signup-errors">';
+				$error_output .= '<ul>';
+				foreach ($errors as $e) { 
+					if(is_array($e)) { $error_output .= '<li><label for="'.$e[1].'">'.$e[0].'</label></li>'; } 
+					else { $error_output .= '<li>'.$e.'</li>'; }
+				}
+				$error_output .= '</ul>';
+				$error_output .= '</div>';
+				$output .= apply_filters('constant_contact_form_errors', $error_output);
 			elseif(isset($_GET['cc_success'])):
-				echo "<p>Success, you have been subscribed.</p>";
+				$success = '<p>Success, you have been subscribed.</p>';
+				$output .= apply_filters('constant_contact_form_success', $success);
 			elseif($description):
-				echo "<p>$description</p>";
+				$description = wpautop($description);
+				$output .= apply_filters('constant_contact_form_description', $description);
 			endif;
-			?>
 			
-			<br />
-			<form action="<?php echo get_option('home'); ?><?php echo $_SERVER['REQUEST_URI']?>" method="post" id="constant-contact-signup">
-				<?php
-				if(get_option('cc_widget_show_firstname')):
-				?>
-					First Name:<br />
+			$output .=
+			'<br />
+			<form action="'.$this->curPageURL().'" method="post" id="constant-contact-signup">';
+			
+			if(get_option('cc_widget_show_firstname')):
+				$output .='
+					<label for="cc_firstname">First Name:</label>
 					<div class="input-text-wrap">
-						<input type="text" name="cc_firstname" value="<?php echo (isset($_POST['cc_firstname'])) ? htmlentities($_POST['cc_firstname']) : ''?>" />
-					</div>
-				<?php
+						<input type="text" name="cc_firstname" id="cc_firstname" value="'; 
+						$output .= (isset($_POST['cc_firstname'])) ? htmlentities($_POST['cc_firstname']) : '';
+						$output .= '" />
+					</div>';
 				endif;
-				?>
 				
-				<?php
 				if(get_option('cc_widget_show_lastname')):
-				?>
-					Last Name:<br />
+				$output .='
+					<label for="cc_lastname">Last Name:</label>
 					<div class="input-text-wrap">
-						<input type="text" name="cc_lastname" value="<?php echo (isset($_POST['cc_lastname'])) ? htmlentities($_POST['cc_lastname']) : ''?>" />
-					</div>
-				<?php
+						<input type="text" name="cc_lastname" id="cc_lastname" value="';
+						$output .= (isset($_POST['cc_lastname'])) ? htmlentities($_POST['cc_lastname']) : '';
+						$output .= '" />
+					</div>';
 				endif;
-				?>
 				
-				Email:<br />
+				$output .= '
+				<label for="cc_email">Email:</label>
 				<div class="input-text-wrap">
-					<input type="text" name="cc_email" value="<?php echo (isset($_POST['cc_email'])) ? htmlentities($_POST['cc_email']) : ''?>" />
-				</div>
+					<input type="text" name="cc_email" id="cc_email" value="';
+					$output .= (isset($_POST['cc_email'])) ? htmlentities($_POST['cc_email']) : '';
+				$output .= '" />
+				</div>';
 				
-				<?php
 				if(get_option('cc_widget_show_list_selection')):
 					if(get_option('cc_widget_list_selection_format') == 'select'):
-				?>
-					<?php echo get_option('cc_widget_list_selection_title'); ?><br />
+
+					$output .= get_option('cc_widget_list_selection_title') .'<br />
 					<div class="input-text-wrap">
-					<select name="cc_newsletter[]" multiple size="5">
-						<?php
+					<select name="cc_newsletter[]" multiple size="5">';
 						if($lists):
 						foreach($lists as $k => $v):
 							if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])):
-								echo '<option selected value="'.$v['id'].'">'.$v['Name'].'</option>';
+								$output .=  '<option selected value="'.$v['id'].'">'.$v['Name'].'</option>';
 							else:
-								echo '<option value="'.$v['id'].'">'.$v['Name'].'</option>';
+								$output .=  '<option value="'.$v['id'].'">'.$v['Name'].'</option>';
 							endif;
 						endforeach;
 						endif;
-						?>
+					$output .= '
 					</select>
-					</div>
-					<?php
+					</div>';
+					
 					elseif($lists):
-						echo get_option('cc_widget_list_selection_title');
-						echo '<br /><div class="input-text-wrap">';
+						$output .=  get_option('cc_widget_list_selection_title');
+						$output .=  '<div class="input-text-wrap">';
+						$output .=  '<ul>';
 						foreach($lists as $k => $v):
 							if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])):
-								echo '<input checked="checked" type="checkbox" name="cc_newsletter[]" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '<br />';
+								$output .=  '<li><label for="cc_newsletter-'.$v['id'].'"><input checked="checked" type="checkbox" name="cc_newsletter[]" id="cc_newsletter-'.$v['id'].'" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '</label></li>'; // ZK added label, ID, converted to <LI>
 							else:
-								echo '<input type="checkbox" name="cc_newsletter[]" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '<br />';
+								$output .=  '<li><label for="cc_newsletter-'.$v['id'].'"><input type="checkbox" name="cc_newsletter[]" id="cc_newsletter-'.$v['id'].'" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '</label></li>'; // ZK added label, ID
 							endif;
 						endforeach;
-						echo '</div>';
+						$output .=  '</ul>';
+						$output .=  '</div>';
 					endif;
-					?>
-				<?php
 				endif;
-				?>
+				$output .= '
+				<div>
+					<input type="hidden" id="cc_referral_url" name="cc_referral_url" value="'.urlencode($this->curPageURL()).'" />';
+					$submit_button = '<input type="submit" name="constant-contact-signup-submit" value="Signup" class="button submit" />';
+					$output .= apply_filters('constant_contact_form_submit', $submit_button);
+					$output .= '
+				</div>
+			</form>';
+			$output .= (isset($after_widget)) ? $after_widget : ''; 
 			
-				<br /><input type="submit" name="constant-contact-signup-submit" value="Signup" />
-			</form>
+			// Modify the output by calling add_filter('constant_contact_form', 'your_function');
+			// Passes the output to the function, needs return $output coming from the function.
+			$output = apply_filters('constant_contact_form', $output);
 			
-			<?php echo (isset($after_widget)) ? $after_widget : ''; ?>
-        <?php
+			echo $output;
     }
-
+	
+   /*
+	* From http://www.webcheatsheet.com/PHP/get_current_page_url.php
+	*/
+	function curPageURL() {
+		 $pageURL = 'http';
+		 if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
+		 $pageURL .= "://";
+		 if ($_SERVER["SERVER_PORT"] != "80") {
+		  $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
+		 } else {
+		  $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+		 }
+		 return remove_query_arg('cc_success',$pageURL);
+	}
+	
     /** @see WP_Widget::form */
     function form($instance)
 	{
@@ -164,12 +216,15 @@ class constant_contact_api_widget extends WP_Widget {
 
 } // class constant_contact_api_widget
 
-
-
+	function tempty($val) { 
+		$val = trim($val);
+    	return empty($val) && $val !== 0; 
+	}
+	
     /** function used to handle submitting the widget */
 	function constant_contact_submit_widget()
 	{
-		$errors = false;
+		$errors = array();
 		
 		// proces the submitted form
 		if(!isset($_POST['constant-contact-signup-submit'], $_POST['cc_email'])):
@@ -178,33 +233,33 @@ class constant_contact_api_widget extends WP_Widget {
 		
 		$email = strip_tags($_POST['cc_email']);
 		$fields = array();
-			
+		
 		if(get_option('cc_widget_show_firstname') && isset($_POST['cc_firstname'])):
-			if(trim($_POST['cc_firstname']) == ''):
-				$errors[] = 'Please enter your first name';
+			if(tempty($_POST['cc_firstname'])):
+				$errors[] = array('Please enter your first name', 'cc_firstname');
 			else:
 				$fields['FirstName'] = strip_tags($_POST['cc_firstname']);
 			endif;
 		endif;
 			
 		if(get_option('cc_widget_show_lastname') && isset($_POST['cc_lastname'])):
-			if(trim($_POST['cc_lastname']) == ''):
-				$errors[] = 'Please enter your last name';
+			if(tempty($_POST['cc_lastname'])):
+				$errors[] = array('Please enter your last name', 'cc_lastname');
 			else:
 				$fields['LastName'] = strip_tags($_POST['cc_lastname']);
 			endif;
 		endif;
 			
-		if(trim($email) == ''):
-			$errors[] = 'Please enter your email';
+		if(tempty($email)):
+			$errors[] = array('Please enter your email', 'cc_email');
 		elseif(!is_email($email)):
-			$errors[] = 'Please enter a valid email address';
+			$errors[] = array('Please enter a valid email address', 'cc_email');
 		endif;
 			
 			
 		// return errors if any exist
 		if($errors):
-			$_SESSION['cc_errors'] = $errors;
+			$GLOBALS['cc_errors'] = $errors;
 			return;
 		endif;
 			
@@ -253,7 +308,7 @@ class constant_contact_api_widget extends WP_Widget {
 		endif;
 		
 		if(!count($lists)):
-			$_SESSION['cc_errors'][] = 'Please select at least 1 ' . get_option('cc_widget_list_selection_title');
+			$GLOBALS['cc_errors'][] = 'Please select at least 1 ' . get_option('cc_widget_list_selection_title');
 			return;
 		endif;
 					
@@ -271,13 +326,14 @@ class constant_contact_api_widget extends WP_Widget {
 		endif;
 			  
 		if(!$status):
-			$_SESSION['cc_errors'][] = 'Sorry there was a problem, please try again later';
+			$GLOBALS['cc_errors'][] = 'Sorry there was a problem, please try again later';
 			return;
 		elseif($redirect_to):
 			header("Location: $redirect_to");
 			exit;
 		else:
-			header("Location: " . get_option('siteurl') . '?cc_success');
+			$url = add_query_arg('cc_success', true, urldecode($_POST['cc_referral_url']));
+			header("Location: " . $url );
 			exit;
 		endif;
 		

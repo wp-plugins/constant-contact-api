@@ -1,16 +1,20 @@
 === Constant Contact for Wordpress ===
 Contributors: jamesbenson, katzwebdesign
 Donate link: http://integrationservic.es/donate.php
-Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API
+Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms
 Requires at least: 2.9
 Tested up to: 2.9.2
-Stable tag: 1.0.10
+Stable tag: 1.1
 
 This plugin integrates the Constant Contact API into your wordpress blog.
 
 == Description ==
 
-__This plugin requires a <a href="http://bit.ly/cctrial" title="Sign up for Constant Contact" rel="nofollow">Constant Contact account</a>.__
+__This plugin requires a <a href="http://bit.ly/tryconstantcontact" title="Sign up for a free Constant Contact trial" rel="nofollow">Constant Contact account</a>.__
+
+### Fully integrate your email marketing campaigns into your WordPress website ###
+
+__Take your website & newsletter to the next level__
 
 The Constant Contact Wordpress plugin integrates features from the Constant Contact REST API into your wordpress blog, it's the only plugin you need if you use the constantcontact.com service and wordpress.
 
@@ -43,13 +47,28 @@ To install the plugin follow the steps below:
 4. You'll need to enter your username and password on the settings page then save the page to see your contact lists.
 5. Now Configure the "Register Page Settings" to get the checkbox or list selection displayed on the user register page.
 6. Alternatively configure the signup widget in the admin area, if widgets are not supported in your theme you'll have to place the code below somewhere into one of your PHP theme files:
-
-`<?php $sbw = new constant_contact_api_widget(); $sbw->widget(); ?>`
+<pre>
+&lt;?php $sbw = new constant_contact_api_widget(); $sbw-&gt;widget(); ?&gt;
+</pre>
 
 Optionally, If you want to change the default plugin options you can you edit the config.php file before installing, this is not required because all the options are editable via the wp admin interface but doing so means you can install the plugin with your preferred settings or provide the plugin to clients using a default set of options.
 
 
 == Changelog ==
+
+= 1.1 =
+* Adds error messages if username & password aren't properly configured & working
+* Replaced $_SESSION with $GLOBALS for servers with `register_globals` issues
+* Improved widget error messages
+	* Converted widget errors to list items (`<LI>`s), instead of items separated with `<BR />` for better standards compliance
+	* Wrapped errors in `<LABEL>`s so that clicking an error will take users to the input
+* Improved redirection upon widget submission; now properly redirects to the page the user was on, instead of the home page
+* Added filters for more control over widget output:
+	* apply_filters('constant_contact_form', $output); to widget output
+	* apply_filters('constant_contact_form_success', $success);
+	* apply_filters('constant_contact_form_description', $description);
+	* apply_filters('constant_contact_form_errors', $errors);
+	* apply_filters('constant_contact_form_submit', $submit_button);
 
 = 1.0.10 =
 * This release fixes a problem with 1and1 servers
@@ -65,6 +84,12 @@ Optionally, If you want to change the default plugin options you can you edit th
 
 == Upgrade Notice ==
 
+= 1.1 = 
+* Fixes a potential `register_globals` issue
+* Adds helpful filters for developers
+* Improves widget error handling & error messages
+* Improves 
+
 = 1.0.10 =
 This release fixes a problem with 1and1 servers
 
@@ -77,6 +102,35 @@ This version simply updates the readme.txt file so the project description page 
 = 1.0.5 =
 This version fixes a major bug and all users should upgrade immediately.
 
+== Frequently Asked Questions ==
+
+= Do I need a Constant Contact account for this plugin? =
+This plugin requires a [Constant Contact account](http://bit.ly/constant-contact-signup 'Sign up for Constant Contact').
+
+Constant Contact is a great email marketing company -- their rates are determined by the number of contacts in your list, not how many emails you send. This means you can send unlimited emails per month for one fixed rate! [Give it a test run](http://bit.ly/constant-contact-signup 'Try out Constant Contact today').
+
+= How do I use the new `apply_filters()` functionality? (Added 1.1) =
+If you want to change some code in the widget, you can use the WordPress `add_filter()` function to achieve this.
+
+You can add code to your theme's `functions.php` file that will modify the widget output. Here's an example:
+<pre>
+function my_example_function($widget) { 
+	// The $widget variable is the output of the widget
+	// This will replace 'this word' with 'that word' in the widget output.
+	$widget = str_replace('this word', 'that word', $widget);
+	// Make sure to return the $widget variable, or it won't work!
+	return $widget;
+}
+add_filter('constant_contact_form', 'my_example_function');
+</pre>
+
+You can modify the widget output by hooking into any of the filters below in a similar manner.
+
+* Entire form output: `constant_contact_form`
+* Successful submission message: `constant_contact_form_success`
+* Form description text: `constant_contact_form_description` (after it has been modified by `wpautop()`)
+* Error message: `constant_contact_form_errors`
+* Submit button: `constant_contact_form_submit` (includes entire `input` string)
 
 == License ==
 

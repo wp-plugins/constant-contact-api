@@ -86,33 +86,29 @@
 			return false;
 		endif;
 		
-		if(is_object($cc) && $cc->get_service_description()):
+		if(is_object($cc) && $cc->get_service_description()) {
 			// we have successfully connected
 			return $cc;
-		elseif($cc->http_response_code):
+		} elseif($cc->http_response_code) {
 			// oops, problem occured and we have an error code
 			$error = $cc->http_get_response_code_error($cc->http_response_code);
 			
 			// if we get an unauthorized 401 error code reset the username and password
 			// if we don't do this the CC account will be temporarily blocked eventually
 			if(intval($cc->http_response_code) === 401):
+				// Leave the wrong info there, but show the error message // ZK - 1.1
 				update_option('cc_username', '');
-				update_option('cc_password', '');
-			endif;
-			
-			/*
-			if(is_admin()):
-				// display an error
-				function constant_contact_setup_error()
-				{
-					echo "<div id='constant-contact-warning' class='updated fade'>
-					<p><strong>$error</strong></p>
+				update_option('cc_password', ''); 
+				if(is_admin() && !isset($_POST['error_displayed'])) { // error_diplayed for showing only once, it was showing twice
+					$_POST['error_displayed'] = true;
+					echo "<div id='constant-contact-warning' class='error'>
+						<p><strong>$error</strong></p>
 					</div>";
 				}
-				add_action('admin_notices', 'constant_contact_setup_error');
+				
 			endif;
-			*/
-		endif;
+			
+		} // if http_response_code
 		
 		return false;
 	}
