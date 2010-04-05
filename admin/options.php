@@ -1,5 +1,10 @@
 <?php // $Id$
 
+/* Version 1.1.0.1
+* Changes made by Zack Katz; katzwebdesign on April 5, 2010
+* Converted settings page description fields to `<textarea>` to allow for better description visibility.
+*/
+
 // Register the settings we need on the settings page
 function constant_contact_register_settings()
 {
@@ -152,10 +157,10 @@ function constant_contact_settings()
 		</td>
 	</tr>
 	<tr valign="top">
-		<th scope="row">Signup Description</th>
+		<th scope="row"><label for="cc_signup_description">Signup Description</label></th>
 		<td>
-		<input type="text" name="cc_signup_description" value="<?php echo get_option('cc_signup_description'); ?>" size="50" />
-		<span class="description"><br />The description text displayed on the register page, if enabled</span>
+		<textarea name="cc_signup_description" id="cc_signup_description" cols="50" rows="4"><?php echo get_option('cc_signup_description'); ?></textarea>
+		<span class="description"><br />The description text displayed on the register page, if enabled. HTML allowed. If not HTML, paragraphs will be automatically added.</span>
 		</td>
 	</tr>
 	<tr valign="top">
@@ -193,10 +198,10 @@ function constant_contact_settings()
 		</td>
 	</tr>
 	<tr valign="top">
-		<th scope="row">Signup Widget Description</th>
+		<th scope="row"><label for="cc_signup_widget_description">Signup Widget Description</label></th>
 		<td>
-		<input type="text" name="cc_signup_widget_description" value="<?php echo get_option('cc_signup_widget_description'); ?>" size="50" />
-		<span class="description"><br />The description text displayed in the sidebar widget below the title, if enabled</span>
+		<textarea name="cc_signup_widget_description" id="cc_signup_widget_description" cols="50" rows="4"><?php echo get_option('cc_signup_widget_description'); ?></textarea>
+		<span class="description"><br />The description text displayed in the sidebar widget below the title, if enabled. HTML allowed. If not HTML, paragraphs will be automatically added.</span>
 		</td>
 	</tr>
 	<tr valign="top">

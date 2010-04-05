@@ -20,6 +20,11 @@
 *   apply_filters('constant_contact_form_submit', $submit_button);
 * Converted widget code from echo to $output .=
 */
+/* Version 1.1.0.1
+* Changes made by Zack Katz; katzwebdesign on April 5, 2010
+* Removed <br /> before widget form
+* Fixed widget description and title display issues by renaming variables from `$title` to `$widget_title` and `$description` to `$widget_description`.
+*/
 
 class constant_contact_api_widget extends WP_Widget {
 
@@ -79,13 +84,13 @@ class constant_contact_api_widget extends WP_Widget {
 			$lists = $new_lists;
 		endif;
 		
-        $title = apply_filters('widget_title', get_option('cc_signup_widget_title'));
-		$description = get_option('cc_signup_widget_description');
+        $widget_title = apply_filters('widget_title', get_option('cc_signup_widget_title'));
+		$widget_description = get_option('cc_signup_widget_description');
         extract( $args );
         ?>
 			<?php $output .= (isset($before_widget)) ? $before_widget : ''; ?>
 			<?php $output .= (isset($before_title, $after_title)) ? $before_title : '<h2>'; ?>
-			<?php $output .= (isset($title)) ? $title : ''; ?>
+			<?php $output .= (isset($widget_title)) ? $widget_title : ''; ?>
 			<?php $output .= (isset($after_title, $before_title)) ? $after_title : '</h2>'; ?>
 			
 			<?php
@@ -103,14 +108,12 @@ class constant_contact_api_widget extends WP_Widget {
 			elseif(isset($_GET['cc_success'])):
 				$success = '<p>Success, you have been subscribed.</p>';
 				$output .= apply_filters('constant_contact_form_success', $success);
-			elseif($description):
-				$description = wpautop($description);
-				$output .= apply_filters('constant_contact_form_description', $description);
+			elseif($widget_description):
+				$widget_description = wpautop($widget_description);
+				$output .= apply_filters('constant_contact_form_description', $widget_description);
 			endif;
-			
 			$output .=
-			'<br />
-			<form action="'.$this->curPageURL().'" method="post" id="constant-contact-signup">';
+			'<form action="'.$this->curPageURL().'" method="post" id="constant-contact-signup">';
 			
 			if(get_option('cc_widget_show_firstname')):
 				$output .='

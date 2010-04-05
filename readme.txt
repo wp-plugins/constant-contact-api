@@ -16,7 +16,7 @@ __This plugin requires a <a href="http://bit.ly/tryconstantcontact" title="Sign 
 
 __Take your website & newsletter to the next level__
 
-The Constant Contact Wordpress plugin integrates features from the Constant Contact REST API into your wordpress blog, it's the only plugin you need if you use the constantcontact.com service and wordpress.
+The Constant Contact Wordpress plugin integrates features from the Constant Contact REST API into your wordpress blog, it's the only WordPress plugin you need if you use Constant Contact.
 
 You can place a signup checkbox or list selection on your register page or use the signup widget anywhere in your website sidebar or PHP templates.
 
@@ -56,6 +56,11 @@ Optionally, If you want to change the default plugin options you can you edit th
 
 == Changelog ==
 
+= 1.1.0.1 = 
+* Removed line break (`<br />`) before widget form to improve display of widget signup form
+* Fixed widget description and title display issues by renaming variables from `$title` to `$widget_title` and `$description` to `$widget_description`.
+* Converted some settings fields to `<textarea>` to make editing easier.
+
 = 1.1 =
 * Adds error messages if username & password aren't properly configured & working
 * Replaced $_SESSION with $GLOBALS for servers with `register_globals` issues
@@ -83,6 +88,9 @@ Optionally, If you want to change the default plugin options you can you edit th
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
+
+= 1.1.0.1 =
+* If your widget description and titles were not displaying in the signup form, that is now fixed.
 
 = 1.1 = 
 * Fixes a potential `register_globals` issue
