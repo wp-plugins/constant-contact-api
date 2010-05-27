@@ -4,27 +4,34 @@
  */
 
 /*
-* Version 1.1
-* Changes made by Zack Katz; katzwebdesign on March 27, 2010
-* Replaced $_SESSION with $GLOBALS in case servers have register_globals issues, which mine was having
-* Converted trim() to tempty()
-* Converted errors to <LI>s
-* Converted errors to array for <LABEL>ing
-* Used add_query_args for ?cc_success on referral page instead of referring to home page
-* Added referral URL input in form using urlencode($this->curPageURL()) to generate current page
-* Added 
-*   apply_filters('constant_contact_form', $output); to widget output
-*   apply_filters('constant_contact_form_success', $success);
-*   apply_filters('constant_contact_form_description', $description);
-*   apply_filters('constant_contact_form_errors', $errors);
-*   apply_filters('constant_contact_form_submit', $submit_button);
-* Converted widget code from echo to $output .=
+Version 1.1
+Changes made by Zack Katz; katzwebdesign on March 27, 2010
+	Replaced $_SESSION with $GLOBALS in case servers have register_globals issues, which mine was having
+	Converted trim() to tempty()
+	Converted errors to <LI>s
+	Converted errors to array for <LABEL>ing
+	Used add_query_args for ?cc_success on referral page instead of referring to home page
+	Added referral URL input in form using urlencode($this->curPageURL()) to generate current page
+	Added 
+	  apply_filters('constant_contact_form', $output); to widget output
+	  apply_filters('constant_contact_form_success', $success);
+	  apply_filters('constant_contact_form_description', $description);
+	  apply_filters('constant_contact_form_errors', $errors);
+	  apply_filters('constant_contact_form_submit', $submit_button);
+	Converted widget code from echo to $output .=
+
+Version 1.1.0.1
+Changes made by Zack Katz; katzwebdesign on April 5, 2010
+	Removed <br /> before widget form
+	Fixed widget description and title display issues by renaming variables from `$title` to `$widget_title` and `$description` to `$widget_description`.
+
+Version 1.1.1
+Changes made by Zack Katz; katzwebdesign on May 27, 2010
+	Added `cc_widget_lists_array` option to store Constant Contact lists, so that the API doesn't need to be called every page load. Now, API is only called when the plugin settings are saved.
+	Wrapped the List Selection Title for the multi-select form element in a `label` tag, and removed line break.
+
 */
-/* Version 1.1.0.1
-* Changes made by Zack Katz; katzwebdesign on April 5, 2010
-* Removed <br /> before widget form
-* Fixed widget description and title display issues by renaming variables from `$title` to `$widget_title` and `$description` to `$widget_description`.
-*/
+
 
 class constant_contact_api_widget extends WP_Widget {
 
@@ -40,7 +47,7 @@ class constant_contact_api_widget extends WP_Widget {
 	
 	
 
-    /** @see WP_Widget::widget */
+   /** @see WP_Widget::widget */
     function widget($args = array(), $instance = array())
 	{
 		$output = '';
@@ -51,6 +58,7 @@ class constant_contact_api_widget extends WP_Widget {
 		endif;
 		
 		$cc_lists = get_option('cc_widget_lists');
+		$cc_lists_array = get_option('cc_widget_lists_array');
 		$exclude_lists = get_option('cc_widget_exclude_lists');
 		$exclude_lists = (!is_array($exclude_lists)) ? array() : $exclude_lists;
 		
@@ -60,7 +68,11 @@ class constant_contact_api_widget extends WP_Widget {
 			return;
 		endif;
 		
-		if($cc_lists):
+		// If the list has already been set, don't ask for it again.
+		// This saves bandwidth
+		if($cc_lists_array){
+			$lists = unserialize($cc_lists_array);
+		} else if($cc_lists) {
 			// show only the lists they have selected
 			$new_lists = array();
 			foreach($cc_lists as $id):
@@ -69,7 +81,8 @@ class constant_contact_api_widget extends WP_Widget {
 				endif;
 			endforeach;
 			$lists = $new_lists;
-		else:
+			update_option('cc_widget_lists_array', maybe_serialize($lists));
+		} else {
 			// show all lists and exclude any have may have selected
 			$lists = $cc->get_all_lists();
 			
@@ -82,7 +95,8 @@ class constant_contact_api_widget extends WP_Widget {
 				endforeach;
 			endif;
 			$lists = $new_lists;
-		endif;
+			update_option('cc_widget_lists_array', maybe_serialize($lists));
+		}
 		
         $widget_title = apply_filters('widget_title', get_option('cc_signup_widget_title'));
 		$widget_description = get_option('cc_signup_widget_description');
@@ -146,9 +160,9 @@ class constant_contact_api_widget extends WP_Widget {
 				if(get_option('cc_widget_show_list_selection')):
 					if(get_option('cc_widget_list_selection_format') == 'select'):
 
-					$output .= get_option('cc_widget_list_selection_title') .'<br />
+					$output .= '<label for="cc_newsletter_select">'.get_option('cc_widget_list_selection_title') .'</label>
 					<div class="input-text-wrap">
-					<select name="cc_newsletter[]" multiple size="5">';
+					<select name="cc_newsletter[]" id="cc_newsletter_select"  multiple size="5">';
 						if($lists):
 						foreach($lists as $k => $v):
 							if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])):

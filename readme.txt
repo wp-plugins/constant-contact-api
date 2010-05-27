@@ -6,15 +6,17 @@ Requires at least: 2.9
 Tested up to: 2.9.2
 Stable tag: trunk
 
-Integrate Constant Contact into your website will this full-featured plugin.
+Integrate Constant Contact into your website with this full-featured plugin.
 
 == Description ==
 
-__This plugin requires a <a href="http://bit.ly/tryconstantcontact" title="Sign up for a free Constant Contact trial" rel="nofollow">Constant Contact account</a>.__
+<div class="error">
+<strong>This plugin requires a <a href="http://bit.ly/tryconstantcontact" title="Sign up for a free Constant Contact trial" rel="nofollow">Constant Contact account</a>.</strong>
+</div>
 
 ### Fully integrate your email marketing campaigns into your WordPress website ###
 
-__Take your website & newsletter to the next level__
+<h4>Take your website & newsletter to the next level</h4>
 
 The Constant Contact Wordpress plugin integrates features from the Constant Contact REST API into your wordpress blog, it's the only WordPress plugin you need if you use Constant Contact.
 
@@ -56,6 +58,11 @@ Optionally, If you want to change the default plugin options you can you edit th
 
 == Changelog ==
 
+= 1.1.1 =
+* Files updated: constant-contact-api-widget.php, readme.txt, /admin/options.php
+* <em>Short story:</em> __Improved speed.__ <br /><em>Long story:</em> Fixes major potential bug - if you have noticed your site takes a long time to start loading, it may be because the plugin had been trying to access the Constant Contact API for the list values twice per page load. This structure has been totally revamped, and now the Constant Contact API is only accessed once upon changing settings. This release improves load time considerably by storing that information in the WordPress database. Added `cc_widget_lists_array` option to store Constant Contact lists, so that the API doesn't need to be called every page load. Now, API is only called when the plugin settings are saved.
+* Wrapped the List Selection Title for the multi-select form element in a `label` tag, and removed line break.
+
 = 1.1.0.1 = 
 * Removed line break (`<br />`) before widget form to improve display of widget signup form
 * Fixed widget description and title display issues by renaming variables from `$title` to `$widget_title` and `$description` to `$widget_description`.
@@ -88,6 +95,10 @@ Optionally, If you want to change the default plugin options you can you edit th
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
+
+= 1.1.1 =
+* Fixes major potential bug - if you have noticed your site takes a long time to start loading, it may be because the plugin had been trying to access the Constant Contact API for the list values twice per page load. This structure has been totally revamped, and now the Constant Contact API is only accessed once upon changing settings. This release improves load time considerably by storing that information in the WordPress database. 
+* Added `cc_widget_lists_array` option to store Constant Contact lists, so that the API doesn't need to be called every page load. Now, API is only called when the plugin settings are saved.
 
 = 1.1.0.1 =
 * If your widget description and titles were not displaying in the signup form, that is now fixed.

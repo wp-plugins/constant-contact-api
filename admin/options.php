@@ -1,8 +1,13 @@
 <?php // $Id$
 
-/* Version 1.1.0.1
-* Changes made by Zack Katz; katzwebdesign on April 5, 2010
-* Converted settings page description fields to `<textarea>` to allow for better description visibility.
+/* 
+	Version 1.1.0.1
+	Changes made by Zack Katz; katzwebdesign on April 5, 2010
+		Converted settings page description fields to `<textarea>` to allow for better description visibility.
+		
+	Version 1.1.1
+	Changes made by Zack Katz; katzwebdesign on May 27, 2010
+		Wrapped list checkboxes in labels
 */
 
 // Register the settings we need on the settings page
@@ -119,9 +124,9 @@ function constant_contact_settings()
 			if($lists):
 			foreach($lists as $k => $v):
 				if(in_array($v['id'], $selected_lists)):
-					echo '<input name="cc_lists[]" type="checkbox" checked="checked" value="'.$v['id'].'" /> '.$v['Name'].'<br />';
+					echo '<label for="cc_lists'.$v['id'].'"><input name="cc_lists[]" type="checkbox" checked="checked" value="'.$v['id'].'" id="cc_lists'.$v['id'].'" /> '.$v['Name'].'<</label><br />';
 				else:
-					echo '<input name="cc_lists[]" type="checkbox" value="'.$v['id'].'" /> '.$v['Name'].'<br />';
+					echo '<label for="cc_lists'.$v['id'].'"><input name="cc_lists[]" type="checkbox" value="'.$v['id'].'" id="cc_lists'.$v['id'].'" /> '.$v['Name'].'</label><br />';
 				endif;
 			endforeach;
 			endif;
@@ -136,9 +141,9 @@ function constant_contact_settings()
 			if($lists):
 			foreach($lists as $k => $v):
 				if(in_array($v['id'], $exclude_lists)):
-					echo '<input name="cc_exclude_lists[]" type="checkbox" checked="checked" value="'.$v['id'].'" /> '.$v['Name'].'<br />';
+					echo '<label for="cc_exclude_lists'.$v['id'].'"><input name="cc_exclude_lists[]" type="checkbox" checked="checked" value="'.$v['id'].'" id="cc_exclude_lists'.$v['id'].'" /> '.$v['Name'].'</label><br />';
 				else:
-					echo '<input name="cc_exclude_lists[]" type="checkbox" value="'.$v['id'].'" /> '.$v['Name'].'<br />';
+					echo '<label for="cc_exclude_lists'.$v['id'].'"><input name="cc_exclude_lists[]" type="checkbox" value="'.$v['id'].'" id="cc_exclude_lists'.$v['id'].'"/> '.$v['Name'].'</label><br />';
 				endif;
 			endforeach;
 			endif;
@@ -250,9 +255,9 @@ function constant_contact_settings()
 			if($lists):
 			foreach($lists as $k => $v):
 				if(in_array($v['id'], $selected_lists)):
-					echo '<input name="cc_widget_lists[]" type="checkbox" checked="checked" value="'.$v['id'].'" /> '.$v['Name'].'<br />';
+					echo '<label for="cc_widget_lists_'.$v['id'].'"><input name="cc_widget_lists[]" type="checkbox" checked="checked" value="'.$v['id'].'" id="cc_widget_lists_'.$v['id'].'" /> '.$v['Name'].'</label><br />';
 				else:
-					echo '<input name="cc_widget_lists[]" type="checkbox" value="'.$v['id'].'" /> '.$v['Name'].'<br />';
+					echo '<label for="cc_widget_lists_'.$v['id'].'"><input name="cc_widget_lists[]" type="checkbox" value="'.$v['id'].'" id="cc_widget_lists_'.$v['id'].'"  /> '.$v['Name'].'</label><br />';
 				endif;
 			endforeach;
 			endif;
@@ -267,9 +272,9 @@ function constant_contact_settings()
 			if($lists):
 			foreach($lists as $k => $v):
 				if(in_array($v['id'], $exclude_lists)):
-					echo '<input name="cc_widget_exclude_lists[]" type="checkbox" checked="checked" value="'.$v['id'].'" /> '.$v['Name'].'<br />';
+					echo '<label for="cc_widget_exclude_lists_'.$v['id'].'"><input name="cc_widget_exclude_lists[]" type="checkbox" checked="checked" value="'.$v['id'].'" id="cc_widget_exclude_lists_'.$v['id'].'" /> '.$v['Name'].'</label><br />';
 				else:
-					echo '<input name="cc_widget_exclude_lists[]" type="checkbox" value="'.$v['id'].'" /> '.$v['Name'].'<br />';
+					echo '<label for="cc_widget_exclude_lists_'.$v['id'].'"><input name="cc_widget_exclude_lists[]" type="checkbox" value="'.$v['id'].'" id="cc_widget_exclude_lists_'.$v['id'].'" /> '.$v['Name'].'</label><br />';
 				endif;
 			endforeach;
 			endif;
