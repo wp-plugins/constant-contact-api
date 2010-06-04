@@ -10,10 +10,7 @@ Integrate Constant Contact into your website with this full-featured plugin.
 
 == Description ==
 
-<blockquote>
-<strong>This plugin requires a <a href="http://bit.ly/tryconstantcontact" title="Sign up for a free Constant Contact trial" rel="nofollow">Constant Contact account</a>.</strong> Constant Contact offers a <em><a href="http://bit.ly/constant-contact-email" rel="nofollow">free 60 day trial</a></em>, so sign up and give this plugin a whirl.
-
-</blockquote>
+> __This plugin requires a <a href="http://bit.ly/tryconstantcontact" title="Sign up for a free Constant Contact trial" rel="nofollow">Constant Contact account</a>.__ Constant Contact offers a *<a href="http://bit.ly/constant-contact-email" rel="nofollow">free 60 day trial</a>*, so sign up and give this plugin a whirl.
 
 ### Fully integrate your email marketing campaigns into your WordPress website ###
 
