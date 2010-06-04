@@ -160,6 +160,4 @@ You can modify the widget output by hooking into any of the filters below in a s
 * Submit button: `constant_contact_form_submit` (includes entire `input` string)
 
 = What is the plugin license? =
-Good news, this plugin is free for everyone!
-
-The plugin is [licensed under the GPL](http://www.gnu.org/licenses/gpl-3.0.txt "View the GPL License").
+Good news, this plugin is free for everyone! The plugin is [licensed under the GPL](http://www.gnu.org/licenses/gpl-3.0.txt "View the GPL License").
