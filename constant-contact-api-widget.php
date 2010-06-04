@@ -30,6 +30,9 @@ Changes made by Zack Katz; katzwebdesign on May 27, 2010
 	Added `cc_widget_lists_array` option to store Constant Contact lists, so that the API doesn't need to be called every page load. Now, API is only called when the plugin settings are saved.
 	Wrapped the List Selection Title for the multi-select form element in a `label` tag, and removed line break.
 
+Version 1.1.2
+Changes made by Zack Katz; katzwebdesign on June 4, 2010
+	Added is_array() to `if(is_array($auto_lists) && in_array($list_id, $auto_lists)):`
 */
 
 
@@ -314,7 +317,7 @@ class constant_contact_api_widget extends WP_Widget {
 							
 			$newlists = array();
 			foreach($_lists as $list_id):
-				if(in_array($list_id, $auto_lists)):
+				if(is_array($auto_lists) && in_array($list_id, $auto_lists)): // 1.1.2 added is_array() check
 					$list = $cc->get_list($list_id);
 					$newlists[$list['id']] = $list['Name'];
 				endif;

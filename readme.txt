@@ -10,19 +10,19 @@ Integrate Constant Contact into your website with this full-featured plugin.
 
 == Description ==
 
-<div class="error">
-<strong>This plugin requires a <a href="http://bit.ly/tryconstantcontact" title="Sign up for a free Constant Contact trial" rel="nofollow">Constant Contact account</a>.</strong>
-</div>
+<blockquote>
+<strong>This plugin requires a <a href="http://bit.ly/tryconstantcontact" title="Sign up for a free Constant Contact trial" rel="nofollow">Constant Contact account</a>.</strong> Constant Contact offers a <em><a href="http://bit.ly/constant-contact-email" rel="nofollow">free 60 day trial</a></em>, so sign up and give this plugin a whirl.
+</blockquote>
 
 ### Fully integrate your email marketing campaigns into your WordPress website ###
 
 <h4>Take your website & newsletter to the next level</h4>
 
-The Constant Contact Wordpress plugin integrates features from the Constant Contact REST API into your wordpress blog, it's the only WordPress plugin you need if you use Constant Contact.
+The Constant Contact for Wordpress plugin is the best email marketing plugin for WordPress: integrate your website seamlessly with your Constant Contact account. 
 
 You can place a signup checkbox or list selection on your register page or use the signup widget anywhere in your website sidebar or PHP templates.
 
-Below are the main features provided in the plugin:
+<h4>Plugin features:</h4>
 
 * Add signup checkbox and list selection to your register page and update profile page
 * Add / edit / delete contact lists without visiting constantcontact.com
@@ -37,7 +37,6 @@ Below are the main features provided in the plugin:
 To obtain support please use this link to the [wordpress forums](http://wordpress.org/tags/constant-contact-api).
 
 If you use the plugin and find it useful please make sure to come back and vote so other users know it works.
-
 
 == Installation ==
 
@@ -57,6 +56,11 @@ Optionally, If you want to change the default plugin options you can you edit th
 
 
 == Changelog ==
+
+= 1.1.2 =
+* Minor bug fix, fixes `in_array(): Wrong datatype for second argument` error <a href="http://wordpress.org/support/topic/393359" rel="nofollow">reported here</a>.
+* Added menu image for plugin, and forced plugin name to be on one line. Menu looks nicer now.
+* If plugin is not configured, the other menu items (Activities, Import, Export, Lists) will not be displayed. Previously, they were displayed, but the pages were empty.
 
 = 1.1.1 =
 * Files updated: constant-contact-api-widget.php, readme.txt, /admin/options.php
@@ -96,6 +100,9 @@ Optionally, If you want to change the default plugin options you can you edit th
 
 == Upgrade Notice ==
 
+= 1.1.2 =
+* Minor bug fix, fixes `in_array(): Wrong datatype for second argument` error <a href="http://wordpress.org/support/topic/393359" rel="nofollow">reported here</a>.
+
 = 1.1.1 =
 * Fixes major potential bug - if you have noticed your site takes a long time to start loading, it may be because the plugin had been trying to access the Constant Contact API for the list values twice per page load. This structure has been totally revamped, and now the Constant Contact API is only accessed once upon changing settings. This release improves load time considerably by storing that information in the WordPress database. 
 * Added `cc_widget_lists_array` option to store Constant Contact lists, so that the API doesn't need to be called every page load. Now, API is only called when the plugin settings are saved.
@@ -124,7 +131,7 @@ This version fixes a major bug and all users should upgrade immediately.
 == Frequently Asked Questions ==
 
 = Do I need a Constant Contact account for this plugin? =
-This plugin requires a [Constant Contact account](http://bit.ly/constant-contact-signup 'Sign up for Constant Contact').
+This plugin requires a [Constant Contact account](http://bit.ly/tryconstantcontact 'Sign up for Constant Contact').
 
 Constant Contact is a great email marketing company -- their rates are determined by the number of contacts in your list, not how many emails you send. This means you can send unlimited emails per month for one fixed rate! [Give it a test run](http://bit.ly/constant-contact-signup 'Try out Constant Contact today').
 
@@ -151,7 +158,7 @@ You can modify the widget output by hooking into any of the filters below in a s
 * Error message: `constant_contact_form_errors`
 * Submit button: `constant_contact_form_submit` (includes entire `input` string)
 
-== License ==
-
+= What is the plugin license? =
 Good news, this plugin is free for everyone!
-It's [licensed under the GPL](http://www.gnu.org/licenses/gpl-3.0.txt "View the GPL License").
+
+The plugin is [licensed under the GPL](http://www.gnu.org/licenses/gpl-3.0.txt "View the GPL License").
