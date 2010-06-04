@@ -12,9 +12,7 @@ Integrate Constant Contact into your website with this full-featured plugin.
 
 > __This plugin requires a <a href="http://bit.ly/tryconstantcontact" title="Sign up for a free Constant Contact trial" rel="nofollow">Constant Contact account</a>.__ <br />*Don't have an account?* Constant Contact offers a <a href="http://bit.ly/constant-contact-email" rel="nofollow">free 60 day trial</a>, so sign up and give this plugin a whirl!
 
-### Fully integrate your email marketing campaigns into your WordPress website ###
-
-<h4>Take your website & newsletter to the next level</h4>
+<h4>Fully integrate Constant Contact with your WordPress website.</h4>
 
 The Constant Contact for Wordpress plugin is the best email marketing plugin for WordPress: integrate your website seamlessly with your Constant Contact account. 
 
@@ -32,8 +30,10 @@ You can place a signup checkbox or list selection on your register page or use t
 * Add extra fields to your signup form
 * Uses the REST API
 
+<h4>Plugin Support</h4>
 To obtain support please use this link to the [wordpress forums](http://wordpress.org/tags/constant-contact-api).
 
+<h4>If you like the plugin...</h4>
 If you use the plugin and find it useful please make sure to come back and vote so other users know it works.
 
 == Installation ==
