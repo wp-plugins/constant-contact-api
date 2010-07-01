@@ -3,7 +3,7 @@ Contributors: jamesbenson, katzwebdesign
 Donate link: http://integrationservic.es/donate.php
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms
 Requires at least: 2.9
-Tested up to: 2.9.2
+Tested up to: 3.0
 Stable tag: trunk
 
 Integrate Constant Contact into your website with this full-featured plugin.
