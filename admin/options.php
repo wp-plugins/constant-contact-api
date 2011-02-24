@@ -123,14 +123,6 @@ function constant_contact_settings()
 		<input type="password" name="cc_password" id="cc_password" value="<?php echo get_option('cc_password'); ?>" autocomplete="off" size="50" />
 		</td>
 	</tr>
-<!--
-	<tr>
-		<th scope="row"><p><label for="cc_use_legacy_widget"><span>Load Legacy Widget?</span></label></th>
-		<td>
-		<label><span class="howto"><input type="checkbox" name="cc_use_legacy_widget" id="cc_use_legacy_widget" value="<?php echo (get_option('cc_use_legacy_widget')) ? 'checked="checked"' : ''; ?>" /> If using the Form Designer, you may not want to load the legacy widget.</span></label>
-		</td>
-	</tr>
--->
 	<tr valign="top">
 		<th scope="row"><p><label for="cc_uninstall_method_keep"><span>Uninstall Method</span></label></th>
 		<td>
