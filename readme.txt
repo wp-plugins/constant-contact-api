@@ -174,7 +174,8 @@ This version fixes a major bug and all users should upgrade immediately.
 1. The administration screen is the landing page for all the functionality of the plugin.
 2. Form Designer - New to 2.0, this bad boy is a custom form designer built right into WordPress.
 3. An example of a form you can create with the custom form designer.
-4. View campaign details on the Campaigns screen
+4. Add users to your registration process
+5. View campaign details on the Campaigns screen
 
 == Frequently Asked Questions ==
 
