@@ -221,5 +221,8 @@ You can modify the widget output by hooking into any of the filters below in a s
 9. You will see the signup widget you created on your website!
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
+= My gradients aren't working on the Form Designer! =
+This plugin uses <a href="http://ozh.in/kw">Ozh's gradient script</a>. Please refer to that page.
+
 = What is the plugin license? =
 Good news, this plugin is free for everyone! The plugin is [licensed under the GPL](http://www.gnu.org/licenses/gpl-3.0.txt "View the GPL License").
