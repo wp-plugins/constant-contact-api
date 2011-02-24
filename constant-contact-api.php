@@ -13,7 +13,6 @@ Author URI: http://www.katzwebservices.com
 	require_once CC_FILE_PATH . 'functions.php';
 	require_once CC_FILE_PATH . 'user.php';
 	require_once CC_FILE_PATH . 'constant-contact-api-widget.php';
-	#require_once CC_FILE_PATH . 'form-designer.php'; // Added 2.0
 
 	// load admin only files
 	if(is_admin()) {
