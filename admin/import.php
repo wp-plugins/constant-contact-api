@@ -1,16 +1,22 @@
 <?php
-// import
+/**
+ * Import submenu page callback function
+ *
+ * @global <type> $cc
+ * @return <type>
+ */
 function constant_contact_import()
 {
+	global $cc;
+
+	// Create the CC api object for use in this page.
+	constant_contact_create_object();
+
 	$errors = false;
 	$success = false;
 	
-	$cc = constant_contact_create_object();
-	if(!is_object($cc)):
-		return 'Failed to create CC object';
-	endif;
-	
-	$_lists = $cc->get_all_lists();
+	// view all lists
+	$_lists = constant_contact_get_lists(isset($_REQUEST['refresh_lists']));
 	$lists = array();
 	
 	if($_lists):
@@ -27,38 +33,35 @@ function constant_contact_import()
 			$status = $cc->create_contacts($_FILES['importfile']['tmp_name'], $lists);
 			
 			if($status):
-				$success[] = __("The imported contact data has been sent to the constant contact API and will be processed shortly, the ID for this activity is $status - <a href='?page=constant-contact-activities&id=$status'>View Activity</a>");
+				$success = __("<strong>Import success:</strong> The imported contact data has been sent to the constant contact API and will be processed shortly, the ID for this activity is <code>$status</code>. <a href='?page=constant-contact-activities&id=$status' class='action button'>View Activity</a>");
 			else:
 				$errors[] = __('Your subscribers could not be imported: ' . constant_contact_last_error($cc->http_response_code));
 			endif;
 		else:
-			$errors[] = __('We could not recognise the file you uploaded');
+#			print_r($_POST);
+			if(empty($_POST['file'])) {
+				$errors[] = __('You did not select a file to upload!');
+			} else {
+				$errors[] = __('We could not recognise the file you uploaded');
+			}
 		endif;
 	endif;
 	  
 ?>
 
 	<div class="wrap">
-	<h2>Constant Contact Import</h2>
+	<h2>Constant Contact - Import Contacts</h2>
 	<?php
 	if($success):
 	?>
-		<div class="success">
-		<h3><?php _e("Success"); ?></h3>
-		<ul>
-			<?php 
-			foreach ($success as $txt):
-				echo "<li>".$txt."</li>";
-			endforeach;
-			?>
-		</ul>
-		<br />
+		<div id="message" class="updated">
+			<p><?php echo $success; ?></p>
 		</div>
 	<?php
 	elseif($errors):
 	?>
 		<div class="error">
-		<h3><?php _e("Errors"); ?></h3>
+		<h3><?php _e("Error"); ?></h3>
 		<ul>
 			<?php 
 			foreach ($errors as $error):
@@ -71,7 +74,9 @@ function constant_contact_import()
 	<?php
 	endif;
 	?>
-<form name="import" id="import" method="post" action="" enctype="multipart/form-data">
+<p class="alignright"><label class="howto" for="refresh_lists"><span>Are the displayed lists inaccurate?</span> <a href="<?php echo add_query_arg('refresh_lists', true); ?>" class="button-secondary action" id="refresh_lists">Refresh Lists</a></label></p>
+<div class="clear"></div>
+<form name="import" id="import" method="post" action="<?php echo remove_query_arg('refresh_lists'); ?>" enctype="multipart/form-data">
 <div id="poststuff" class="metabox-holder">
 <div id="post-body">
 <div id="post-body-content">
@@ -80,49 +85,37 @@ function constant_contact_import()
 <div class="handlediv" title="Click to toggle"><br /></div>
 <h3 class='hndle'><span>Options</span></h3>
 <div class="inside">
-
-<table class="form-table" style="width: 100%;" cellspacing="2" cellpadding="5">
+<table class="form-table" cellspacing="0">
 	<tr class="form-field">
-		<th valign="top"  scope="row"><label for="link_image">CSV or TXT file</label></th>
-		<td><input type="file" name="importfile" class="code" id="importfile" size="50" value="" style="width: 95%" />
-		<span class="description"><br />Upload a CSV or TXT file containing your subscribers, see <a href="http://constantcontact.custhelp.com/cgi-bin/constantcontact.cfg/php/enduser/std_adp.php?p_faqid=2523" target="_blank">this page</a> for help with formatting the file</span>
+		<th valign="top"  scope="row"><p><label for="importfile">CSV or TXT file</label></p><p><span class="description howto">Upload a CSV or TXT file containing your subscribers</span></p></th>
+		<td><p><input type="file" name="importfile" class="code" id="importfile" size="50" value="" style="width: 95%" />
+		<span class="description"><br />See <a href="http://constantcontact.custhelp.com/cgi-bin/constantcontact.cfg/php/enduser/std_adp.php?p_faqid=2523" target="_blank">this page</a> for help with formatting the file. You can also refer to the sample file (<a href="<?php echo CC_FILE_URL.'email-import-sample.txt';?>" target="_blank">email-import-sample.txt</a>) included in the plugin.</span></p>
 		</td>
 	</tr>
 	<?php
-	$cc = constant_contact_create_object();
-	
-	if(is_object($cc)):
 		$selected_lists = get_option('cc_lists');
 		$selected_lists = (!is_array($selected_lists)) ? array() : $selected_lists;
-		$lists = $cc->get_all_lists();
+		$lists = constant_contact_get_lists();
 		?>
 
 		<tr valign="top">
-			<th scope="row">Contact Lists</th>
+			<th scope="row"><p><label>Contact Lists</label></p><p><span class="description howto">Select the contact lists the imported subscribers will be added to.</span></p></th>
 			<td>
 			<?php
 			if($lists):
+			echo '<ul class="categorychecklist">';
 			foreach($lists as $k => $v):
 				if(in_array($v['id'], $selected_lists)):
-					echo '<input name="cc_lists[]" type="checkbox" checked="checked" value="'.$v['id'].'" /> '.$v['Name'].'<br />';
+					echo '<li><label for="cc_lists_'.$v['id'].'"><input class="menu-item-checkbox" id="cc_lists_'.$v['id'].'" name="cc_lists[]" type="checkbox" checked="checked" value="'.$v['id'].'" /> '.$v['Name'].'</label></li>';
 				else:
-					echo '<input name="cc_lists[]" type="checkbox" value="'.$v['id'].'" /> '.$v['Name'].'<br />';
+					echo '<li><label for="cc_lists_'.$v['id'].'"><input class="menu-item-checkbox" id="cc_lists_'.$v['id'].'" name="cc_lists[]" type="checkbox" value="'.$v['id'].'" /> '.$v['Name'].'</label></li>';
 				endif;
 			endforeach;
+			echo '</ul>';
 			endif;
 			?>
-			<span class="description"><br />Select the contact lists the imported subscribers will be added to.</span>
 			</td>
 		</tr>
-	<?php
-	else:
-	?>
-	<tr class="form-field">
-		<th valign="top"  scope="row" colspan="">Could not get contacts lists, please check your username and password are entered correctly on the settings page.</td>
-	</tr>
-	<?php
-	endif;
-	?>
 </table>
 </div>
 </div>

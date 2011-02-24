@@ -322,6 +322,9 @@ class cc {
      * Second argument can be used to show/hide the do-not-mail etc lists
      * This method also sorts the lists based on the SortOrder field
      *
+     * Avoid using this function directly, instead use constant_contact_get_lists()
+     * which has built-in caching via WordPress transients to avoid constant queries
+     * to the API that slow down the frontend of a site.
      *
      * @access     public
      */
@@ -716,7 +719,7 @@ $xml_post .= '
             return $this->get_id_from_link($this->http_response_headers['Location']);
         endif;
 
-        return false;
+        return $this->http_response_body; // was simply `return`
     }
 
 
@@ -1468,14 +1471,15 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
         if(isset($timestamp_bits[0], $timestamp_bits[0])):
             $date_bits = explode('-', $timestamp_bits[0]);
             $time_bits = explode(':', $timestamp_bits[1]);
-            $year = $date_bits[0];
-            $month = $date_bits[1];
-            $day = $date_bits[2];
-            $hour = $time_bits[0];
-            $minute = $time_bits[1];
-            $second = $time_bits[2];
+		  
+            $year = (int) $date_bits[0];
+            $month = (int) $date_bits[1];
+            $day = (int) $date_bits[2];
+            $hour = (int) $time_bits[0];
+            $minute = (int) $time_bits[1];
+            $second = (int) $time_bits[2];
 
-            return mktime($hour,$minute,$second, $month, $day, $year);
+		  return mktime($hour, $minute, $second, $month, $day, $year);
         endif;
 
         return false;
@@ -1764,7 +1768,12 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
      */
     function load_url($action = '', $method = 'get', $params = array(), $expected_http_code = 200)
     {
-        $this->http_send($this->api_url . $action, $method, $params);
+//	echor("cc:load_url($action)");
+
+//	echor(debug_backtrace());
+
+
+	$this->http_send($this->api_url . $action, $method, $params);
 
         // handle status codes
         if(intval($expected_http_code) === $this->http_response_code):
@@ -2120,15 +2129,15 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
     function http_get_response_code_error($code)
     {
         $errors = array(
-        200 => 'Success - The request was successful',
-        201 => 'Created (Success) - The request was successful. The requested object/resource was created.',
-        400 => 'Invalid Request - There are many possible causes for this error, but most commonly there is a problem with the structure or content of XML your application provided. Carefully review your XML. One simple test approach is to perform a GET on a URI and use the GET response as an input to a PUT for the same resource. With minor modifications, the input can be used for a POST as well.',
-        401 => 'Unauthorized - This is an authentication problem. Primary reason is that the API call has either not provided a valid API Key, Account Owner Name and Associated Password or the API call attempted to access a resource (URI) which does not match the same as the Account Owner provided in the login credientials.',
-        404 => 'URL Not Found - The URI which was provided was incorrect. Compare the URI you provided with the documented URIs. Start here.',
-        409 => 'Conflict - There is a problem with the action you are trying to perform. Commonly, you are trying to "Create" (POST) a resource which already exists such as a Contact List or Email Address that already exists. In general, if a resource already exists, an application can "Update" the resource with a "PUT" request for that resource.',
-        415 => 'Unsupported Media Type - The Media Type (Content Type) of the data you are sending does not match the expected Content Type for the specific action you are performing on the specific Resource you are acting on. Often this is due to an error in the content-type you define for your HTTP invocation (GET, PUT, POST). You will also get this error message if you are invoking a method (PUT, POST, DELETE) which is not supported for the Resource (URI) you are referencing.
+        200 => '<strong>Success</strong> - The request was successful',
+        201 => '<strong>Created (Success)</strong> - The request was successful. The requested object/resource was created.',
+        400 => '<strong>Invalid Request</strong> - There are many possible causes for this error, but most commonly there is a problem with the structure or content of XML your application provided. Carefully review your XML. One simple test approach is to perform a GET on a URI and use the GET response as an input to a PUT for the same resource. With minor modifications, the input can be used for a POST as well.',
+        401 => '<strong>UNAUTHORIZED REQUEST</strong> - There was a critical failure to authenticate with Constant Contact</p><p>Debug info: Posisble causes of this error are that the API call has either not provided a valid API Key, Account Owner Name and Associated Password or the API call attempted to access a resource (URI) which does not match the same as the Account Owner provided in the login credientials.',
+        404 => '<strong>URL Not Found</strong> - The URI which was provided was incorrect. Compare the URI you provided with the documented URIs. Start here.',
+        409 => '<strong>Conflict</strong> - There is a problem with the action you are trying to perform. Commonly, you are trying to "Create" (POST) a resource which already exists such as a Contact List or Email Address that already exists. In general, if a resource already exists, an application can "Update" the resource with a "PUT" request for that resource.',
+        415 => '<strong>Unsupported Media Type</strong> - The Media Type (Content Type) of the data you are sending does not match the expected Content Type for the specific action you are performing on the specific Resource you are acting on. Often this is due to an error in the content-type you define for your HTTP invocation (GET, PUT, POST). You will also get this error message if you are invoking a method (PUT, POST, DELETE) which is not supported for the Resource (URI) you are referencing.
         To understand which methods are supported for each resource, and which content-type is expected, see the documentation for that Resource.',
-        500  => 'Server Error',
+        500  => '<strong>Server Error</strong>',
         );
 
         if(array_key_exists($code, $errors)):

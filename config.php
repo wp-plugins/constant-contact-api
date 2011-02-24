@@ -38,7 +38,7 @@ define('cc_widget_list_selection_title', 'Contact Lists:');
 define('CC_TRIAL_URL', 'http://bit.ly/cctrial');
 
 // The format for the list selection form element, checkbox or select
-define('CC_LIST_SELECTION_FORMAT', 'select');
+define('CC_LIST_SELECTION_FORMAT', 'checkbox');
 
 // should we show the firstname field in the signup widget
 define('CC_WIDGET_SHOW_FIRSTNAME', 1);
@@ -51,5 +51,9 @@ define('CC_WIDGET_LIST_SELECTION_FORMAT', 'checkbox');
 
 // The full path to this file
 define('CC_FILE_PATH', dirname(__FILE__) . '/');
+
+// @ Added 2.0
+// The full path to this file
+define('CC_FILE_URL', plugin_dir_url(__FILE__));
 
 ?>

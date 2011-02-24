@@ -2,10 +2,10 @@
 /*
 Plugin Name: Constant Contact API
 Plugin URI: http://integrationservic.es/constant-contact/wordpress-plugin.php
-Description: Integrates the <a href="http://bit.ly/cctrial" target="_blank">Constant Contact API</a> into your wordpress blog.
-Author: James Benson
-Version: 1.1.2
-Author URI: http://justphp.co.uk/
+Description: Powerfully integrates <a href="http://conta.cc/bRojlN" target="_blank">Constant Contact</a> into your WordPress website.
+Author: Katz Web Services, Inc. & James Benson
+Version: 2.0
+Author URI: http://www.katzwebservices.com
 */
 
 	// load our config file, this sets the default path and default PHP constants
@@ -13,10 +13,10 @@ Author URI: http://justphp.co.uk/
 	require_once CC_FILE_PATH . 'functions.php';
 	require_once CC_FILE_PATH . 'user.php';
 	require_once CC_FILE_PATH . 'constant-contact-api-widget.php';
-
+	#require_once CC_FILE_PATH . 'form-designer.php'; // Added 2.0
 
 	// load admin only files
-	if(is_admin()):
+	if(is_admin()) {
 		require_once CC_FILE_PATH . 'admin/install.php';
 		require_once CC_FILE_PATH . 'admin/menu.php';
 		require_once CC_FILE_PATH . 'admin/options.php';
@@ -24,27 +24,29 @@ Author URI: http://justphp.co.uk/
 		require_once CC_FILE_PATH . 'admin/export.php';
 		require_once CC_FILE_PATH . 'admin/lists.php';
 		require_once CC_FILE_PATH . 'admin/activities.php';
-
+		require_once CC_FILE_PATH . 'admin/registration.php'; // Added 2.0
+		require_once CC_FILE_PATH . 'admin/campaigns.php'; // Added 2.0
+		
 		// register admin menu action
 		add_action('admin_menu', 'constant_contact_admin_menu');
-		
-		// Add an icon to the menu, added 1.1.2
-		wp_enqueue_style('constant-contact-api-admin', plugins_url('constant-contact-api/admin/constant-contact-admin-css.css'), false, false, 'all');
-		
+
 		// register user delete action
 		add_action('delete_user', 'constant_contact_delete_user');
 
 		// register the install / uninstall hooks
 		register_activation_hook( __FILE__, 'constant_contact_activate' );
 		register_deactivation_hook( __FILE__, 'constant_contact_deactivate' );
-		
-	endif;
 
-	// register our widgets and post handlers
-	add_action('widgets_init', 'constant_contact_load_widgets');
-	add_action('init', 'constant_contact_submit_widget');
+		// Add the handy Settings link on the plugins page
+		add_filter( 'plugin_action_links', 'constant_contact_settings_link', 10, 2 );
+	}
+	
+	// register legacy widget
+	add_action('widgets_init', 'constant_contact_load_legacy_widget');
 
-
+	// register post handlers
+	add_action('init', 'constant_contact_handle_public_signup_form');
+	
 	// register user update action
 	add_action('profile_update', 'constant_contact_profile_update');
 

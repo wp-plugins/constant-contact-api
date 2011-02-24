@@ -3,6 +3,11 @@
  * constant_contact_api_widget Class
  */
 
+function constant_contact_load_legacy_widget()
+{
+	register_widget( 'constant_contact_api_widget' );
+}
+
 /*
 Version 1.1
 Changes made by Zack Katz; katzwebdesign on March 27, 2010
@@ -41,11 +46,12 @@ class constant_contact_api_widget extends WP_Widget {
     /** constructor */
     function constant_contact_api_widget()
 	{
-		$options = array(
+		$widget_options = array(
 			'description' => 'Displays a Constant Contact signup form to your visitors',
 			'classname' => 'constant-contact-signup',
 		);
-        parent::WP_Widget(false, $name = 'Constant Contact Signup', $options);	
+		$control_options = array('width'=>690); // Min-width of widgets config with expanded sidebar
+        parent::WP_Widget(false, $name = 'Constant Contact Signup', $widget_options, $control_options);	
     }
 	
 	
@@ -53,53 +59,20 @@ class constant_contact_api_widget extends WP_Widget {
    /** @see WP_Widget::widget */
     function widget($args = array(), $instance = array())
 	{
+		extract($instance);
 		$output = '';
 		$errors = false;
 		if(isset($GLOBALS['cc_errors'])):
 			$errors = $GLOBALS['cc_errors'];
 			unset($GLOBALS['cc_errors']);
 		endif;
-		
-		$cc_lists = get_option('cc_widget_lists');
-		$cc_lists_array = get_option('cc_widget_lists_array');
-		$exclude_lists = get_option('cc_widget_exclude_lists');
-		$exclude_lists = (!is_array($exclude_lists)) ? array() : $exclude_lists;
-		
+				
 		$cc = constant_contact_create_object();
 			
 		if(!is_object($cc)):
 			return;
 		endif;
 		
-		// If the list has already been set, don't ask for it again.
-		// This saves bandwidth
-		if($cc_lists_array){
-			$lists = unserialize($cc_lists_array);
-		} else if($cc_lists) {
-			// show only the lists they have selected
-			$new_lists = array();
-			foreach($cc_lists as $id):
-				if(!in_array($id, $exclude_lists)):
-					$new_lists[$id] = $cc->get_list($id);
-				endif;
-			endforeach;
-			$lists = $new_lists;
-			update_option('cc_widget_lists_array', maybe_serialize($lists));
-		} else {
-			// show all lists and exclude any have may have selected
-			$lists = $cc->get_all_lists();
-			
-			$new_lists = array();
-			if($lists):
-				foreach($lists as $k => $v):
-					if(!in_array($v['id'], $exclude_lists)):
-						$new_lists[$v['id']] = $cc->get_list($v['id']);
-					endif;
-				endforeach;
-			endif;
-			$lists = $new_lists;
-			update_option('cc_widget_lists_array', maybe_serialize($lists));
-		}
 		
         $widget_title = apply_filters('widget_title', get_option('cc_signup_widget_title'));
 		$widget_description = get_option('cc_signup_widget_description');
@@ -125,28 +98,32 @@ class constant_contact_api_widget extends WP_Widget {
 			elseif(isset($_GET['cc_success'])):
 				$success = '<p>Success, you have been subscribed.</p>';
 				$output .= apply_filters('constant_contact_form_success', $success);
+				$output .= (isset($after_widget)) ? $after_widget : ''; 
+				$output = apply_filters('constant_contact_form', $output);
+				echo $output;
+				return;
 			elseif($widget_description):
 				$widget_description = wpautop($widget_description);
 				$output .= apply_filters('constant_contact_form_description', $widget_description);
 			endif;
 			$output .=
-			'<form action="'.$this->curPageURL().'" method="post" id="constant-contact-signup">';
+			'<form action="'.constant_contact_current_page_url().'" method="post" id="constant-contact-signup" name="constant-contact-signup">';
 			
-			if(get_option('cc_widget_show_firstname')):
+			if($show_firstname):
 				$output .='
 					<label for="cc_firstname">First Name:</label>
 					<div class="input-text-wrap">
-						<input type="text" name="cc_firstname" id="cc_firstname" value="'; 
+						<input type="text" name="fields[first_name][value]" id="cc_firstname" value="'; 
 						$output .= (isset($_POST['cc_firstname'])) ? htmlentities($_POST['cc_firstname']) : '';
 						$output .= '" />
 					</div>';
 				endif;
 				
-				if(get_option('cc_widget_show_lastname')):
+				if($show_lastname):
 				$output .='
 					<label for="cc_lastname">Last Name:</label>
 					<div class="input-text-wrap">
-						<input type="text" name="cc_lastname" id="cc_lastname" value="';
+						<input type="text" name="fields[last_name][value]" id="cc_lastname" value="';
 						$output .= (isset($_POST['cc_lastname'])) ? htmlentities($_POST['cc_lastname']) : '';
 						$output .= '" />
 					</div>';
@@ -155,48 +132,62 @@ class constant_contact_api_widget extends WP_Widget {
 				$output .= '
 				<label for="cc_email">Email:</label>
 				<div class="input-text-wrap">
-					<input type="text" name="cc_email" id="cc_email" value="';
-					$output .= (isset($_POST['cc_email'])) ? htmlentities($_POST['cc_email']) : '';
+					<input type="text" name="fields[email_address][value]" id="cc_email" value="';
+					$output .= (isset($_POST['email_address'])) ? htmlentities($_POST['email_address']) : '';
 				$output .= '" />
 				</div>';
 				
-				if(get_option('cc_widget_show_list_selection')):
-					if(get_option('cc_widget_list_selection_format') == 'select'):
-
-					$output .= '<label for="cc_newsletter_select">'.get_option('cc_widget_list_selection_title') .'</label>
-					<div class="input-text-wrap">
-					<select name="cc_newsletter[]" id="cc_newsletter_select"  multiple size="5">';
-						if($lists):
-						foreach($lists as $k => $v):
-							if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])):
-								$output .=  '<option selected value="'.$v['id'].'">'.$v['Name'].'</option>';
-							else:
-								$output .=  '<option value="'.$v['id'].'">'.$v['Name'].'</option>';
+				if($show_list_selection) {
+					if($list_selection_format != 'checkbox') {
+						$output .= '<label for="cc_newsletter_select">'.$list_selection_title.'</label>
+						<div class="input-text-wrap">';
+						if($list_selection_format == 'select') {
+							$output .= '<select name="cc_newsletter[]" id="cc_newsletter_select"  multiple size="5">';
+						} else {
+							$output .= '<select name="cc_newsletter[]" id="cc_newsletter_select">';
+						}
+							if(!empty($showlists)):
+							foreach($showlists as $k => $v):
+								if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])):
+									$output .=  '<option selected value="'.$v['id'].'">'.$v['ShortName'].'</option>';
+								else:
+									$output .=  '<option value="'.$v['id'].'">'.$v['ShortName'].'</option>';
+								endif;
+							endforeach;
 							endif;
-						endforeach;
-						endif;
-					$output .= '
-					</select>
-					</div>';
+						$output .= '
+						</select>
+						</div>';
 					
-					elseif($lists):
-						$output .=  get_option('cc_widget_list_selection_title');
+					} else {
+						$output .=  $list_selection_title;
 						$output .=  '<div class="input-text-wrap">';
-						$output .=  '<ul>';
-						foreach($lists as $k => $v):
+						$output .=  '<ul>'."\n";
+						foreach($showlists as $k => $v):
 							if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])):
-								$output .=  '<li><label for="cc_newsletter-'.$v['id'].'"><input checked="checked" type="checkbox" name="cc_newsletter[]" id="cc_newsletter-'.$v['id'].'" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '</label></li>'; // ZK added label, ID, converted to <LI>
+								$output .=  '<li><label for="cc_newsletter-'.$v['id'].'"><input checked="checked" type="checkbox" name="cc_newsletter[]" id="cc_newsletter-'.$v['id'].'" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '</label></li>'."\n"; // ZK added label, ID, converted to <LI>
 							else:
-								$output .=  '<li><label for="cc_newsletter-'.$v['id'].'"><input type="checkbox" name="cc_newsletter[]" id="cc_newsletter-'.$v['id'].'" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '</label></li>'; // ZK added label, ID
+								$output .=  '<li><label for="cc_newsletter-'.$v['id'].'"><input type="checkbox" name="cc_newsletter[]" id="cc_newsletter-'.$v['id'].'" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '</label></li>'."\n"; // ZK added label, ID
 							endif;
 						endforeach;
-						$output .=  '</ul>';
-						$output .=  '</div>';
-					endif;
-				endif;
+						$output .=  '</ul>'."\n";
+						$output .=  '</div>'."\n";
+					}
+				} // end if show list selection
+				
+				if(!empty($hidelists)) {
+					$hide_lists_output = '';
+					foreach($hidelists as $k => $v) {
+						if(in_array($v['id'], $lists)) {
+							$hide_lists_output .= '<input type="hidden" name="cc_newsletter[]" id="cc_newsletter-'.$v['id'].'" value="'.$v['id'].'" />'."\n";
+						}
+					}
+				}
+				
 				$output .= '
 				<div>
-					<input type="hidden" id="cc_referral_url" name="cc_referral_url" value="'.urlencode($this->curPageURL()).'" />';
+					'.$hide_lists_output.'
+					<input type="hidden" id="cc_referral_url" name="cc_referral_url" value="'.urlencode(constant_contact_current_page_url()).'" />';
 					$submit_button = '<input type="submit" name="constant-contact-signup-submit" value="Signup" class="button submit" />';
 					$output .= apply_filters('constant_contact_form_submit', $submit_button);
 					$output .= '
@@ -211,26 +202,199 @@ class constant_contact_api_widget extends WP_Widget {
 			echo $output;
     }
 	
-   /*
-	* From http://www.webcheatsheet.com/PHP/get_current_page_url.php
-	*/
-	function curPageURL() {
-		 $pageURL = 'http';
-		 if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
-		 $pageURL .= "://";
-		 if ($_SERVER["SERVER_PORT"] != "80") {
-		  $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
-		 } else {
-		  $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
-		 }
-		 return remove_query_arg('cc_success',$pageURL);
+	function update($new, $old) {
+		extract($new);
+		$cc = constant_contact_create_object();
+		
+		$show_lists = $hide_lists = array();
+		
+		if(!empty($lists) && is_array($lists)) {
+			// show only the lists they have selected
+			foreach($lists as $id):
+				if(!in_array($id, $exclude_lists)) {
+					$show_lists[$id] = $cc->get_list($id);
+				} else {
+					$hide_lists[$id] = $cc->get_list($id);
+				}
+			endforeach;
+		} else {
+			// show all lists and exclude any have may have selected
+			$lists = $cc->get_all_lists();
+			
+			if($lists):
+				foreach($lists as $k => $v):
+					if(!in_array($v['id'], $exclude_lists)) {
+						$show_lists[$v['id']] = $cc->get_list($v['id']);
+					} else {
+						$hide_lists[$v['id']] = $cc->get_list($v['id']);
+					}
+				endforeach;
+			endif;
+		}
+		$new['showlists'] = $show_lists;
+		$new['hidelists'] = $hide_lists;
+		return $new;
 	}
 	
+	function r($print = null, $die = false) {
+		echo '<pre>';
+		print_r($print);
+		echo '</pre>';
+		if($die) { die(); }
+		return;
+	}
+	
+	function get_value($field, $instance) {
+		if (isset ( $instance[$field])) { return esc_attr( $instance[$field] );}
+		return '';
+	}
+		
     /** @see WP_Widget::form */
+  /** @see WP_Widget::form */
     function form($instance)
 	{
+		$instance = wp_parse_args( (array) $instance, 
+			array(
+				'show_firstname' => get_option('cc_widget_show_firstname'), 
+				'show_lastname' => get_option('cc_widget_show_lastname'), 
+				'description' => get_option('cc_widget_description'),
+				'title' => get_option('cc_signup_widget_title'), 
+				'list_selection_title' => get_option('cc_widget_list_selection_title'), 
+				'list_selection_format' => get_option('cc_widget_list_selection_format'),  
+				'show_list_selection' => get_option('cc_widget_show_list_selection'),
+				'lists' => array(), 
+				'exclude_lists' => array() 
+			)
+		);
+		extract($instance);
+		
+		@include_once('functions.php');
+		$cc = constant_contact_create_object();
+		
+		$title = isset( $instance['title'] ) ? $instance['title'] : '';
+		$description = isset( $instance['description'] ) ? $instance['description'] : '';
 	?>
-		<p><a href="admin.php?page=constant-contact-settings#widget">Edit the widget settings</a></p>
+	<h3>Signup Widget Settings</h3>
+	<a name="widget"></a>
+	<table class="form-table">
+		<tr valign="top">
+			<th scope="row"><p><label for="<?php echo $this->get_field_id('title');?>"><span>Signup Widget Title</span></label></p></th>
+			<td>
+			<input type="text" class="widefat" id="<?php echo $this->get_field_id('title');?>" name="<?php echo $this->get_field_name('title');?>" value="<?php echo $title; ?>" size="50" />
+			<p class="description">The title text for the this widget.</p>
+			</td>
+		</tr>
+		<tr valign="top">
+			<th scope="row"><p><label for="<?php echo $this->get_field_id('description');?>"><span>Signup Widget Description</span></label></p></th>
+			<td>
+			<textarea class="widefat" name="<?php echo $this->get_field_name('description');?>" id="<?php echo $this->get_field_id('description');?>" cols="50" rows="4"><?php echo $description; ?></textarea>
+			<p class="description">The description text displayed in the sidebar widget before the form. HTML allowed. Paragraphs will be added automatically like in posts.</p>
+			</td>
+		</tr>
+		<tr valign="top">
+			<th scope="row"><p><label for="<?php echo $this->get_field_id('redirect_url');?>"><span>Signup Widget Thanks Page</span></label></p></th>
+			<td>
+			<input type="text" class="widefat code" name="<?php echo $this->get_field_name('redirect_url');?>"  id="<?php echo $this->get_field_id('redirect_url');?>" value="<?php echo $this->get_value('redirect_url', $instance); ?>" size="50" />
+			<p class="description">Enter a url above to redirect new registrants to a thank you page upon successfully submitting the signup form. Use the full URL/address including <strong>http://</strong> Leave this blank for no redirection (page will reload with success message inside widget).</p>
+			</td>
+		</tr>
+		<tr valign="top">
+			<th scope="row"><p><label for="<?php echo $this->get_field_id('show_list_selection');?>"><span>Show List Selection?</span></label></p></th>
+			<td>
+			<label for="<?php echo $this->get_field_id('show_list_selection');?>" class="howto"><input <?php checked($show_list_selection) ?> type="checkbox" name="<?php echo $this->get_field_name('show_list_selection');?>" id="<?php echo $this->get_field_id('show_list_selection');?>" class="list-selection" value="1" /> <span>Yes, let visitors choose which contact lists they want to subscribe to.</span></label>
+			<p class="description">This will let users see the various lists ticked in the <strong>Active Contact Lists</strong> option below. 	<strong>If this is not checked</strong> they will automatically be subscribed to all <strong>Active Contact Lists</strong>.</p>
+			</td>
+		</tr>
+		
+<?php
+	
+		$selected_lists = (!is_array($instance['lists'])) ? array() : $instance['lists'];
+		$exclude_lists = (!is_array($instance['exclude_lists'])) ? array() : $instance['exclude_lists'];
+		
+#		$lists_all = constant_contact_get_transient('lists_all');
+	
+		$lists_all = constant_contact_get_lists(isset($_REQUEST['fetch_lists']));
+/*
+		if(empty($lists_all)) {
+			$lists_all = $cc->get_all_lists();
+			constant_contact_set_transient('lists_all', $lists_all);
+		}
+*/
+		$hidecss = !$show_list_selection ? ' style="display:none;"' : '';
+
+		?>
+		<tr valign="top" class="contact-lists">
+			<th scope="row"><p><label><span>Contact Lists</span></label></p><p><a href="<?php echo admin_url('widgets.php?fetch_lists=true'); ?>" class="button">Refresh Lists</a></p></th>
+			<td>
+			<?php
+			if($lists_all):
+#			$this->r($lists_all);
+			$selectList = $checkList = '';
+			foreach($lists_all as $k => $v):
+				if(in_array($v['id'], $selected_lists) || sizeof($selected_lists) == 0 && $k == 0):
+					$checkList .= '<label for="'.$this->get_field_id('lists_'.$v['id']).'"><input name="'.$this->get_field_name('lists').'[]" type="checkbox" checked="checked" value="'.$v['id'].'" id="'.$this->get_field_id('lists_'.$v['id']).'" /> '.$v['Name'].'</label><br />';
+					$selectList .= '<option>'.$v['Name'].'</option>'; 
+				else:
+					$checkList .= '<label for="'.$this->get_field_id('lists_'.$v['id']).'"><input name="'.$this->get_field_name('lists').'[]" type="checkbox" value="'.$v['id'].'" id="'.$this->get_field_id('lists_'.$v['id']).'"  /> '.$v['Name'].'</label><br />';
+					$selectList .= '<option>'.$v['Name'].'</option>'; 
+				endif;
+			endforeach;
+			echo $checkList;
+			endif;
+			?>
+			<p class="description">If you show the list selection you can select which lists are available above, alternatively if you disable the list selection you should select which lists the user is automatically subscribed to (if you show the list selection and don't select any lists above all lists will be available to the user including newly created ones).</p>
+			</td>
+		</tr>
+		<tr valign="top" class="list-selection"<?php echo $hidecss; ?>>
+			<th scope="row"><p><label for="<?php echo $this->get_field_id('list_selection_title');?>"><span>List Selection Title</span></label></p></th>
+			<td>
+			<input type="text" class="widefat" id="<?php echo $this->get_field_id('list_selection_title');?>" name="<?php echo $this->get_field_name('list_selection_title');?>" value="<?php echo $this->get_value('list_selection_title', $instance); ?>" size="50" />
+			<p class="description">Label text displayed in widget just above the list selection  form.</p>
+			</td>
+		</tr>
+		<tr valign="top" class="list-selection"<?php echo $hidecss; ?>>
+			<th scope="row"><p><label for="<?php echo $this->get_field_id('list_selection_format');?>"><span>List Selection Format</span></label></p></th>
+			<td>
+			<label for="<?php echo $this->get_field_id('list_selection_format_checkbox'); ?>"><input <?php checked($instance['list_selection_format'], 'checkbox') ?> type="radio" name="<?php echo $this->get_field_name('list_selection_format'); ?>" value="checkbox" id="<?php echo $this->get_field_id('list_selection_format_checkbox'); ?>" /> Checkboxes</label>
+			<label for="<?php echo $this->get_field_id('list_selection_format_dropdown'); ?>"><input <?php checked($instance['list_selection_format'], 'dropdown') ?> type="radio" name="<?php echo $this->get_field_name('list_selection_format'); ?>" value="dropdown" id="<?php echo $this->get_field_id('list_selection_format_dropdown'); ?>" /> Dropdown List</label>
+			<label for="<?php echo $this->get_field_id('list_selection_format_select'); ?>"><input <?php checked($instance['list_selection_format'], 'select') ?> type="radio" name="<?php echo $this->get_field_name('list_selection_format'); ?>" value="select" id="<?php echo $this->get_field_id('list_selection_format_select'); ?>" /> Multi-Select</label>
+			<script type="text/javascript"><!--
+			 jQuery(document).ready(function($) {
+				$('a.moreInfo').live('click', function(e) {
+					e.preventDefault();
+					jQuery("div.moreInfo").toggle();
+					return false; 
+				});
+			});
+			--></script>
+			<p class="description">This controls what kind of list is shown. <a href="#listTypeInfo" class="moreInfo">More info</a></p>
+			<div class="moreInfo" id="listTypeInfo" style="display:none;">
+				<ul class="howto" style="list-style:disc outside!important; display:list-item!important;">
+					<li><strong>Checkboxes</strong> displays a list of checkboxes, like the lists above and below</li>
+					<li><strong>Dropdown List</strong> displays the list as a multi-select drop-down.<br />Example: <select><?php echo $selectList; ?></select></li>
+					<li><strong>Multi-Select</strong> displays the list as a multi-select drop-down.<br />Example: <select multiple="multiple" size="4" style="height:5em!important;"><?php echo $selectList; ?></select></li>
+				</ul>
+			</div>
+			</td>
+		</tr>
+		<tr valign="top" class="list-selection contact-lists-hide"<?php echo $hidecss; ?>>
+			<th scope="row"><p><label><span>Hide Contact Lists from User Selection</span></label></p></th>
+			<td>
+			<?php
+			if($lists_all):
+			foreach($lists_all as $k => $v):
+				if(in_array($v['id'], $exclude_lists)):
+					echo '<label for="'.$this->get_field_id('exclude_lists_'.$v['id']).'"><input name="'.$this->get_field_name('exclude_lists').'[]" type="checkbox" checked="checked" value="'.$v['id'].'" id="'.$this->get_field_id('exclude_lists_'.$v['id']).'" /> '.$v['Name'].'</label><br />';
+				else:
+					echo '<label for="'.$this->get_field_id('exclude_lists_'.$v['id']).'"><input name="'.$this->get_field_name('exclude_lists').'[]" type="checkbox" value="'.$v['id'].'" id="'.$this->get_field_id('exclude_lists_'.$v['id']).'" /> '.$v['Name'].'</label><br />';
+				endif;
+			endforeach;
+			endif;
+			?>
+			<p class="description">If you show the list selection you can select which lists to always exclude from the selection.</p>
+			</td>
+		</tr>
+	</table>
 	<?php
     }
 
@@ -328,7 +492,7 @@ class constant_contact_api_widget extends WP_Widget {
 		endif;
 		
 		if(!count($lists)):
-			$GLOBALS['cc_errors'][] = 'Please select at least 1 ' . get_option('cc_widget_list_selection_title');
+			$GLOBALS['cc_errors'][] = 'Please select at least 1 list.';
 			return;
 		endif;
 					

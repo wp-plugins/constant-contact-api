@@ -61,6 +61,8 @@
 		add_option('cc_widget_show_lastname',CC_WIDGET_SHOW_LASTNAME, '', 'no');
 		add_option('cc_widget_list_selection_format',CC_WIDGET_LIST_SELECTION_FORMAT, '', 'no');
 		add_option('cc_widget_list_selection_title', cc_widget_list_selection_title, '', 'no');
+		add_option('cc_widget_list_selection_title', cc_widget_list_selection_title, '', 'no');
+		add_option('cc_use_legacy_widget', true, '', 'no');
 		
 		if(!get_option('cc_username') || !get_option('cc_password')):
 			function constant_contact_warning() {
@@ -100,6 +102,7 @@
 			'cc_widget_list_selection_format',
 			'cc_widget_redirect_url',
 			'cc_widget_list_selection_title',
+			'cc_use_legacy_widget'
 		);
 		
 		if(get_option('cc_uninstall_method') == 'remove'):

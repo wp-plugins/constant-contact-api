@@ -1,9 +1,9 @@
 === Constant Contact for Wordpress ===
-Contributors: jamesbenson, katzwebdesign
-Donate link: http://integrationservic.es/donate.php
+Contributors: katzwebdesign, jamesbenson
+Donate link: http://www.seodenver.com
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms
 Requires at least: 2.9
-Tested up to: 3.0
+Tested up to: 3.1
 Stable tag: trunk
 
 Integrate Constant Contact into your website with this full-featured plugin.
@@ -18,10 +18,15 @@ The Constant Contact for Wordpress plugin is the best email marketing plugin for
 
 You can place a signup checkbox or list selection on your register page or use the signup widget anywhere in your website sidebar or PHP templates.
 
-<h4>Plugin features:</h4>
+<h3>Version 2.0</h3>
+Version 2.0 of the Constant Contact API plugin brings great new capabilities, improved interface, and expanded instructions.  New capabilities include Campaign details (email sending statistics) and caching of data to dramatically improve load speed. The plugin has been majorly reconstructed to improve the way the API is accessed and reduce the number of calls to the API. Each administration screen has improved interfaces to make the plugin look and feel more like a native extension of WordPress. Great care has been taken to conform to WordPress standards of design.
 
+<strong>The new Constant Contact Form Designer (CCFD)</strong> gives the Constant Contact API a form generation tool. The Form Designer allows users to generate unlimited number of unique forms and gives a wide variety of options that can be configured, including what fields to show in the signup form. There and tons of design options, including custom background images, border width, colors, fonts and much more.
+
+<h4>Plugin features:</h4>
 * Add signup checkbox and list selection to your register page and update profile page
 * Add / edit / delete contact lists without visiting constantcontact.com
+* Includes a powerful form designer
 * Show contact list selection on register page with ability to exclude certain lists
 * Automatically subscribe your user to one or more contact lists on the register page
 * Customize the register page signup box (and list selection) title and description
@@ -42,18 +47,43 @@ To install the plugin follow the steps below:
 
 1. Upload `constant-contact-api` to the `/wp-content/plugins/` directory.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
-3. Click the new main menu item called "Constant Contact".
-4. You'll need to enter your username and password on the settings page then save the page to see your contact lists.
-5. Now Configure the "Register Page Settings" to get the checkbox or list selection displayed on the user register page.
-6. Alternatively configure the signup widget in the admin area, if widgets are not supported in your theme you'll have to place the code below somewhere into one of your PHP theme files:
+3. Activate the Constant Contact API: Form Designer plugin (optional)
+4. Click the new main menu item called "Constant Contact".
+5. You'll need to enter your username and password on the settings page then save the page to see your contact lists.
+6. Now Configure the "Register Page Settings" to get the checkbox or list selection displayed on the user register page.
+7. Alternatively configure the signup widget in the admin area, if widgets are not supported in your theme you'll have to place the code below somewhere into one of your PHP theme files:
 <pre>
 &lt;?php $sbw = new constant_contact_api_widget(); $sbw-&gt;widget(); ?&gt;
 </pre>
 
 Optionally, If you want to change the default plugin options you can you edit the config.php file before installing, this is not required because all the options are editable via the wp admin interface but doing so means you can install the plugin with your preferred settings or provide the plugin to clients using a default set of options.
 
+### Using the new Form Designer
+1. Install this plugin.
+2. Activate the Constant Contact API: Form Designer plugin
+3. Configure the settings on the form designer by updating the settings in the boxes on the left. 
+4. Next to "Form Name" where it says "Enter form name here," enter your form name.
+5. Once you have configured and named your form, click Save Form.
+6. In the Appearance menu of the administration, click the Widgets link.
+7. Drag the widget named "Constant Contact Form Designer" into the sidebar. 
+8. Configure the settings shown, then click the "Save" button at the bottom of the widget form.
+9. You will see the signup widget you created on your website!
+10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
 == Changelog ==
+
+= 2.0 = 
+* <strong>Major upgrade</strong> - make sure to back up your database. If you already have installed the plugin, this upgrade may not transfer your current settings.
+* Went through each page of the admin and made the layout and code better, and reworded the administration to <strong>make more sense</strong>
+* Fixed Import, Export, Activity
+* Converted the widget settings to be in the widget, not on a page.
+* <strong>New Form Designer</strong> - Create awesome forms with tons of configuration options. This is really cool. <em>Requires a decent browser for the admin. Internet Explorer older than 2009 won't work.</em> Please leave feedback with issues - this feature is in Alpha.
+	* Drag and drop inputs with live-updating form preview
+	* Create custom gradients or choose from patterns or URL-based backgrounds
+	* So, so much more.
+* Lists will now be updated (<a href="http://wordpress.org/support/topic/423429">bug #423429</a>)
+* Added a sample import CSV file in the plugin folder, named `email-import-sample.txt`
+* Improved load time of the plugin & widget
 
 = 1.1.2 =
 * Minor bug fix, fixes `in_array(): Wrong datatype for second argument` error <a href="http://wordpress.org/support/topic/393359" rel="nofollow">reported here</a>.
@@ -98,6 +128,20 @@ Optionally, If you want to change the default plugin options you can you edit th
 
 == Upgrade Notice ==
 
+= 2.0 = 
+* <strong>Major upgrade</strong> - make sure to back up your database. If you already have installed the plugin, this upgrade may not transfer your current settings.
+* Went through each page of the admin and made the layout and code better, and reworded the administration to <strong>make more sense</strong>
+* Fixed Import, Export, Activity
+* Converted the widget settings to be in the widget, not on a page.
+* <strong>New Form Designer</strong> - Create awesome forms with tons of configuration options. This is really cool. <em>Requires a decent browser for the admin. Internet Explorer older than 2009 won't work.</em> Please leave feedback with issues - this feature is in Alpha.
+	* Comes with a new Form Designer widget
+	* Drag and drop inputs with live-updating form preview
+	* Create custom gradients or choose from patterns or URL-based backgrounds
+	* So, so much more. Check out the screenshots for an example.
+* Lists will now be updated (<a href="http://wordpress.org/support/topic/423429">bug #423429</a>)
+* Added a sample import CSV file in the plugin folder, named `email-import-sample.txt`
+* Improved load time of the plugin & widget
+
 = 1.1.2 =
 * Minor bug fix, fixes `in_array(): Wrong datatype for second argument` error <a href="http://wordpress.org/support/topic/393359" rel="nofollow">reported here</a>.
 
@@ -125,6 +169,12 @@ This version simply updates the readme.txt file so the project description page 
 
 = 1.0.5 =
 This version fixes a major bug and all users should upgrade immediately.
+
+== Screenshots ==
+1. The administration screen is the landing page for all the functionality of the plugin.
+2. Form Designer - New to 2.0, this bad boy is a custom form designer built right into WordPress.
+3. An example of a form you can create with the custom form designer.
+4. View campaign details on the Campaigns screen
 
 == Frequently Asked Questions ==
 
@@ -155,6 +205,20 @@ You can modify the widget output by hooking into any of the filters below in a s
 * Form description text: `constant_contact_form_description` (after it has been modified by `wpautop()`)
 * Error message: `constant_contact_form_errors`
 * Submit button: `constant_contact_form_submit` (includes entire `input` string)
+
+= How do I use the Form Designer? =
+
+### Using the new Form Designer
+1. Install this plugin.
+2. Activate the Constant Contact API: Form Designer plugin
+3. Configure the settings on the form designer by updating the settings in the boxes on the left. 
+4. Next to "Form Name" where it says "Enter form name here," enter your form name.
+5. Once you have configured and named your form, click Save Form.
+6. In the Appearance menu of the administration, click the Widgets link.
+7. Drag the widget named "Constant Contact Form Designer" into the sidebar. 
+8. Configure the settings shown, then click the "Save" button at the bottom of the widget form.
+9. You will see the signup widget you created on your website!
+10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
 = What is the plugin license? =
 Good news, this plugin is free for everyone! The plugin is [licensed under the GPL](http://www.gnu.org/licenses/gpl-3.0.txt "View the GPL License").

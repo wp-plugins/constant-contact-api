@@ -1,116 +1,778 @@
 <?php // $Id$
 
-	// load the custom widgets
-	function constant_contact_load_widgets()
-	{
-		register_widget( 'constant_contact_api_widget' );
+/**
+ * Fetch array of all contact lists from the transient cache, checking API and updating cache if necessary or forced.
+ *
+ * Attempts to serve array from 'cc_lists_cache' transient. If nothing is there or $force_update, 
+ * it first checks via the API (cc::get_all_lists()) and saves a new transient.
+ *
+ * @uses $cc::get_all_lists() if API needs to be checked. Avoid that function as it slows down the page
+ * @global cc $cc
+ * @param boolean $force_update If true the API will be queried even if there is a valid cache.
+ * @return <type>
+ */
+function constant_contact_get_lists($force_update = false) {
+	global $cc;
+
+	if(!$force_update) {
+		// First check the transient to see if it is still fresh enough
+		$lists = get_transient('cc_lists_cache');
+	
+		// If it is an array and we are not forcing an update, return the data
+		if (is_array($lists))
+			return $lists;
+	}
+	/**
+	 * Otherwise we need to fetch and save a fresh copy in our transient
+	 */
+	// Create the cc object if necessary
+	if(!constant_contact_create_object()) { return false; };
+
+	// Fetch the array of all lists using the API
+	$lists = $cc->get_all_lists();
+
+	// Save the array into the cc_lists_cache transient with a 12-hour expiration
+	set_transient('cc_lists_cache', $lists, 60*60*12);
+
+	return $lists;
+
+}
+
+/**
+ * Fetch data array for a specific contact list from the transient cache.
+ *
+ * Avoids the extra API query in cc:get_list by using constant_contact_get_lists() and its transientn cache
+ *
+ * @param integer $id Numeric id of the list you want the data for.
+ * @return <type>
+ */
+function constant_contact_get_list($id) {
+
+	$lists = constant_contact_get_lists();
+
+	foreach ($lists as $key => $details) :
+		if ($details['id'] == $id)
+			return $details;
+	endforeach;
+}
+
+/**
+ * Format field mappings into array
+ * @return <type>
+ */
+function constant_contact_build_field_mappings()
+{
+	if(isset($GLOBALS['cc_extra_field_mappings'])):
+		return $GLOBALS['cc_extra_field_mappings'];
+	endif;
+
+	$mappings = get_option('cc_extra_field_mappings');
+	$field_mappings = explode(',', $mappings);
+
+	$GLOBALS['cc_extra_field_mappings'] = array();
+
+	if($field_mappings):
+	foreach($field_mappings as $mapping):
+		$bits = explode(':', $mapping);
+
+		if(is_array($bits) && isset($bits[0], $bits[1])):
+			$GLOBALS['cc_extra_field_mappings'][trim($bits[0])] = trim($bits[1]);
+		endif;
+	endforeach;
+	endif;
+
+	return $GLOBALS['cc_extra_field_mappings'];
+}
+
+
+/**
+ * This function determines what the last error was and returns a friendly error message
+ *
+ * @param <type> $status_code
+ * @return boolean
+ */
+function constant_contact_last_error($status_code = 0)
+{
+	$last_error = false;
+	$status_code = intval($status_code);
+
+	if(!$status_code):
+		return $last_error;
+	endif;
+
+	$last_error = 'Sorry there was a problem processing your request, the error given was: ';
+
+	switch($status_code):
+		case 400: /* Invalid Request */
+			$last_error .= 'Invalid Request';
+		break;
+		case 401: /* Unauthorized */
+			$last_error .= 'Unauthorized';
+		break;
+		case 404: /* Page Not Found */
+			$last_error .= 'Page Not Found';
+		break;
+		case 409: /* Conflict */
+			$last_error .= 'Conflict';
+		break;
+		case 415: /* Unsupported Media Type */
+			$last_error .= 'Unsupported Media Type';
+		break;
+		case 500: /* Internal Server Error */
+			$last_error .= 'Internal Server Error';
+		break;
+		default: /* Unknown Error */
+			$last_error .= 'Unknown Error';
+		break;
+	endswitch;
+
+	return $last_error;
+}
+
+
+/**
+ * Create and validate a cc object as defined in class.cc.php
+ *
+ * Saves to global $cc if the object is created successfully.
+ *
+ * Makes a request to Constant Contact servers to test the connection and ensure validity of the object.
+ *
+ * Should only be run ONCE PER PAGELOAD because the global $cc can be used afterwards
+ * and creating extra $cc objects wastes resources and slows down pageload. Should not
+ * be run on any pages where queries to the API are not explicitly needed.
+ *
+ * Formerly returned the $cc object and was used all over by various functions. This
+ * caused many unnecessary connections, so global $cc is now used instead.
+ *
+ * Still returns the $cc object if it is valid for backwards-compatibility.
+ * 
+ * @return cc
+ */
+function constant_contact_create_object($force_new = false)
+{
+	global $cc;
+
+	// If there is already the object, leave it alone
+	if(!$force_new && is_object($cc)) { return $cc; }
+	
+	// If the cc object has been stored, 
+	if(!$force_new && $trans_api = get_transient('cc_object')) {
+		require_once CC_FILE_PATH . 'class.cc.php';
+		$cc = maybe_unserialize($trans_api);
+		
+		// If there is a problem with $cc show an error
+		if(!is_object($cc)) {
+			constant_contact_admin_credentials_error();
+			return;
+		} else {
+			return $cc;
+		}
+	} else {
+		delete_transient('cc_object');
 	}
 
-	// Format field mappings into array
-	function constant_contact_build_field_mappings()
-	{
-		if(isset($GLOBALS['cc_extra_field_mappings'])):
-			return $GLOBALS['cc_extra_field_mappings'];
+	// Get the username and password
+	$username = get_option('cc_username');
+	$password =  get_option('cc_password');
+
+	// If either are missing always return false, they are mandatory
+	if(!$username || !$password):
+		// issues an error using wp system
+		return false;
+	endif;
+
+	// Include the class definition file
+	require_once CC_FILE_PATH . 'class.cc.php';
+
+	// Create a new instance
+	$new_cc = new cc($username, $password);
+
+
+	/**
+	 * Test the instance to make sure it is valid
+	 */
+	// Run a generic check to see if we can connect
+	if(is_object($new_cc) && $new_cc->get_service_description()) {
+		// If we have connected copy the object into the global
+		$cc = $new_cc;
+		
+		// Save some processing time!
+		set_transient('cc_object', maybe_serialize($cc), 60*60*12);
+		
+		// If there is a problem with $cc show an error
+		if(!is_object($cc)) {
+			return false;
+		} else {
+			return $cc;
+		}
+		
+	// Otherwise, if there is a response code, deal with the connection error
+	} elseif(is_object($new_cc) AND isset($new_cc->http_response_code)) {
+
+		$error = $new_cc->http_get_response_code_error($new_cc->http_response_code);
+
+		// if we get an unauthorized 401 error code reset the username and password
+		// if we don't do this the CC account will be temporarily blocked eventually
+		if(intval($new_cc->http_response_code) === 401):
+			// Leave the wrong info there, but show the error message // ZK - 1.1
+			#update_option('cc_username', '');
+			#update_option('cc_password', '');
+			if(is_admin() && !isset($_POST['error_displayed'])) { // error_diplayed for showing only once, it was showing twice
+				$_POST['error_displayed'] = true;
+				echo "<div id='constant-contact-warning' class='error'>
+					<p>$error</p>
+				</div>";
+			}
+
 		endif;
+
+	} // if http_response_code
+
+	return false;
+}
+
+/**
+ * Display an error about Constant Contact credentials to show in admin when
+ * we are unable to build the $cc object
+ */
+function constant_contact_admin_credentials_error() {
+	return '<div class="error"><p>There was a problem with your <a href="' . admin_url('admin.php?page=constant-contact-api') . '">Constant Contact settings</a>, please ensure that you have entered a valid username and password.</p></div>';
+}
+
+function constant_contact_urlencode_array($args) {
+	if(!is_array($args)) return false;
+  $c = 0;
+  $out = '';
+  foreach($args as $name => $value)
+  {
+    if($c++ != 0) $out .= '&';
+    $out .= urlencode("$name").'=';
+    if(is_array($value))
+    {
+      $out .= constant_contact_urlencode_array($value);
+    }else{
+      $out .= urlencode("$value");
+    }
+  }
+  return $out;
+}
+
+
+add_shortcode('constantcontactapi', 'constant_contact_signup_form_shortcode');
+function constant_contact_signup_form_shortcode($atts, $content=null) {
+	shortcode_atts( array(
+		'before' => null,
+		'after' => null,
+		'formid' => 0,
+		'redirect_url' => false,
+		'lists' => array(),
+		'title' => '',
+		'exclude_lists' => array(),
+		'description' => '',
+		'show_list_selection' => false,
+		'list_selection_title' => 'Add me to these lists:',
+		'list_selection_format' => 'checkbox'
+	), $atts );
+	
+	return constant_contact_public_signup_form($atts, false);
+};
+
+/**
+ * HTML Signup form to be used in widget and shortcode
+ *
+ * Based on original widget code but broken out to be used in shortcode and
+ * any other place where non-logged-in users will be signing up.
+ *
+ * @param <type> $args
+ */
+function constant_contact_public_signup_form($args, $echo = true) {
+	$output = $error_output = $success = $haserror = $listoutput = $hiddenlistoutput = '';
+	$defaultArgs = array(
+		'before' => null,
+		'after' => null,
+		'formid' => 0,
+		'redirect_url' => false,
+		'lists' => array(),
+		'title' => '',
+		'exclude_lists' => array(),
+		'description' => '',
+		'show_list_selection' => false,
+		'list_selection_title' => 'Add me to these lists:',
+		'list_selection_format' => 'checkbox'
+	);
+	$args = wp_parse_args($args, $defaultArgs);
+	
+	extract($args, EXTR_SKIP);
+
+	/**
+	 * Make it possible to call using shortcode comma separated values. eg: lists=1,2,3
+	 */
+	if(is_string($lists)) { $lists = explode(',', $lists); }
+	
+	/**
+	 * Prepare the set of contact lists that will be shown to the user
+	 */
+	// $lists_to_show: array which will hold data about lists to display if necessary
+	$lists_to_show = array();
+
+	/**
+	 * Get array of IDs of contact lists chosen in the "Active Contact Lists" option
+	 * If this is empty we show all available lists, otherwise only show these.
+	 */
+	$cc_lists = $lists;
+
+	/**
+	 * Get array of IDs of "Hidden Contact Lists" from options
+	 * Never show any of these lists regardless of 'cc_widget_lists' option
+	 */
+	if (!is_array($exclude_lists)) $exclude_lists = array();
+
+	// Loop through array of all cached contact lists
+	foreach (constant_contact_get_lists() as $key => $details) :
+
+		// If we have a specific set of lists to show and this list isn't in it then skip it
+		if (is_array($cc_lists) AND count($cc_lists) AND !in_array($details['id'], $cc_lists))
+			continue;
+
+		// If we have a hidden list array and this list IS in it, then skip it.
+		if (is_array($exclude_lists) AND count($exclude_lists) AND in_array($details['id'], $exclude_lists))
+			continue;
+
+		// Success: add this list to the lists_to_show array
+		$lists_to_show[$details['id']] = $details;
+	endforeach;
+
+
+	if($formid !== '' && function_exists('constant_contact_retrieve_form')) {
 		
-		$mappings = get_option('cc_extra_field_mappings');
-		$field_mappings = explode(',', $mappings);
+		$force = isset($_REQUEST['cache']) ? true : false;
+		$form = constant_contact_retrieve_form($formid, $force);
 		
-		$GLOBALS['cc_extra_field_mappings'] = array();
+	}
+	
+	/**
+	 * Display errors or Success message if the form was submitted.
+	 */
+	/**
+	 * Success message: If no errors AND signup was successful show the success message
+	 */ 
+	if(isset($_GET['cc_success'])) {
+		$success = '<p class="success cc_success">Success, you have been subscribed.</p>';
+		$success = apply_filters('constant_contact_form_success', $success);
+		return str_replace('<!-- %%SUCCESS%% -->', $success, $form);
+	} 
+	 // Display errors if they exist in the cc_errors global
+	else if(isset($GLOBALS['cc_errors'])) {
+		$errors = false; $haserror = ' has_errors';
+		$errors = $GLOBALS['cc_errors'];
+		// Remove errors from the global so we dont' show them twice by accident
+		unset($GLOBALS['cc_errors']);
+
+		// Set up error display
+		$error_output .= '<div id="constant-contact-signup-errors" class="error">';
+		$error_output .= '<ul>';
+		foreach ($errors as $e) {
+			if(is_array($e)) { $error_output .= '<li><label for="'.$e[1].'">'.$e[0].'</label></li>'; }
+			else { $error_output .= '<li>'.$e.'</li>'; }
+		}
+		$error_output .= '</ul>';
+		$error_output .= '</div>';
+
+		// Filter output so text can be modified by plugins/themes
+		$error_output = apply_filters('constant_contact_form_errors', $error_output);
+	} // end if(isset($GLOBALS['cc_errors']))
+	
+	$form = str_replace('<!-- %%ERRORS%% -->', $error_output, $form);
+	$form = str_replace('%%HASERROR%%', $haserror, $form);
+
+	/**
+	 * Show Description message if it was entered in options
+	 */
+	$widget_description = $description;
+	if($widget_description) {
+		// Format with wpautop() which adds <p> tags based on line returns similar to the post editor
+		$widget_description = wpautop($widget_description);
+		$output .= apply_filters('constant_contact_form_description', $widget_description);
+	}
+	
+#	function kws_die() { die(); }
+#	add_action('dynamic_sidebar', 'kws_die', 9999);
+	
+	/**
+	 * Begin form output
+	 */
+	// Generate the current page url, removing the success _GET query arg if it exists
+	$current_page_url = remove_query_arg('cc_success', constant_contact_current_page_url());
+	#$output .= '<form action="'. $current_page_url .'" method="post" id="constant-contact-signup">';
+	$form = str_replace('%%ACTION%%', $current_page_url, $form);
+
+	/**
+	 * If List Selection is active in options show the list of choices
+	 */
+	if($show_list_selection) {
+		$listoutput = '';
+		/**
+		 * Show Multi-select format if it was chosen in options
+		 */
+		if($list_selection_format == 'select' || $list_selection_format == 'dropdown') {
+
+			$listoutput .= '<label for="cc_newsletter_select">'.$list_selection_title .'</label>
+			<div class="cc_newsletter kws_input_container input-text-wrap">
+			<select name="cc_newsletter[]" id="cc_newsletter_select" ';
+				if($list_selection_format !='dropdown') { $listoutput .= ' multiple size="5"'; }$listoutput .= '>';
+				if($lists_to_show) {
+					if($list_selection_format =='dropdown') { $listoutput .= '<option selected value="">Select a List</option>'; }
+					foreach($lists_to_show as $k => $v) {
+						if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])) {
+							$listoutput .=  '<option selected value="'.$v['id'].'">'.$v['Name'].'</option>';
+						} else {
+							$listoutput .=  '<option value="'.$v['id'].'">'.$v['Name'].'</option>';
+						}
+					}
+				} // end lists_to_show
+			$listoutput .= '
+			</select>
+			</div>';
+
+		/**
+		 * Otherwise show the Checkbox format as long as there are lists to show
+		 */
+		} // endif get_option('cc_widget_list_selection_format') == 'select') 
 		
-		if($field_mappings):
-		foreach($field_mappings as $mapping):
-			$bits = explode(':', $mapping);
-			
-			if(is_array($bits) && isset($bits[0], $bits[1])):
-				$GLOBALS['cc_extra_field_mappings'][trim($bits[0])] = trim($bits[1]);
+		elseif(count($lists_to_show)) {
+
+			$listoutput .=  $list_selection_title;
+			$listoutput .=  '<div class="cc_newsletter kws_input_container input-text-wrap">';
+			$listoutput .=  '<ul>';
+			foreach($lists_to_show as $k => $v):
+				if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])):
+					$listoutput .=  '<li><label for="cc_newsletter-'.$v['id'].'"><input checked="checked" type="checkbox" name="cc_newsletter[]" id="cc_newsletter-'.$v['id'].'" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '</label></li>'; // ZK added label, ID, converted to <LI>
+				else:
+					$listoutput .=  '<li><label for="cc_newsletter-'.$v['id'].'"><input type="checkbox" name="cc_newsletter[]" id="cc_newsletter-'.$v['id'].'" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '</label></li>'; // ZK added label, ID
+				endif;
+			endforeach;
+			$listoutput .=  '</ul>';
+			$listoutput .=  '</div>';
+
+		/**
+		 * Otherwise show no lists. This means the user chose to auto-subscribe people to specific lists.
+		 */
+		} // end elseif(count($lists_to_show))
+	
+		
+	} // endif(get_option('cc_widget_show_list_selection'))
+	elseif(count($lists_to_show)) {
+			foreach($lists_to_show as $k => $v):
+				$hiddenlistoutput .=  '<input type="hidden" name="cc_newsletter[]" id="cc_newsletter-'.$v['id'].'" value="'.$v['id'].'" />';
+			endforeach;
+	}
+	$form = str_replace('<!-- %%LISTSELECTION%% -->', $listoutput, $form);
+
+
+	/**
+	 * Finish form output including a hidden field for referrer and submit button
+	 */
+	$hiddenoutput = '
+		<div>
+			<input type="hidden" id="cc_redirect_url" name="cc_redirect_url" value="'. urlencode( $redirect_url ) .'" />
+			<input type="hidden" id="cc_referral_url" name="cc_referral_url" value="'. urlencode( $current_page_url ) .'" />'.$hiddenlistoutput.'
+		</div>';
+#			$submit_button = '<input type="submit" name="constant-contact-signup-submit" value="Signup" class="button submit" />';
+			// Filter output of submit button so it can be modified by themes/plugins
+#			$output .= apply_filters('constant_contact_form_submit', $submit_button);
+#			$hiddenoutput .= '
+#		</div>';
+	$form = str_replace('<!-- %%HIDDEN%% -->', $hiddenoutput, $form);
+
+	// Modify the output by calling add_filter('constant_contact_form', 'your_function');
+	$output = apply_filters('constant_contact_form', $form);
+
+	/**
+	 * Echo the output if $args['echo'] is true
+	 */
+	if ($echo) {
+		echo $output;
+	}
+	
+	/**
+	 * Otherwise return the $output
+	 */
+	return $output;
+}
+
+
+
+function constant_contact_signup_form_field_mapping() {
+	$signup_form_field_mapping = array('email_address'=>'EmailAddress','first_name' => 'FirstName','last_name' => 'LastName','middle_name' => 'MiddleName','company_name' => 'CompanyName','job_title' => 'JobTitle','home_number' => 'HomePhone','work_number' => 'WorkPhone','address_line_1' => 'Addr1','address_line_2' => 'Addr2','address_line_3' => 'Addr3','city_name' => 'City','state_code' => 'StateCode','state_name' => 'StateName','country_code' => 'CountryCode','zip_code' => 'PostalCode','sub_zip_code' => 'SubPostalCode','custom_field_1' => 'CustomField1','custom_field_2' => 'CustomField2','custom_field_3' => 'CustomField3','custom_field_4' => 'CustomField4','custom_field_5' => 'CustomField5','custom_field_6' => 'CustomField6','custom_field_7' => 'CustomField7','custom_field_8' => 'CustomField8','custom_field_9' => 'CustomField9','custom_field_10' => 'CustomField10','custom_field_11' => 'CustomField11','custom_field_12' => 'CustomField12','custom_field_13' => 'CustomField13','custom_field_14' => 'CustomField14', 'custom_field_15' => 'CustomField15');
+	return $signup_form_field_mapping;
+}
+
+/**
+ * Manage the results of signup forms submissions from the widget or shortcode.
+ *
+ * @global cc $cc
+ * @return <type>
+ */
+function constant_contact_handle_public_signup_form() {
+	global $cc;
+
+/*
+
+		$fields = get_option('cc_extra_fields');
+		$field_mappings = constant_contact_build_field_mappings();
+		// parse custom fields
+		$extra_fields = array();
+		if(is_array($fields)):
+		foreach($fields as $field):
+			$fieldname = str_replace(' ','', $field);
+			if(isset($field_mappings[$fieldname]) && isset($_POST[$field_mappings[$fieldname]])):
+				$extra_fields[$fieldname] = $_POST[$field_mappings[$fieldname]];
 			endif;
 		endforeach;
 		endif;
-		
-		return $GLOBALS['cc_extra_field_mappings'];
-	}
-	
-	
-	// This function determines what the last error was and returns a friendly error message
-	function constant_contact_last_error($status_code = 0)
-	{
-		$last_error = false;
-		$status_code = intval($status_code);
-		
-		if(!$status_code):
-			return $last_error;
-		endif;
-		
-		$last_error = 'Sorry there was a problem processing your request, the error given was: ';
-		
-		switch($status_code):
-			case 400: /* Invalid Request */
-				$last_error .= 'Invalid Request';
-			break;
-			case 401: /* Unauthorized */
-				$last_error .= 'Unauthorized';
-			break;
-			case 404: /* Page Not Found */
-				$last_error .= 'Page Not Found';
-			break;
-			case 409: /* Conflict */
-				$last_error .= 'Conflict';
-			break;
-			case 415: /* Unsupported Media Type */
-				$last_error .= 'Unsupported Media Type';
-			break;
-			case 500: /* Internal Server Error */
-				$last_error .= 'Internal Server Error';
-			break;
-			default: /* Unknown Error */
-				$last_error .= 'Unknown Error';
-			break;
-		endswitch;
-		
-		return $last_error;
-	}
 
+*/
+	/**
+	 * Check that the form was submitted and we have an email value, otherwise return false
+	 */
 	
-	// Used in many functions throughout to create an object of class.cc.php
-	function constant_contact_create_object()
-	{
-		$username = get_option('cc_username');
-		$password =  get_option('cc_password');
-					  
-		require_once CC_FILE_PATH . 'class.cc.php';
-		$cc = new cc($username, $password);
-		
-		if(!$username || !$password):
-			// issues an error using wp system
-			return false;
-		endif;
-		
-		if(is_object($cc) && $cc->get_service_description()) {
-			// we have successfully connected
-			return $cc;
-		} elseif($cc->http_response_code) {
-			// oops, problem occured and we have an error code
-			$error = $cc->http_get_response_code_error($cc->http_response_code);
-			
-			// if we get an unauthorized 401 error code reset the username and password
-			// if we don't do this the CC account will be temporarily blocked eventually
-			if(intval($cc->http_response_code) === 401):
-				// Leave the wrong info there, but show the error message // ZK - 1.1
-				update_option('cc_username', '');
-				update_option('cc_password', ''); 
-				if(is_admin() && !isset($_POST['error_displayed'])) { // error_diplayed for showing only once, it was showing twice
-					$_POST['error_displayed'] = true;
-					echo "<div id='constant-contact-warning' class='error'>
-						<p><strong>$error</strong></p>
-					</div>";
-				}
-				
-			endif;
-			
-		} // if http_response_code
-		
+	if(!isset($_POST['constant-contact-signup-submit'], $_POST['fields']['email_address'])) {
 		return false;
 	}
+	
+	// Create the cc object if necessary
+	if(!constant_contact_create_object()) { return false;}
+
+	/**
+	 * $errors array - this will contain any errors we want to add to our global for showing to the user
+	 */
+	$errors = array();
+
+	/**
+	 * $fields - Contains extra meta fields about this subscriber to send to the API
+	 */
+	$fields = array();
+	
+	$signup_form_field_mapping = constant_contact_signup_form_field_mapping();
+
+	foreach($_POST['fields'] as $key => $field) {
+	
+		$value = isset($field['value']) ? esc_attr($field['value']) : '';
+		
+		// If the field is required...
+		if(isset($field['req']) && $field['req'] == 1) {
+			
+			
+			if(tempty($value)) {
+				if(isset($field['label']) && !empty($field['label'])) {
+					$errors[] = array('Please enter your '.$field['label'], $key);
+				} else {
+					$errors[] = array('Please enter all required fields', $key);
+				}
+			}
+			
+			if($key == 'email_address' && !is_email($field['value'])) {
+				$errors[] = array('Please enter a valid email address', 'cc_email_address');
+			}
+		}
+		if(isset($signup_form_field_mapping[$key])) { $fields[$signup_form_field_mapping[$key]] = $value; }
+		
+	}
+	
+	if(isset($fields['StateCode']) && $fields['StateName']) {
+		unset($fields['StateCode']);
+	}
+	if(isset($fields['CountryCode']) && strtolower($fields['CountryCode'] == 'usa')) { 
+		$fields['CountryCode'] = 'us';
+	}
+	
+	/**
+	 * If we have registered errors then return them now and exit
+	 */
+	if($errors):
+		$GLOBALS['cc_errors'] = $errors;
+		return;
+	endif;
+
+	// URL to send user to upon successful subscription
+	$redirect_to = $_POST['cc_redirect_url'];
+
+	/**
+	 * Determine $subscribe_lists - flat array of IDs of lists that we will subscribe this user to
+	 */
+	$subscribe_lists = array();
+
+	/**
+	 * Get the full list of lists from the API (no transient cache)
+	 */
+	$all_lists = constant_contact_get_lists() ;
+
+	if (isset($_POST['cc_newsletter']) AND is_array($_POST['cc_newsletter'])) :
+		$selected_lists = $_POST['cc_newsletter'];
+
+		/**
+		 * Validate the choices in case the form showed invalid lists
+		 * Add each one to $list_ids if it is valid
+		 */
+		foreach ($selected_lists as $list_id) :
+			// For each selected list, loop through all_lists to see if tehre is a matching one
+			foreach ($all_lists as $key => $details) :
+				if ($details['id'] == $list_id)
+					$subscribe_lists[] = $list_id;
+			endforeach;
+		endforeach;
+	endif;
+
+	/**
+	 * If we have nothing in $list_id's return an error and exit
+	 */
+	if(empty($subscribe_lists)):
+		$GLOBALS['cc_errors'][] = 'Please select at least 1 list.';
+		return;
+	endif;
+
+	/**
+	 * Connect to CC API and add/update the email address with the new subscriptions
+	 */
+	$cc->set_action_type('contact'); /* important, tell CC that the contact made this action */
+	$contact = $cc->query_contacts($fields['EmailAddress']);
+	
+	if($contact):
+		$contact = $cc->get_contact($contact['id']);
+		$status = $cc->update_contact($contact['id'], $fields['EmailAddress'], $subscribe_lists, $fields);
+	else:
+		$status = $cc->create_contact($fields['EmailAddress'], $subscribe_lists, $fields);
+	endif;
+	
+	/**
+	 * If the call was unsuccessful show a generic error. 
+	 */
+	if(!$status):
+		$GLOBALS['cc_errors'][] = 'Sorry there was a problem, please try again later';
+		return;
+	elseif($redirect_to):
+		header("Location: $redirect_to");
+		exit;
+	else:
+		$url = add_query_arg('cc_success', true, urldecode($_POST['cc_referral_url']));
+		header("Location: " . $url );
+		exit;
+	endif;
+
+	// return false so we display no errors when viewing the form
+	// the script should not get this far
+	return false;
+}
+
+
+/*
+* From http://www.webcheatsheet.com/PHP/get_current_page_url.php
+*/
+
+function constant_contact_current_page_url() {
+	 $pageURL = 'http';
+	 if (isset($_SERVER["HTTPS"]) AND ($_SERVER["HTTPS"] == "on")) {$pageURL .= "s";}
+	 $pageURL .= "://";
+	 if ($_SERVER["SERVER_PORT"] != "80") {
+	  $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
+	 } else {
+	  $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+	 }
+	 return remove_query_arg('cc_success',$pageURL);
+}
+
+// Add the Settings link on the Plugins page
+function constant_contact_settings_link( $links, $file ) {
+	if ( $file == 'constant-contact-api/constant-contact-api.php' ) {
+	    $settings_link = '<a href="' . admin_url( 'options-general.php?page=constant-contact-api' ) . '">' . __('Settings', 'constant-contact-api') . '</a>';
+	    array_unshift( $links, $settings_link ); // before other links
+	}
+	return $links;
+}
+
+function constant_contact_create_checkbox($id, $name, $value, $label='') {
+		return "<label for='$id'>$label<input id='$id' name='$id\[\]' type='checkbox' value='$value' />$name</label>\n";
+}
+
+function constant_contact_create_option($name, $value) {
+	return "<option value='$value'>$name</option>\n";
+}
+     
+function constant_contact_make_textfield($initiated = false, $required=false, $default, $setting = '', $fieldid = '', $fieldname='', $title = '') {
+	
+	if(!$initiated || ($required && empty($setting))) { $setting = $default; }
+    
+	$input = '
+	<p>
+		<label for="'.$fieldid.'">'.__($title).'
+		<input type="text" class="widefat" id="'.$fieldid.'" name="'.$fieldname.'" value="'.$setting.'"/>
+		</label>
+	</p>';
+	
+	echo $input;
+}
+function constant_contact_make_textarea($initiated = false, $required=false, $default, $setting = '', $fieldid = '', $fieldname='', $title = '') {
+	
+	if(!$initiated || ($required && empty($setting))) { $setting = $default; }
+    
+	$input = '
+	<p>
+		<label for="'.$fieldid.'">'.__($title).'
+		<textarea class="widefat" id="'.$fieldid.'" name="'.$fieldname.'" cols="40" rows="5">'.$setting.'</textarea>
+		</label>
+	</p>';
+	
+	echo $input;
+}
+    
+function constant_contact_make_checkbox($setting = '', $fieldid = '', $fieldname='', $title = '', $value = 'yes', $checked = false, $disabled = false) {
+	echo constant_contact_get_checkbox($setting, $fieldid, $fieldname, $title, $value, $checked,$disabled);
+}
+function constant_contact_get_checkbox($setting = '', $fieldid = '', $fieldname='', $title = '', $value = 'yes', $checked = false, $disabled = false) {
+	$checkbox = '
+		<input type="checkbox" id="'.$fieldid.'" name="'.$fieldname.'" value="'.$value.'"';
+			if($checked || !empty($setting)) { $checkbox .= ' checked="checked"'; }
+			if($disabled)  { $checkbox .= ' disabled="disabled"';}
+			$checkbox .= ' class="checkbox" />
+		<label for="'.$fieldid.'">'.__($title).'</label>';
+    return $checkbox;
+}
+
+// Added in version 1.2 instead of storing in options table - this caches the list results
+// and uses it if available instead of re-fetching and processing the feed
+// from constant contact. Saves much time.
+function constant_contact_get_transient($key = false) {
+	   if(!isset($_REQUEST['cache'])) {
+		$transient = get_transient('cc_api');
+		
+		if(!$key && !empty($transient)) { return $transient; } elseif(empty($transient)) { return false; }
+		
+		// If there is a cache, use it. Storing in an array allows all reports to be in one cache key
+		// Could not be the best way. Email info@katzwebservices.com if you know how to improve!
+		if(!empty($transient[$key])) {
+			return apply_filters('cc_api', maybe_unserialize(maybe_unserialize($transient[$key])));
+		}
+		return false;
+	} else {
+		return false;
+	}
+}
+
+
+function constant_contact_set_transient($key = false, $data, $time = 172800) {
+	// $time = 48 hours. If you want to modify it you can.
+	$time = apply_filters('cc_api_cache_time', $time);
+	
+	if(!is_admin()) {
+		$transient = get_transient('cc_api');
+		if(!empty($key)) {
+			$transient[$key] = $data;				
+			// Set a cached version of the table so it'll be faster next time. Expires every 12 hours
+			set_transient('cc_api',$transient, $time);
+		}
+	}
+	
+	return $data;
+}
 
 ?>
