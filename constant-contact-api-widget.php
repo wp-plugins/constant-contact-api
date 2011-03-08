@@ -59,7 +59,23 @@ class constant_contact_api_widget extends WP_Widget {
    /** @see WP_Widget::widget */
     function widget($args = array(), $instance = array())
 	{
+		$instance = wp_parse_args( (array) $instance, 
+			array(
+				'show_firstname' => get_option('cc_widget_show_firstname'), 
+				'show_lastname' => get_option('cc_widget_show_lastname'), 
+				'description' => get_option('cc_widget_description'),
+				'title' => get_option('cc_signup_widget_title'), 
+				'list_selection_title' => get_option('cc_widget_list_selection_title'), 
+				'list_selection_format' => get_option('cc_widget_list_selection_format'),  
+				'show_list_selection' => get_option('cc_widget_show_list_selection'),
+				'show_firstname' => get_option('cc_widget_show_firstname'),
+				'show_lastname' => get_option('cc_widget_show_lastname'),
+				'lists' => array(), 
+				'exclude_lists' => array() 
+			)
+		);
 		extract($instance);
+		
 		$output = '';
 		$errors = false;
 		if(isset($GLOBALS['cc_errors'])):
@@ -73,9 +89,8 @@ class constant_contact_api_widget extends WP_Widget {
 			return;
 		endif;
 		
-		
-        $widget_title = apply_filters('widget_title', get_option('cc_signup_widget_title'));
-		$widget_description = get_option('cc_signup_widget_description');
+		$widget_title = $title; #apply_filters('widget_title', get_option('cc_signup_widget_title'));
+		$widget_description = $description; //get_option('cc_signup_widget_description');
         extract( $args );
         ?>
 			<?php $output .= (isset($before_widget)) ? $before_widget : ''; ?>
@@ -175,8 +190,8 @@ class constant_contact_api_widget extends WP_Widget {
 					}
 				} // end if show list selection
 				
+				$hide_lists_output = '';
 				if(!empty($hidelists)) {
-					$hide_lists_output = '';
 					foreach($hidelists as $k => $v) {
 						if(in_array($v['id'], $lists)) {
 							$hide_lists_output .= '<input type="hidden" name="cc_newsletter[]" id="cc_newsletter-'.$v['id'].'" value="'.$v['id'].'" />'."\n";
@@ -262,6 +277,8 @@ class constant_contact_api_widget extends WP_Widget {
 				'list_selection_title' => get_option('cc_widget_list_selection_title'), 
 				'list_selection_format' => get_option('cc_widget_list_selection_format'),  
 				'show_list_selection' => get_option('cc_widget_show_list_selection'),
+				'show_firstname' => get_option('cc_widget_show_firstname'),
+				'show_lastname' => get_option('cc_widget_show_lastname'),
 				'lists' => array(), 
 				'exclude_lists' => array() 
 			)
@@ -284,6 +301,19 @@ class constant_contact_api_widget extends WP_Widget {
 			<p class="description">The title text for the this widget.</p>
 			</td>
 		</tr>
+		<tr valign="top">
+			<th scope="row"><p><label><span>Show First Name?</span></label></p></th>
+			<td>
+				<p><label class="howto" for="<?php echo $this->get_field_id('show_firstname');?>"><input <?php checked($show_firstname, 1); ?> type="checkbox" class="checkbox" name="<?php echo $this->get_field_name('show_firstname');?>" value="1" id="<?php echo $this->get_field_id('show_firstname');?>" /> <span>Show first name input field</span></label></p>
+			</td>
+		</tr>
+		<tr valign="top">
+			<th scope="row"><p><label><span>Show Last Name?</span></label></p></th>
+			<td>
+				<p><label class="howto" for="<?php echo $this->get_field_id('show_lastname');?>"><input <?php checked($show_lastname, 1); ?> type="checkbox" class="checkbox" name="<?php echo $this->get_field_name('show_lastname');?>" value="1" id="<?php echo $this->get_field_id('show_lastname');?>" /> <span>Show last name input field</span></label></p>
+			</td>
+		</tr>
+
 		<tr valign="top">
 			<th scope="row"><p><label for="<?php echo $this->get_field_id('description');?>"><span>Signup Widget Description</span></label></p></th>
 			<td>
