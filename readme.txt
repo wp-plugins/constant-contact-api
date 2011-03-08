@@ -74,6 +74,8 @@ Optionally, If you want to change the default plugin options you can you edit th
 
 = 2.0.1 =
 * <strong>Fixed major bug</strong> where username and password would be reset when saving settings on the plugin's Registration options page.
+* Restored options to show or hide first and last names in Legacy widget
+* Fixed multiple Legacy widget bugs
 * Improved blog registration form HTML
 * Improved Admin Profile lists HTML
 
@@ -135,6 +137,8 @@ Optionally, If you want to change the default plugin options you can you edit th
 
 = 2.0.1 =
 * <strong>Fixed major bug</strong> where username and password would be reset when saving settings on the plugin's Registration options page.
+* Restored options to show or hide first and last names in Legacy widget
+* Fixed multiple Legacy widget bugs
 * Improved blog registration form HTML
 * Improved Admin Profile lists HTML
 
