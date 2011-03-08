@@ -72,6 +72,11 @@ Optionally, If you want to change the default plugin options you can you edit th
 
 == Changelog ==
 
+= 2.0.1 =
+* <strong>Fixed major bug</strong> where username and password would be reset when saving settings on the plugin's Registration options page.
+* Improved blog registration form HTML
+* Improved Admin Profile lists HTML
+
 = 2.0 = 
 * <strong>Major upgrade</strong> - make sure to back up your database. If you already have installed the plugin, this upgrade may not transfer your current settings.
 * Went through each page of the admin and made the layout and code better, and reworded the administration to <strong>make more sense</strong>
@@ -127,6 +132,11 @@ Optionally, If you want to change the default plugin options you can you edit th
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
+
+= 2.0.1 =
+* <strong>Fixed major bug</strong> where username and password would be reset when saving settings on the plugin's Registration options page.
+* Improved blog registration form HTML
+* Improved Admin Profile lists HTML
 
 = 2.0 = 
 * <strong>Major upgrade</strong> - make sure to back up your database. If you already have installed the plugin, this upgrade may not transfer your current settings.

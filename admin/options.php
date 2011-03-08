@@ -16,29 +16,32 @@ add_action( 'admin_init', 'constant_contact_register_settings' );
 // Register the settings we need on the settings page
 function constant_contact_register_settings()
 {
-	$options_group = 'constant-contact';
-	register_setting($options_group, 'cc_username');
-	register_setting($options_group, 'cc_password');
-	register_setting($options_group, 'cc_extra_field_mappings');
-	register_setting($options_group, 'cc_register_page_method');
-	register_setting($options_group, 'cc_default_opt_in');
-	register_setting($options_group, 'cc_signup_title');
-	register_setting($options_group, 'cc_signup_description');
-	register_setting($options_group, 'cc_signup_widget_title');
-	register_setting($options_group, 'cc_signup_widget_description');
-	register_setting($options_group, 'cc_list_selection_format');
-	register_setting($options_group, 'cc_uninstall_method');
-	register_setting($options_group, 'cc_lists');
-	register_setting($options_group, 'cc_exclude_lists');
-	register_setting($options_group, 'cc_widget_lists');
-	register_setting($options_group, 'cc_widget_exclude_lists');
-	register_setting($options_group, 'cc_widget_show_list_selection');
-	register_setting($options_group, 'cc_widget_show_firstname');
-	register_setting($options_group, 'cc_widget_show_lastname');
-	register_setting($options_group, 'cc_widget_list_selection_format');
-	register_setting($options_group, 'cc_widget_redirect_url');
-	register_setting($options_group, 'cc_widget_list_selection_title');
-	register_setting($options_group, 'cc_use_legacy_widget');
+	$group = 'constant-contact';
+	
+	register_setting('constant-contact', 'cc_username');
+	register_setting('constant-contact', 'cc_password');
+	register_setting('constant-contact', 'cc_uninstall_method');
+	register_setting('constant-contact-registration', 'cc_lists');
+	register_setting('constant-contact-registration', 'cc_exclude_lists');
+	register_setting('constant-contact-registration', 'cc_signup_title');
+	register_setting('constant-contact-registration', 'cc_signup_description');
+	register_setting('constant-contact-registration', 'cc_extra_field_mappings');
+	register_setting('constant-contact-registration', 'cc_register_page_method');
+	register_setting('constant-contact-registration', 'cc_default_opt_in');
+	register_setting('constant-contact-registration', 'cc_list_selection_format');
+/*
+	register_setting('constant-contact-legacy-widget', 'cc_signup_widget_title');
+	register_setting('constant-contact-legacy-widget', 'cc_signup_widget_description');
+    register_setting('constant-contact-legacy-widget', 'cc_widget_lists');
+    register_setting('constant-contact-legacy-widget', 'cc_widget_exclude_lists');
+    register_setting('constant-contact-legacy-widget', 'cc_widget_show_list_selection');
+    register_setting('constant-contact-legacy-widget', 'cc_widget_show_firstname');
+    register_setting('constant-contact-legacy-widget', 'cc_widget_show_lastname');
+    register_setting('constant-contact-legacy-widget', 'cc_widget_list_selection_format');
+    register_setting('constant-contact-legacy-widget', 'cc_widget_redirect_url');
+    register_setting('constant-contact-legacy-widget', 'cc_widget_list_selection_title');
+    register_setting('constant-contact-legacy-widget', 'cc_use_legacy_widget');
+*/
 }
 
 // show the admin settings page

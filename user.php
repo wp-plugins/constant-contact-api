@@ -178,7 +178,6 @@ function constant_contact_show_user_profile($user)
 	<?php echo $signup_description;?>
 
 	<p>
-	<label style="display: block; margin-bottom: 5px;">
 		<?php
 		// Checkbox display for Single Checkbox method
 		if($register_page_method == 'checkbox'):
@@ -186,14 +185,15 @@ function constant_contact_show_user_profile($user)
 			$checked = '';
 			if($cc_newsletter) $checked = 'checked="checked"';
 			// output the checkbox
-			echo '<input type="checkbox" ' . $checked . ' name="cc_newsletter" class="checkbox" value="1" />';
+			echo '<label style="display: block; margin-bottom: 5px;" for="cc_newsletter"><input type="checkbox" ' . $checked . ' name="cc_newsletter" id="cc_newsletter" class="checkbox" value="1" /></label>';
 
 		// List display for the List Selection Method
 		elseif($register_page_method == 'lists'):
 			// Multi-select version
 			if(get_option('cc_list_selection_format') == 'select' ||  get_option('cc_list_selection_format') == 'dropdown'):
 		?>
-			<select name="cc_newsletter[]"<?php if(get_option('cc_list_selection_format') == 'select') {?> multiple size="5"<?php } ?>>
+			<label style="display: block; margin-bottom: 5px;" for="cc_newsletter">
+			<select name="cc_newsletter[]" id="cc_newsletter" <?php if(get_option('cc_list_selection_format') == 'select') {?> multiple size="5"<?php } ?>>
 				<?php
 				if($lists):
 				foreach($lists as $k => $v):
@@ -206,20 +206,22 @@ function constant_contact_show_user_profile($user)
 				endif;
 				?>
 			</select>
+			</label>
 		<?php
 			// Checkboxes version
 			elseif($lists):
 			foreach($lists as $k => $v):
+				echo '<label style="display:block; margin-bottom:5px;" for="cc_newsletter_'.$v['id'].'">';
 				if(in_array($v['id'], $cc_newsletter)):
-					echo '<input checked="checked" type="checkbox" name="cc_newsletter[]" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '<br />';
+					echo '<input checked="checked" type="checkbox" id="cc_newsletter_'.$v['id'].'" name="cc_newsletter[]" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'];
 				else:
-					echo '<input type="checkbox" name="cc_newsletter[]" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '<br />';
+					echo '<input type="checkbox" name="cc_newsletter[]" id="cc_newsletter_'.$v['id'].'" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'];
 				endif;
+				echo '</label>';
 			endforeach;
 			endif;
 		endif;
 		?>
-	</label>
 	</p>
 	<br />
 <?php
@@ -354,45 +356,40 @@ function constant_contact_register_form()
 	endif;
 ?>
 	<p>
-	<label style="display: block; margin-bottom: 5px;">
-		<?php echo get_option('cc_signup_title');?><br />
+	<label><?php echo get_option('cc_signup_title');?></label><br />
 		<?php
+		// Checkbox display for Single Checkbox method
 		if($register_page_method == 'checkbox'):
-			if(isset($_POST['cc_newsletter']) && $_POST['cc_newsletter']):
-				echo '<input checked="checked" type="checkbox" name="cc_newsletter" class="checkbox" value="1" />';
-			else:
-				echo '<input type="checkbox" name="cc_newsletter" class="checkbox" value="1" />';
-			endif;
+			// Set up checked status
+			$checked = '';
+			// output the checkbox
+			echo '<label style="display: block; margin-bottom: 5px;" for="cc_newsletter"><input type="checkbox" ' . $checked . ' name="cc_newsletter" id="cc_newsletter" class="checkbox" value="1" /></label>';
+
+		// List display for the List Selection Method
 		elseif($register_page_method == 'lists'):
-			if(get_option('cc_list_selection_format') == 'select' || get_option('cc_list_selection_format') == 'dropdown'):
+			// Multi-select version
+			if(get_option('cc_list_selection_format') == 'select' ||  get_option('cc_list_selection_format') == 'dropdown'):
 		?>
-			<select name="cc_newsletter[]"<?php if(get_option('cc_list_selection_format') == 'select') {?> multiple size="5"<?php } ?>>
+			<label style="display: block; margin-bottom: 5px;" for="cc_newsletter">
+			<select name="cc_newsletter[]" id="cc_newsletter" <?php if(get_option('cc_list_selection_format') == 'select') {?> multiple size="5"<?php } ?>>
 				<?php
 				if($lists):
 				foreach($lists as $k => $v):
-					if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])):
-						echo '<option selected value="'.$v['id'].'">'.$v['Name'].'</option>';
-					else:
 						echo '<option value="'.$v['id'].'">'.$v['Name'].'</option>';
-					endif;
 				endforeach;
 				endif;
 				?>
 			</select>
+			</label>
 		<?php
+			// Checkboxes version
 			elseif($lists):
-			echo '<br />';
-			foreach($lists as $k => $v):
-				if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])):
-					echo '<input checked="checked" type="checkbox" name="cc_newsletter[]" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '<br />';
-				else:
-					echo '<input type="checkbox" name="cc_newsletter[]" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '<br />';
-				endif;
-			endforeach;
+				foreach($lists as $k => $v):
+					echo '<label style="display:block; margin-bottom:5px;" for="cc_newsletter_'.$v['id'].'"><input type="checkbox" name="cc_newsletter[]" id="cc_newsletter_'.$v['id'].'" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'].'</label>';
+				endforeach;
 			endif;
 		endif;
 		?>
-	</label>
 	</p>
 	<br />
 <?php

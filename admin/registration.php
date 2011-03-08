@@ -17,18 +17,11 @@ function constant_contact_registration_settings()
     if(isset($_GET['updated'])):
 		?>
 		<div class="updated">
-			<p><strong><?php _e('Your settings have been saved', 'mt_trans_domain' ); ?></strong></p>
+			<p><strong><?php _e('Your settings have been saved', 'constant_contact_api' ); ?></strong></p>
 		</div>
 		<?php
     endif;
 
-    /**
-     * Fetch full list of contact lists for various purposes
-     */
-    $all_contact_lists = constant_contact_get_lists(true);
-	
-	$options = get_option('cc_api_options');
-	
 ?>
 	<script type="text/javascript">
 		jQuery(document).ready(function($) {
@@ -42,7 +35,7 @@ function constant_contact_registration_settings()
 	<div class="wrap">
 	<h2>Constant Contact - Registration &amp; User Profile Settings</h2>
 	<form method="post" action="options.php">
-	<?php settings_fields( 'constant-contact' ); ?>
+	<?php settings_fields( 'constant-contact-registration' ); ?>
 	<div class="alignright" style="width:510px; display:none;" id="registrationScreenshots">
 		<h4 style="text-align:center;"><a href="<?php echo get_bloginfo('url'); ?>/wp-login.php?action=register">Blog Registration</a> Form Screenshots</h4>
 		<div class="alignleft" style="width:250px;"><img src="<?php echo CC_FILE_URL; ?>images/registration-form-before.jpg" alt="registration-form-before" width="250" height="299"/><p class="caption howto">User subscription method: <strong>Disabled</strong></p></div>
@@ -53,11 +46,13 @@ function constant_contact_registration_settings()
 	<p><strong>Note:</strong> If new user registration is disabled for your WordPress installation ("Anyone can register" in <strong>Settings &gt; General</strong>)  then visitors to your site will not be able to subscribe with this  method, but it will still be available to logged-in users via their  personal profile options.</p>
 	<table class="form-table widefat">
 	<tr valign="top">
-		<th scope="row"><p><label for="cc_register_page_method_none"><span>User subscription method</span></label></th>
+		<th scope="row"><p><label><span>User subscription method</span></label></th>
 		<td>
-			<input <?php echo (!get_option('cc_register_page_method') || get_option('cc_register_page_method')=='none') ? 'checked="checked"':''; ?> type="radio" name="cc_register_page_method" id="cc_register_page_method_none" value="none" /> Disabled<br />
-		<input <?php echo (get_option('cc_register_page_method')=='checkbox') ? 'checked="checked"':''; ?> type="radio" name="cc_register_page_method" id="cc_register_page_method_checkbox" value="checkbox" /> Single Checkbox <br />
-		<input <?php echo (get_option('cc_register_page_method')=='lists') ? 'checked="checked"':''; ?> type="radio" name="cc_register_page_method" id="cc_register_page_method_lists" value="lists" /> List Selection 
+		<p>
+			<label for="cc_register_page_method_none" class="howto"><input <?php echo (!get_option('cc_register_page_method') || get_option('cc_register_page_method')=='none') ? 'checked="checked"':''; ?> type="radio" name="cc_register_page_method" id="cc_register_page_method_none" value="none" /> <span>Disabled</span></label>
+			<label for="cc_register_page_method_checkbox" class="howto"><input <?php echo (get_option('cc_register_page_method')=='checkbox') ? 'checked="checked"':''; ?> type="radio" name="cc_register_page_method" id="cc_register_page_method_checkbox" value="checkbox" /> <span>Single Checkbox</span></label>
+			<label for="cc_register_page_method_lists" class="howto"><input <?php echo (get_option('cc_register_page_method')=='lists') ? 'checked="checked"':''; ?> type="radio" name="cc_register_page_method" id="cc_register_page_method_lists" value="lists" /> <span>List Selection</span></label>
+		</p>
 		<p class="description">
 			<strong>Single Checkbox</strong>: Shows users a checkbox which, if ticked, will automatically subscribe them to the lists you select below in the <strong>Active Contact Lists</strong> section.<br />
 			<strong>List Selection</strong>: Displays the <strong>Active Contact Lists</strong> as a set of checkboxes/multi-select and lets the user decide which ones they want</p>
@@ -86,6 +81,13 @@ function constant_contact_registration_settings()
 		</td>
 	</tr>
 	<?php
+
+    /**
+     * Fetch full list of contact lists for various purposes
+     */
+
+    $all_contact_lists = constant_contact_get_lists(true);
+
 	/**
 	 * Contact Lists and Hidden Contact Lists options
 	 * Only show them if we have lists from the API already
