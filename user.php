@@ -354,9 +354,18 @@ function constant_contact_register_form()
 	if(get_option('cc_default_opt_in') && $register_page_method == 'lists'):
 		$_POST['cc_newsletter'] = array_keys($lists);
 	endif;
+
+	// Prepare the description from the settings screen
+	$signup_description =  get_option('cc_signup_description');
+	if(!empty($signup_description)) {
+		$signup_description = wpautop($signup_description);
+		$signup_description = "</p><div class='description' style='margin-bottom:5px;'>$signup_description</div><p>";
+	} else {
+		$signup_description = '<br />';
+	}
 ?>
-	<p>
-	<label><?php echo get_option('cc_signup_title');?></label><br />
+	<p><label><?php echo get_option('cc_signup_title');?></label>
+	<?php echo $signup_description;?>
 		<?php
 		// Checkbox display for Single Checkbox method
 		if($register_page_method == 'checkbox'):

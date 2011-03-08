@@ -73,9 +73,10 @@ Optionally, If you want to change the default plugin options you can you edit th
 == Changelog ==
 
 = 2.0.1 =
-* <strong>Fixed major bug</strong> where username and password would be reset when saving settings on the plugin's Registration options page.
-* Restored options to show or hide first and last names in Legacy widget
+* <strong>Fixed major bug</strong> where username and password would be reset when saving settings on the plugin's Registration options page. (<a href="http://wordpress.org/support/topic/532274" rel="nofollow">issue #532274</a>)
+* Restored options to show or hide first and last names in Legacy widget (<a href="http://wordpress.org/support/topic/532932" rel="nofollow">issue #532932</a>)
 * Fixed multiple Legacy widget bugs
+* Remedied bug where registration form description wasn't displaying (<a href="http://wordpress.org/support/topic/513878" rel="nofollow">issue #513878</a>)
 * Improved blog registration form HTML
 * Improved Admin Profile lists HTML
 
@@ -136,9 +137,10 @@ Optionally, If you want to change the default plugin options you can you edit th
 == Upgrade Notice ==
 
 = 2.0.1 =
-* <strong>Fixed major bug</strong> where username and password would be reset when saving settings on the plugin's Registration options page.
-* Restored options to show or hide first and last names in Legacy widget
+* <strong>Fixed major bug</strong> where username and password would be reset when saving settings on the plugin's Registration options page. (<a href="http://wordpress.org/support/topic/532274" rel="nofollow">issue #532274</a>)
+* Restored options to show or hide first and last names in Legacy widget (<a href="http://wordpress.org/support/topic/532932" rel="nofollow">issue #532932</a>)
 * Fixed multiple Legacy widget bugs
+* Remedied bug where registration form description wasn't displaying (<a href="http://wordpress.org/support/topic/513878" rel="nofollow">issue #513878</a>)
 * Improved blog registration form HTML
 * Improved Admin Profile lists HTML
 
