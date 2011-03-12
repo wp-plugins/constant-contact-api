@@ -1015,6 +1015,145 @@ $xml_data .= '
     }
 
 
+	/**
+     * Gets all activities
+     *
+     * @access     public
+     */
+    function get_events($action = 'events')
+    {
+    	$events = get_transient('cc_events');
+		if($events && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'events')) { return maybe_unserialize($events); }
+		
+        $xml = $this->load_url($action);
+
+        if(!$xml):
+            return false;
+        endif;
+
+        // parse into nicer array
+        $events = array();
+        $_events = (isset($xml['atom:feed']['atom:entry'])) ? $xml['atom:feed']['atom:entry'] : false;
+        if(is_array($_events)):
+        	if(isset($_events[0]['atom:link_attr']['href'])):
+                foreach($_events as $k => $v):
+                    $id = $this->get_id_from_link($v['atom:link_attr']['href']);
+                    $event = $v['atom:content']['Event'];
+                    $event['id'] = $id;
+                    $events[] = $event;
+                endforeach;
+            else:
+                $id = $this->get_id_from_link($_events['atom:link_attr']['href']);
+                $event = $_events['atom:content']['Event'];
+                $event['id'] = $id;
+                $events[] = $event;
+            endif;
+        endif;
+        
+        set_transient('cc_events', maybe_serialize($events), 60*60);
+
+        return $events;
+    }
+    
+     /**
+     * Gets an individual activity
+     *
+     * @access     public
+     */
+    function get_event($id)
+    {
+    	$transient_title = 'ccev_'.sha1($id);
+		$events = get_transient($transient_title);
+		if($events && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'event')) { return maybe_unserialize($events); }
+    	
+        $xml = $this->load_url("events/$id");
+        
+        if(!$xml):
+            return false;
+        endif;
+
+        // parse into nicer array
+        $_events = (isset($xml['atom:entry'])) ? $xml['atom:entry'] : false;
+        $events = $_events['atom:content']['Event'];
+        $events['id'] = $id;
+
+        if(isset($events['FileName'])):
+            $events['FileName'] = $this->get_id_from_link($events['FileName']);
+        endif;
+		
+		set_transient($transient_title, maybe_serialize($events), 60*60);
+        
+        return $events;
+    }
+    
+    function get_event_registrants($id) {
+    
+    	$transient_title = 'ccers'.sha1($id);
+		$registrants = get_transient($transient_title);
+		if($registrants && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'registrants')) { return maybe_unserialize($registrants); }
+		
+    	 $xml = $this->load_url("events/$id/registrants");
+        
+        if(!$xml):
+            return false;
+        endif;
+
+        // parse into nicer array
+        $registrants = array();
+        $_registrants = (isset($xml['atom:feed']['atom:entry'])) ? $xml['atom:feed']['atom:entry'] : false;
+
+        if(is_array($_registrants)):
+            if(isset($_registrants[0]['atom:link_attr']['href'])):
+                foreach($_registrants as $k => $v):
+                    $id = $this->get_id_from_link($v['atom:link_attr']['href']);
+                    $registrant = $v['atom:content']['Registrant'];
+                    $registrant['id'] = $id;
+                    $registrants[] = $registrant;
+                endforeach;
+            else:
+                $id = $this->get_id_from_link($_registrants['atom:link_attr']['href']);
+                $registrant = $_registrants['atom:content']['Registrant'];
+                $registrant['id'] = $id;
+                $registrants[] = $registrant;
+            endif;
+
+        endif;
+        
+        set_transient($transient_title, maybe_serialize($registrants), 60*60);
+
+        return $registrants;
+    }
+    
+    function get_event_registrant($eventid = '',$registrantid = '')
+    {
+    	$transient_title = 'ccer'.sha1($eventid.$registrantid);
+		$registrant = get_transient($transient_title);
+		if($registrant && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'registrant')) { return maybe_unserialize($registrant); }
+		
+        $xml = $this->load_url("events/$eventid/registrants/$registrantid");
+
+        if(!$xml):
+            return false;
+        endif;
+
+
+        // parse into nicer array
+        $registrant = false;
+        $_registrant = (isset($xml['atom:entry'])) ? $xml['atom:entry'] : false;
+
+        // parse into nicer array
+        if(is_array($_registrant)):
+            $id = $this->get_id_from_link($_registrant['atom:link_attr']['href']);
+            $registrant = $_registrant['atom:content']['Registrant'];
+            $registrant['id'] = $id;
+        endif;
+		
+		set_transient($transient_title, maybe_serialize($registrant), 60*60);
+		
+        return $registrant;
+    }
+    
+    
     /**
      * Be careful with this method :)
      * You can use this to clear all contacts from a specific set of contact lists
@@ -1189,7 +1328,11 @@ $xml_data .= '
      */
     function get_campaigns($action = 'campaigns')
     {
-        $xml = $this->load_url($action);
+    	$transient_title = 'cc_campaigns';
+		$campaigns = get_transient($transient_title);
+		if($campaigns && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'campaigns')) { return maybe_unserialize($campaigns); }
+		
+		$xml = $this->load_url($action);
 
         if(!$xml):
             return false;
@@ -1217,6 +1360,8 @@ $xml_data .= '
 
         endif;
 
+		set_transient($transient_title, maybe_serialize($campaigns), 60*60);
+		
         return $campaigns;
     }
 
@@ -1467,12 +1612,13 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
     function convert_timestamp($timestamp)
     {
         $timestamp_bits = explode('T', $timestamp);
-
+		
         if(isset($timestamp_bits[0], $timestamp_bits[0])):
             $date_bits = explode('-', $timestamp_bits[0]);
             $time_bits = explode(':', $timestamp_bits[1]);
-		  
+            
             $year = (int) $date_bits[0];
+            if($year < 1900) { $year = date('Y'); } // The year was showing 111
             $month = (int) $date_bits[1];
             $day = (int) $date_bits[2];
             $hour = (int) $time_bits[0];
@@ -1897,6 +2043,7 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
 
         $this->http_headers_add('User-Agent', $this->http_user_agent);
         $this->http_headers_add('Content-Length', strlen($params));
+        $this->http_headers_add('Accept', 'application/atom+xml'); // Added in 2.1 for Events marketing
 
         $request = $this->http_build_request_headers();
 

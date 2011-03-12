@@ -1,7 +1,7 @@
 === Constant Contact for Wordpress ===
 Contributors: katzwebdesign, jamesbenson
 Donate link: http://www.seodenver.com
-Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms
+Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 2.9
 Tested up to: 3.1
 Stable tag: trunk
@@ -34,6 +34,11 @@ Version 2.0 of the Constant Contact API plugin brings great new capabilities, im
 * Add a signup widget to your sidebar or anywhere in your template
 * Add extra fields to your signup form
 * Uses the REST API
+
+<h3>Now featuring Event Marketing!</h3>
+Version 2.1 of the plugin introduces <a href="http://conta.cc/hB5lnC" title="Learn more about Constant Contact Event Marketing" rel="nofollow">Constant Contact Event Marketing</a> functionality by allowing you to track events, registration, and registrants using the plugin. Simply navigate to Constant Contact > Events. Manage your events from inside WordPress!
+
+Upcoming Event Marketing integration will include an Event widget & dashboard reports.
 
 <h4>Plugin Support</h4>
 To obtain support please use this link to the [wordpress forums](http://wordpress.org/tags/constant-contact-api).
@@ -71,6 +76,11 @@ Optionally, If you want to change the default plugin options you can you edit th
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
 == Changelog ==
+
+= 2.1 =
+* Events Marketing page now available in the administration (under Constant Contact > Events)
+	* View event and registrant details
+* Improves speed of administration by caching Activities, Campaigns, Lists, and Events
 
 = 2.0.1 =
 * <strong>Fixed major bug</strong> where username and password would be reset when saving settings on the plugin's Registration options page. (<a href="http://wordpress.org/support/topic/532274" rel="nofollow">issue #532274</a>)
@@ -135,6 +145,11 @@ Optionally, If you want to change the default plugin options you can you edit th
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
+
+= 2.1 =
+* Events Marketing page now available in the administration (under Constant Contact > Events)
+	* View event and registrant details
+* Improves speed of administration by caching Activities, Campaigns, Lists, and Events
 
 = 2.0.1 =
 * <strong>Fixed major bug</strong> where username and password would be reset when saving settings on the plugin's Registration options page. (<a href="http://wordpress.org/support/topic/532274" rel="nofollow">issue #532274</a>)

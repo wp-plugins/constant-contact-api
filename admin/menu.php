@@ -21,6 +21,9 @@ function constant_contact_admin_menu()
 		// Activities
 		add_submenu_page( 'constant-contact-api', 'Activities', 'Activities', 'administrator', 'constant-contact-activities', 'constant_contact_activities');
 		
+		// Events - Added 2.1
+		add_submenu_page( 'constant-contact-api', 'Events', 'Events', 'administrator', 'constant-contact-events', 'constant_contact_events');
+		
 		// Import
 		add_submenu_page( 'constant-contact-api', 'Import', 'Import', 'administrator', 'constant-contact-import', 'constant_contact_import');
 		

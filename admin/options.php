@@ -85,6 +85,7 @@ function constant_contact_settings()
 	<h3>Account Actions</h3>
 	<ul class="ul-disc">
 		<li><a href="<?php echo admin_url('admin.php?page=constant-contact-activities'); ?>">Activities</a> - View your account's recent activity, including: sent campaigns, exports, and imports.</li>
+		<li><a href="<?php echo admin_url('admin.php?page=constant-contact-events'); ?>">Events</a> - View your Constant Contact Event Marketing data: events and registrant information.</li>
 		<li><a href="<?php echo admin_url('admin.php?page=constant-contact-import'); ?>">Import</a> - Import contacts into your choice of user lists.</li>
 		<li><a href="<?php echo admin_url('admin.php?page=constant-contact-export'); ?>">Export</a> - Export contacts to <code>.csv</code> and <code>.txt</code> format.</li>
 		<li><a href="<?php echo admin_url('admin.php?page=constant-contact-lists'); ?>">Lists</a> - Add, remove, and edit your contact lists.</li>
