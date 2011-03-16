@@ -77,6 +77,10 @@ Optionally, If you want to change the default plugin options you can you edit th
 
 == Changelog ==
 
+= 2.1.1 =
+* Improved Events page layout by adding Event Status filters and updating styles
+* Added Events dashboard widget showing active & draft events
+
 = 2.1 =
 * Events Marketing page now available in the administration (under Constant Contact > Events)
 	* View event and registrant details
@@ -145,6 +149,10 @@ Optionally, If you want to change the default plugin options you can you edit th
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
+
+= 2.1.1 =
+* Improved Events page layout by adding Event Status filters and updating styles
+* Added Events dashboard widget showing active & draft events
 
 = 2.1 =
 * Events Marketing page now available in the administration (under Constant Contact > Events)
