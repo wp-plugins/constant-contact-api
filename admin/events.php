@@ -526,7 +526,7 @@ function constant_contact_events_list_make_table($events = array(), $title = '')
 			<thead>
 				<tr>
 					<th scope="col" id="name" class="manage-column column-title" style="">Name</th>
-					<th scope="col" id="title" class="manage-column column-author" style="">Title</th>
+					<th scope="col" id="title" class="manage-column column-title" style="">Title</th>
 					<?php if(!isset($_GET['event_status']) || $_GET['event_status'] == 'all') {?>
 					<th scope="col" id="status" class="manage-column column-author" style="">Status</th>
 					<?php } ?>
@@ -553,7 +553,7 @@ function constant_contact_events_list_make_table($events = array(), $title = '')
 						<td class="column-title post-title" style="padding:8px;">
 							<strong><a class="row-title" href="<?php echo add_query_arg('id', $v['id'], remove_query_arg('refresh')); ?>" title="<?php echo esc_html($v['Name']).' - '.esc_html($v['Title']); ?>"><?php echo esc_html($v['Name']); ?></a></strong>
 						</td>
-						<td class="author column-author" style="padding:8px;">
+						<td class="column-title post-title" style="padding:8px;">
 							<?php echo $v['Title']; ?>
 						</td>
 				<?php if(!isset($_GET['event_status']) || $_GET['event_status'] == 'all') {?>
