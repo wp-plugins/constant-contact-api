@@ -1,15 +1,16 @@
 jQuery.noConflict();
 
 jQuery(document).ready(function($) {
-	$('#examplewrapper').scrollFollow( {
-    	speed: 1000,
-    	offset: 0,
-    	container: 'nav-menus-frame',
-    	killSwitch: 'stopFollowingMe'
- 	});
+	$('#examplewrapper').scrollFollow({
+		speed: 1000,
+		offset: 0,
+		container: 'nav-menus-frame',
+		killSwitch: 'stopFollowingMe'
+	});
  
 	$('input.colorwell').each(function() { 
 		var $input = $(this);
+		var intcolor = '#000'; 
 		$(this).ColorPicker({
 			color: jQuery(this).val(),
 			livePreview: false,
@@ -28,13 +29,13 @@ jQuery(document).ready(function($) {
 				return false;
 			},
 			onLoad: function (hsb, hex, rgb) {
-				console.log('background-color: #' + hex);
+				if(hsb.b > 50) { intcolor = '#000'; } else { intcolor = '#fff'; }
 				$input.val('#'+hex).css({"background-color": '#' + hex, "color": intcolor});
 				return;
 			},
 			onChange: function (hsb, hex, rgb) {
 				$('body').disableSelection();
-				if(hsb.b > 50) { var intcolor = '#000'; } else { var intcolor = '#fff'; }
+				if(hsb.b > 50) { intcolor = '#000'; } else { intcolor = '#fff'; }
 				$input.val('#'+hex).css({"background-color": '#' + hex, "color": intcolor}).trigger('colorchange');
 				return;
 			},
@@ -62,9 +63,9 @@ $('textarea.tinymce').tinymce({
 	inline_styles: true,
 	tab_focus : ':prev,:next',
 	setup: function(ed){
-        ed.onKeyUp.add(triggerTextUpdate);
-        ed.onChange.add(triggerTextUpdate);
-    }
+		ed.onKeyUp.add(triggerTextUpdate);
+		ed.onChange.add(triggerTextUpdate);
+	}
 });
 
 function triggerTextUpdate(inst) {
@@ -97,7 +98,7 @@ $('#lpad').bind('change', function() {
 	updateLabelPadding($('#lpad').val());
 });
 
-$('#size').change(function() { updateTextInputSize($('#size').val())});
+$('#size').change(function() { updateTextInputSize($('#size').val()); });
 $('#tfont,#tsize,input[name=talign]').bind('click change', function() { 
 	updateStyleAndColors();
 });
@@ -163,11 +164,11 @@ $("#defaultbuttontext,input[name=submitdisplay],input[name=submitposition]").bin
 
 // Pattern selection
 $("ul#patternList li").click(function(){ 
-	updatePattern($(this))
+	updatePattern($(this));
 });
 
 $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', function(e) { 
-	if(eventKeys(e) || e.keyCode == 46 || e.keyCode == 8) { 
+	if(eventKeys(e) || e.keyCode === 46 || e.keyCode === 8) { 
 		// If it's not an arrow, tab, etc. and not delete or backspace, process the sucker!
 		/* updateBoxWidthandPadding();   */
 		updateWidthCalculator(); 
@@ -178,13 +179,14 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 
 	
 	function updatePattern($clickedLI) {
+		var val = '';
 		if(empty($clickedLI)) {
 			if($("ul#patternList li.selected").length > 0) {
-				var $clickedLI = $("ul#patternList li.selected");
-				var val = $clickedLI.attr('title'); 
+				$clickedLI = $("ul#patternList li.selected");
+				val = $clickedLI.attr('title'); 
 			} else {				
-				var val = $('#patternurl').val(); 
-				var $clickedLI = $("ul#patternList li[title*="+val+"]");
+				val = $('#patternurl').val(); 
+				$clickedLI = $("ul#patternList li[title*="+val+"]");
 			}
 		}
 		$("ul#patternList li").removeClass('selected'); 
@@ -203,13 +205,13 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		var formFields = '&'+$('input,textarea,select',$('#form-fields')).serialize();
 		var styleFields = '';
 		$('#side-sortables div.inside').each(function() {
-			if($(this).parents('#formfields_select').length > 0) { } else {
+			if($(this).parents('#formfields_select').length === 0) {
 				styleFields =  $('input,textarea,select,textarea', $(this)).serialize() + '&'+styleFields;
 			}
 		});
 		if($changed && $($changed,$('.grabber')).length > 0) {	changedLink = '&changed='+$changed.attr('id'); }
 		
-		if(textOnly == 'style') {
+		if(textOnly === 'style') {
 			textOnlyLink = '&styleOnly='+textOnly;
 			styleOnly = true;
 			textOnly = false;
@@ -232,8 +234,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 					var input = false;
 					var pre = false;
 					
-
-					var data = jQuery.parseJSON(data);
+					data = jQuery.parseJSON(data);
 					
 					// If we want to pass debug info, this works
 					if(!empty(data.pre)) {
@@ -272,6 +273,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 				}
 			},
 			error: function(XMLHttpRequest, textStatus, errorThrown) {
+				$('.grabber').css('width','80%').css('margin','0 auto').css('text-align', 'left').html('<h2><em>Form Designer needs your help!</em></h2><h3>Your web server thinks that Form Designer is an unwelcome script. Obviously, it\'s not.</h3><p style="font-size:14px;">For Form Designer to work, you need to <strong>contact your web host</strong> and request that they "whitelist your domain for ModSecurity." This shouldn\'t pose any risk to your website; it just lets the host know you want the Form Designer to do what it does best!</p>');
 				return false;
 			},
 			dataType: 'text'
@@ -303,7 +305,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		$("#cc-form-settings input, #cc-form-settings textarea, #cc-form-settings select")
 		.not('.inside input')
 		.not('.inside textarea')
-		.bind('change', 	
+		.bind('change',	
 			function() {  
 				updateFormFields('style', false, '#cc-form-settings style - '+$(this).attr('id')); 
 			}
@@ -312,7 +314,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	
 	function updatePresets(preset) {
 		if(!preset) {
-			var preset = $('#presets').val();
+			preset = $('#presets').val();
 		}
 		
 		//unbindSettings();
@@ -435,7 +437,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	
 	function eventKeys(e) {
 		var code = (e.keyCode ? e.keyCode : e.which);
-		if (code == 37 || code == 38 || code == 39 || code == 40 || code == 46 || code == 8 || code == 16) {
+		if (code === 37 || code === 38 || code === 39 || code === 40 || code === 46 || code === 8 || code === 16) {
 			return false;
 		}else {
 			return true;
@@ -451,7 +453,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	
 	function updateBoxAlign(align) {
 		if(empty(align)) {
-			var align = $('input[name=formalign]:checked').val();
+			align = $('input[name=formalign]:checked').val();
 		}
 		
 	}
@@ -467,12 +469,12 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	}
 	
 	function updateWidthCalculator() {
-		if($('input[name=widthtype]:checked').val() == 'px') {
+		if($('input[name=widthtype]:checked').val() === 'px') {
 		var borderwidth = $('#borderwidth').val() * 2;
 		var paddingwidth = $('#paddingwidth').val() * 2;
 		var rawwidth = $('#width').val();
-		var setwidth = (rawwidth *1) - (paddingwidth*1) - (borderwidth*1);
-		var realwidth = (rawwidth *1) + (paddingwidth*1) + (borderwidth*1);
+		var setwidth = Math.floor(rawwidth) - Math.floor(paddingwidth) - Math.floor(borderwidth);
+		var realwidth = Math.floor(rawwidth) + Math.floor(paddingwidth) + Math.floor(borderwidth);
 			$('#actualwidth').html('<div class="wrap"><p class="link-to-original"><strong>Actual width is '+ realwidth + 'px.</strong> <em>For an form that is '+rawwidth+'px wide, set Form Width to '+setwidth+'px</em><br />	Width: '+ $('#width').val()+ 'px<br />Padding: '+ paddingwidth + 'px ('+$('#paddingwidth').val() + 'px'+' * 2)<br />Border Width: '+  borderwidth + 'px ('+$('#borderwidth').val() + 'px * 2)<br /><span style="display:block; clear:both; border-top:1px solid #888; float:left; width:30%; margin-top:5px; padding-top:5px;">'+rawwidth+'px + '+paddingwidth+'px + '+borderwidth+'px = '+realwidth+'px</span></p></div>');
 		} else {
 			$('#actualwidth').html('');
@@ -484,21 +486,21 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	}
 		
 	function mySorter(a,b){  
-		return $(a).find("input.position").val() > $(b).find("input.position").val() ? 1 : -1;  
-	}; 
+		return $(a).find("input.position").val() > $(b).find("input.position").val() ? 1 : -1;
+	}
 	
 	function sortFieldMenu() {
 		$('#form-fields ul.menu li.menu-item').sort(mySorter).appendTo('#form-fields ul.menu');
 	}
 	function showHideFormFields($clicked) {
 		if(!$clicked) {
-			var $clicked = $('#formfields_select input:checkbox');
+			$clicked = $('#formfields_select input:checkbox');
 		}
 		$clicked.each(function() {
 				//$('#form-fields .menu li').has('#'+$(this).val()).find('input.checkbox').attr('checked', $(this).attr('checked'));
 				var targetLI = $('#form-fields .menu li').has('#'+$(this).val());
 				var checked = $(this).attr('checked');
-				if(checked == true) {
+				if(checked === true) {
 					targetLI.remove().appendTo($('#form-fields .menu')).show()
 					.find('input.checkbox').attr('checked', checked)
 					.find('input').each(function() { $(this).attr('disabled', false); });
@@ -514,11 +516,11 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	}
 	
 	function updateFormFields(textOnly, $changed, from) {
-		console.log('textOnly: '+textOnly + ', changed: '+$changed +', from: '+ from);
-		if(empty(textOnly) || textOnly == 'style') {
+		/* console.log('textOnly: '+textOnly + ', changed: '+$changed +', from: '+ from); */
+		if(empty(textOnly) || textOnly === 'style') {
 			updateStyleAndColors();
 		} 
-		if(textOnly != 'style') {
+		if(textOnly !== 'style') {
 			if(empty($changed)) {
 				$('ul.menu li.formfield').each(function() {
 					updateFormField(textOnly, $(this));
@@ -533,7 +535,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	
 	function updateFormField(textOnly, $item) {
 		// Get the <li> we're working within.
-		if($item.is('li')) { } else { $item = $item.parents('li.formfield'); }
+		if($item.not('li')) { $item = $item.parents('li.formfield'); }
 		
 		var checkbox = $('input.checkbox', $item);
 		if(checkbox.attr('checked')) {
@@ -562,7 +564,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 				input.label = tempInput.val();
 			}
 						
-			if(check.rel == 'textarea' || $item.hasClass('tinymce') || $('textarea.labelValue', $item).length > 0 || $('body.mceContentBody', $item).length > 0) { 
+			if(check.rel === 'textarea' || $item.hasClass('tinymce') || $('textarea.labelValue', $item).length > 0 || $('body.mceContentBody', $item).length > 0) { 
 				input.textarea = true; 
 			}
 			
@@ -582,19 +584,19 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 			if($('#'+check.id+'_required').is(':checked')) { input.required = true; }
 			
 			//console.debug(input);
-			if(check.rel == 'text') {
+			if(check.rel === 'text') {
 				input.html = '<input type="text" value="'+input.value+'" size="' + input.size + '" name="'+check.name+'" class="text" id="cc_'+check.id+'" />';
 			}
-			if(check.rel == 'button' || check.rel == 'submit') {
+			if(check.rel === 'button' || check.rel === 'submit') {
 				input.html = '<input type="submit" value="'+input.value+'" name="'+check.name+'" id="cc_'+check.id+'" />';
 			}
-			if(check.rel == 'textarea') {
+			if(check.rel === 'textarea') {
 				input.html = $('<textarea>'+input.value+'</textarea>').attr('name', check.name).attr('id', check.id).attr('disabled', false);
 			}
 						
 		} else { // If not checked
 			//console.debug('Not checked');
-			if(textOnly != 'style' || empty(textOnly)) { // This might save some time?
+			if(textOnly !== 'style' || empty(textOnly)) { // This might save some time?
 				$item.removeClass('checked').removeClass('ui-state-active');
 				$('.menu-item-settings',$item).hide();
 			}
@@ -603,7 +605,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	
 	function updateDisabled() {
 		$('ul.menu li.formfield').each(function() {
-			if($('input.checkbox', $(this)).attr("checked") == true) {
+			if($('input.checkbox', $(this)).attr("checked") === true) {
 				$('input[type=hidden],li input, li textarea', $(this)).attr('disabled', false);
 			} else {
 				$('input[type=hidden],li input, li textarea', $(this)).attr('disabled', true);
@@ -611,7 +613,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 			$('input.position[type=hidden]', $(this)).val($('ul.menu li.formfield input.position').index($('input.position', $(this))));
 		});
 	}		
-    
+	
 	$('#form-fields ul.menu').sortable({
 		handle: '.menu-item-handle',
 		placeholder: 'sortable-placeholder',
@@ -650,8 +652,8 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		next = ui.placeholder.next();
 
 		// Make sure we don't select the moving item.
-		if( prev[0] == ui.item[0] ) prev = prev.prev();
-		if( next[0] == ui.item[0] ) next = next.next();
+		if( prev[0] === ui.item[0] ) prev = prev.prev();
+		if( next[0] === ui.item[0] ) next = next.next();
 
 	}
 	
@@ -719,61 +721,42 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		
 			case 'times':
 				return "'Times New Roman', Times, Georgia, serif";
-				break;
 			case 'georgia':
 				return "Georgia,'Times New Roman', Times, serif";
-				break;
 			case 'palatino':
 				return "'Palatino Linotype', Palatino, 'Book Antiqua',Garamond, Bookman, 'Times New Roman', Times, Georgia, serif";
-				break;
 			case 'garamond':
 				return "Garamond,'Palatino Linotype', Palatino, Bookman, 'Book Antiqua', 'Times New Roman', Times, Georgia, serif";
-				break;
 			case 'bookman':
 				return "Bookman,'Palatino Linotype', Palatino, Garamond, 'Book Antiqua','Times New Roman', Times, Georgia, serif";
-				break;
 			case 'helvetica':
 				return "'Helvetica Neue',HelveticaNeue, Helvetica, Arial, Geneva, sans-serif";
-				break;
 			case 'arial':
 				return "Arial, Helvetica, sans-serif";
-				break;
 			case 'lucida':
 				return "'Lucida Grande', 'LucidaGrande', 'Lucida Sans Unicode', Lucida, Verdana, sans-serif";
-				break;
 			case 'verdana':
 				return "Verdana, 'Lucida Grande', Lucida, TrebuchetMS, 'Trebuchet MS',Geneva, Helvetica, Arial, sans-serif";
-				break;
 			case 'trebuchet':
 				return "'Trebuchet MS', Trebuchet, Verdana, sans-serif";
-				break;
 			case 'tahoma':
 				return "Tahoma, Verdana, Arial, sans-serif";
-				break;
 			case 'franklin':
 				return "'Franklin Gothic Medium','FranklinGotITC','Arial Narrow Bold',Arial,sans-serif";
-				break;
 			case 'impact':
 				return "Impact, Chicago, 'Arial Black', sans-serif";
-				break;
 			case 'arialblack':
 				return "'Arial Black',Impact, Arial, sans-serif";
-				break;
 			case 'gillsans':
 				return "'Gill Sans','Gill Sans MT', 'Trebuchet MS', Trebuchet, Verdana, sans-serif";
-				break;
 			case 'courier':
 				return "'Courier New', Courier, Monaco, monospace";
-				break;
 			case 'lucidaconsole':
 				return "'Lucida Console', Monaco, 'Courier New', Courier, monospace";
-				break;
 			case 'comicsans':
 				return "'Comic Sans MS','Comic Sans', Sand, 'Trebuchet MS', cursive";
-				break;
 			case 'papyrus':
 				return "Papyrus,'Palatino Linotype', Palatino, Bookman, fantasy";
-				break;
 		}
 	}
 	
@@ -787,7 +770,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	}
 	
 	function updateBorderStyle(borderstyle) {
-		if(!borderstyle || borderstyle == '') {
+		if(!borderstyle || borderstyle === '') {
 			var borderstyle =  $('#borderstyle option:selected').val();
 		} else {
 			 $('#borderstyle option[value='+borderstyle+']').attr('selected','selected');
@@ -845,7 +828,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		} else if ( target.hasClass('page-numbers') ) {
 			$.post( ajaxurl, e.target.href.replace(/.*\?/, '').replace(/action=([^&]*)/, '') + '&action=menu-get-metabox',
 				function( resp ) {
-					if ( -1 == resp.indexOf('replace-id') )
+					if ( -1 === resp.indexOf('replace-id') )
 						return;
 	
 					var metaBoxData = $.parseJSON(resp),
@@ -884,7 +867,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		if(empty(textbordercolor)) { $('#color6').css('color',textbordercolor); }
 		if(empty(textcolor2)) { $('#color2').css('color',textcolor2); }
 		
-		if($("input[name=backgroundtype]").val() == 'gradient') {
+		if($("input[name=backgroundtype]").val() === 'gradient') {
 			$('#safesubscribelightimg,#safesubscribedarkimg,#safesubscribeblackimg').css("background-color", color2).css("background-image", 'none');
 		} else {
 			$('#safesubscribelightimg,#safesubscribedarkimg,#safesubscribeblackimg').css("background-color", color2).css("background-image", 'none');
@@ -900,12 +883,12 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	function updateBackgroundType(bordercolor,color2,textbordercolor,textcolor2,url, height, gradtype){
 		if(empty(gradtype)) { gradtype = $('#gradtype').val(); }
 		var selection = $("input[name=backgroundtype]:checked").val();
-		if(selection == 'gradient') {
+		if(selection === 'gradient') {
 			if(empty(height)) { height = $('#gradheight').val(); }
 //			console.debug('gradient');
 			$("#bgtop,#gradheightli,#gradtypeli").show();
 			$("#bgpattern,#bgurl").hide();
-			if($('#gradtype').val() == 'vertical') { 
+			if($('#gradtype').val() === 'vertical') { 
 				$("#bgbottom label").text('Bottom Color:');
 				$("#bgtop label").text('Top Color:');
 				$("#gradheightli label span").text('Gradient Height:');
@@ -918,7 +901,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 			$('#color2,#gradheight,#gradwidth,#gradtype,#bgrepeat,#bgpos').attr('disabled', false);
 			updateBackgroundColor(bordercolor,color2,textbordercolor,textcolor2);
 			updateGradient(bordercolor,color2,textbordercolor,textcolor2,url,height,gradtype);
-		} else if(selection == 'solid') {
+		} else if(selection === 'solid') {
 			//console.debug('solid');
 				updateBackgroundColor(bordercolor,color2,textbordercolor,textcolor2);
 			$("#bgtop,#gradheightli,#gradtypeli,#bgpattern,#bgurl").hide();
@@ -926,7 +909,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 			$("#bgbottom label").text('Background Color:');
 			$('#patternurl,#bgimage,#gradwidth,#gradtype,#gradheight,#bgrepeat,#bgpos').attr('disabled', true);
 			$('#color2').attr('disabled', false);
-		} else if(selection == 'pattern') {
+		} else if(selection === 'pattern') {
 			$("#bgtop,#gradheightli,#gradtypeli,#bgbottom,#bgurl").hide();
 			$("#bgpattern").show();
 			$('#color2,#bgimage').attr('disabled', true);
@@ -938,7 +921,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 			else { var bgTitle = $("#bgpattern ul li:first").attr('title'); }
 				updatePattern();
 				updateBackgroundURL(bgTitle, 'transparent', 'repeat');
-		} else if(selection == 'url') {
+		} else if(selection === 'url') {
 			//console.debug('url');
 			$('#patternurl').attr('disabled', true);
 			$('#color2,#bgimage,#bgrepeat,#bgpos').attr('disabled', false);
@@ -955,11 +938,11 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	
 	function updateBackgroundURL(url, color, repeat, position) {
 		if(!repeat) { var repeat = $('#bgrepeat').val();}
-		if(!url || url == 'undefined') {
+		if(!url || url === 'undefined') {
 			//console.debug('we are undefined');
 			var url = $('input#bgimage').val(); 
 		} 
-		if(url == '' || url == 'http://') { url = ''; } else { url = 'url('+url+')'; }
+		if(url === '' || url === 'http://') { url = ''; } else { url = 'url('+url+')'; }
 		
 		if(!color) { var color = $('#color2').val(); }
 		if(!position) { var position = $('#bgpos').val(); }
@@ -976,21 +959,21 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		  dataType: "text",
 		  data: 'start='+bordercolor+'&end='+color2+'&height='+$('#gradheight').val(),
 		  async: true,
-		  error: function() { console.error('error generating gradient'); return false; },
+		  error: function() { /* console.error('error generating gradient'); */ return false; },
 		  success: function(msg){
-		     var getImage = msg;
-//		     var bgRule = '#'+color2+' url(gradients/'+getImage+') left top repeat-x';
-		     var bgRule = '#'+color2+' url('+getImage+') left top repeat-x';
-//		     updateCode('style', false, 'ajaxGradient');
-		     $('#gradtype').trigger('stylechange');
-		     return true;
+			var getImage = msg;
+//			var bgRule = '#'+color2+' url(gradients/'+getImage+') left top repeat-x';
+			var bgRule = '#'+color2+' url('+getImage+') left top repeat-x';
+//			updateCode('style', false, 'ajaxGradient');
+			$('#gradtype').trigger('stylechange');
+			return true;
 //			 $('.kws_form').css('background', bgRule);
 		   }
 		});
 	}
 	
 	function updateGradient(bordercolor,color2,textbordercolor,textcolor2,url,gradheight, gradtype) {
-		if(bordercolor == '1') { return false; }
+		if(bordercolor === '1') { return false; }
 			if(!bordercolor) {
 				var bordercolor = $('#color6').val().replace(/#+?/g,'');	
 			} else {
@@ -1008,21 +991,21 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 				$('#color2').css('color',textcolor2);
 			}
 			//console.debug('in updateGradient. typeof(gradheight) is '+typeof(gradheight));
-			if(empty(gradheight) || typeof(gradheight) == 'object') {
-				var gradheight = $('#gradheight').val();
+			if(empty(gradheight) || typeof(gradheight) === 'object') {
+				gradheight = $('#gradheight').val();
 			} else {
 				$('#gradheight').val(gradheight);
 			}
 			if(empty(gradtype)) {
-				var gradtype = $('#gradtype').val();
+				gradtype = $('#gradtype').val();
 			} else {
 				$('#gradtype').val(gradtype);
 			}
-			if($('#gradtype').val() == 'vertical') {
-				var gradwidth = 1;
+			if($('#gradtype').val() === 'vertical') {
+				gradwidth = 1;
 				$('#gradwidth').val(1);
 			} else {	
-				var gradwidth =$('.kws_form').width();
+				gradwidth =$('.kws_form').width();
 				$('#gradwidth').val(gradwidth);
 			}
 		
@@ -1046,8 +1029,8 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	}
 	function updateSafeSubscribe(safesubscribe) {
 		if(!empty(safesubscribe)) {
-			if(safesubscribe == 'white') { safesubscribe = 'dark'; }
-			if(safesubscribe == 'gray' || safesubscribe == 'grey') { safesubscribe = 'light'; }
+			if(safesubscribe === 'white') { safesubscribe = 'dark'; }
+			if(safesubscribe === 'gray' || safesubscribe === 'grey') { safesubscribe = 'light'; }
 			$('input[name="safesubscribe"][value='+safesubscribe+']').click().attr('checked', true);
 		}
 		else { 
@@ -1093,7 +1076,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	
 	function updateLabelColor(color) {
 		if(!color) {
-			var color = $('#lcolor').val();	
+			color = $('#lcolor').val();	
 		} else {
 			$('#lcolor').val(color).css('background-color',color).ColorPickerSetColor(color);
 			$('.kws_form .kws_input_container label').css('color', color);
@@ -1103,7 +1086,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	
 	function updateLabelPadding(val) {
 		if(empty(val)) {
-			var val = $('#lpad').val(); 
+			val = $('#lpad').val(); 
 		} 
 		$('.kws_form .kws_input_container label').css("padding-top",val+'em');
 	}
@@ -1127,7 +1110,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	
 	function updateTextColor(color,textcolor) {
 		if(!color) {
-			var color = $('#tcolor').val();	
+			color = $('#tcolor').val();	
 		} 
 		$('#tcolor').val(color).css('background-color',color).ColorPickerSetColor(color);
 		
@@ -1142,21 +1125,21 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 			if(textcolor) { $('#lcolor').css('color', textcolor); } 
 		}
 	}
-    function updateBorderRadius(borderradius) {
-    	if(!empty(borderradius)) {
-    		$("#borderradius").val(borderradius);
-    		return;
-    	}
-    	$('.kws_form').css({
-    		'border-radius':$('#borderradius').val()+'px '+ $('#borderradius').val()+'px',
-    		'-moz-border-radius':$('#borderradius').val()+'px '+ $('#borderradius').val()+'px',
-    		'-webkit-border-radius':$('#borderradius').val()+'px '+ $('#borderradius').val()+'px'
-    	});
-    	return;
-    }
+	function updateBorderRadius(borderradius) {
+		if(!empty(borderradius)) {
+			$("#borderradius").val(borderradius);
+			return;
+		}
+		$('.kws_form').css({
+			'border-radius':$('#borderradius').val()+'px '+ $('#borderradius').val()+'px',
+			'-moz-border-radius':$('#borderradius').val()+'px '+ $('#borderradius').val()+'px',
+			'-webkit-border-radius':$('#borderradius').val()+'px '+ $('#borderradius').val()+'px'
+		});
+		return;
+	}
 	function updateBorderColor(bordercolor,textcolor) {
 		if(!bordercolor) {
-			var bordercolor = $('#bordercolor').val();	
+			bordercolor = $('#bordercolor').val();	
 		}
 		
 		$('#bordercolor').val(bordercolor).css('background-color',bordercolor).ColorPickerSetColor(bordercolor);
@@ -1169,7 +1152,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	
 function setPatterns() {
 	$('#patternList li').each(function() {
-	 	$(this).css('background', 'url('+ScriptParams.path+$(this).attr('title')+') left top repeat');
+		$(this).css('background', 'url('+ScriptParams.path+$(this).attr('title')+') left top repeat');
 	});
 	return;
 }
@@ -1209,22 +1192,22 @@ $('form label.error').hide();
    });
    
    
-  	$("a.toggleMore").live('click', function() { 
+	$("a.toggleMore").live('click', function() { 
 		$(this).parents('ul').find('.toggleMore:not(a):not(:has(input[type=checkbox]:checked))').toggle('fast'); 
 		
 		var text = $(this).text();
 		var text2 = text.replace('Show', 'Hide');
-		if(text2 == text) {$(this).text(text.replace('Hide', 'Show'))} else { $(this).text(text2); }
+		if(text2 === text) {$(this).text(text.replace('Hide', 'Show'))} else { $(this).text(text2); }
 		return false; 
 	});
    
    jQuery('.toggleMore:not(a)').hide();
-      	
+		
 });
 
 	jQuery.fn.clearText = function() {
 	return this.focus(function() {
-		if( this.value == this.defaultValue ) {
+		if( this.value === this.defaultValue ) {
 			this.value = "";
 		}
 	}).blur(function() {
@@ -1275,53 +1258,53 @@ $('form label.error').hide();
 	
 	(function(jQuery) {
   jQuery.fn.stripHtml = function() {
-      var regexp = /<("[^"]*"|'[^']*'|[^'">])*>/gi;
-      this.each(function() {
-          jQuery(this).html(
-              jQuery(this).html().replace(regexp,"")
-          );
-      });
-      return jQuery(this);
+	var regexp = /<("[^"]*"|'[^']*'|[^'">])*>/gi;
+	this.each(function() {
+		jQuery(this).html(
+			jQuery(this).html().replace(regexp,"")
+		);
+	});
+	return jQuery(this);
   }
 	})(jQuery);
 function empty (mixed_var) {
-    // http://kevin.vanzonneveld.net
-        
-    var key;
-    
-    if (mixed_var === "" ||
-        mixed_var === 0 ||
-        mixed_var === "0" ||
-        mixed_var === null ||
-        mixed_var === false ||
-        typeof mixed_var === 'undefined'
-    ){
-        return true;
-    }
+	// http://kevin.vanzonneveld.net
+		
+	var key;
+	
+	if (mixed_var === "" ||
+		mixed_var === 0 ||
+		mixed_var === "0" ||
+		mixed_var === null ||
+		mixed_var === false ||
+		typeof mixed_var === 'undefined'
+	){
+		return true;
+	}
 
-    if (typeof mixed_var == 'object') {
-        for (key in mixed_var) {
-            return false;
-        }
-        return true;
-    }
+	if (typeof mixed_var === 'object') {
+		for (key in mixed_var) {
+			return false;
+		}
+		return true;
+	}
 
-    return false;
+	return false;
 }
 
 /*
 function
-if(typeof window.console!="undefined"&&typeof console.log=="function"){
+if(typeof window.console!="undefined"&&typeof console.log==="function"){
 	console.log(msg);
 }else{alert(msg)}}
 */
 
 function rgb2hex(rgb) {
-    rgb = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?\)$/);
-    function hex(x) {
-        return ("0" + parseInt(x).toString(16)).slice(-2);
-    }
-    return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+	rgb = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?\)$/);
+	function hex(x) {
+		return ("0" + parseInt(x).toString(16)).slice(-2);
+	}
+	return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
 }
 
 

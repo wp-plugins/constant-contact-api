@@ -18,6 +18,9 @@ The Constant Contact for Wordpress plugin is the best email marketing plugin for
 
 You can place a signup checkbox or list selection on your register page or use the signup widget anywhere in your website sidebar or PHP templates.
 
+<h3>Now featuring Event Marketing!</h3>
+Version 2.1 of the plugin introduces <a href="http://conta.cc/hB5lnC" title="Learn more about Constant Contact Event Marketing" rel="nofollow">Constant Contact Event Marketing</a> functionality by allowing you to track events, registration, and registrants using the plugin. Simply navigate to Constant Contact > Events. Manage your events from inside WordPress!
+
 <h3>Version 2.0</h3>
 Version 2.0 of the Constant Contact API plugin brings great new capabilities, improved interface, and expanded instructions.  New capabilities include Campaign details (email sending statistics) and caching of data to dramatically improve load speed. The plugin has been majorly reconstructed to improve the way the API is accessed and reduce the number of calls to the API. Each administration screen has improved interfaces to make the plugin look and feel more like a native extension of WordPress. Great care has been taken to conform to WordPress standards of design.
 
@@ -27,6 +30,7 @@ Version 2.0 of the Constant Contact API plugin brings great new capabilities, im
 * Add signup checkbox and list selection to your register page and update profile page
 * Add / edit / delete contact lists without visiting constantcontact.com
 * Includes a powerful form designer
+* View your events registration details and get updated with a dashboard widget
 * Show contact list selection on register page with ability to exclude certain lists
 * Automatically subscribe your user to one or more contact lists on the register page
 * Customize the register page signup box (and list selection) title and description
@@ -34,11 +38,6 @@ Version 2.0 of the Constant Contact API plugin brings great new capabilities, im
 * Add a signup widget to your sidebar or anywhere in your template
 * Add extra fields to your signup form
 * Uses the REST API
-
-<h3>Now featuring Event Marketing!</h3>
-Version 2.1 of the plugin introduces <a href="http://conta.cc/hB5lnC" title="Learn more about Constant Contact Event Marketing" rel="nofollow">Constant Contact Event Marketing</a> functionality by allowing you to track events, registration, and registrants using the plugin. Simply navigate to Constant Contact > Events. Manage your events from inside WordPress!
-
-Upcoming Event Marketing integration will include an Event widget & dashboard reports.
 
 <h4>Plugin Support</h4>
 To obtain support please use this link to the [wordpress forums](http://wordpress.org/tags/constant-contact-api).
@@ -76,6 +75,23 @@ Optionally, If you want to change the default plugin options you can you edit th
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
 == Changelog ==
+
+= 2.1.2 = 
+
+* Form Designer
+	* Determined that issues with Form Designer not displaying are caused by hosting configuration issues. <strong>Contact your web host and request that they "whitelist your domain for ModSecurity."</strong> View the FAQ section for more information.
+	* Improved error notices for Form Designer when hosting issues are detected.
+	* Improved the form generator javascript
+* Legacy (non-Form Designer) widget
+	* Improved speed
+	* Fixed issue with "Please select at least 1 list" when Show List Selection was not checked
+	* Restored functionality: incomplete form submissions once again fill in submitted data
+* WP Registration form
+	* Added support for Multisite registration forms
+	* Vastly improved registration form functionality, including formatting of description, labels, and more.
+	* Fixed <a href="http://wordpress.org/support/topic/432029">bug #432029</a>; "subscribe users by default" now functions properly when using the single opt-in checkbox
+	* Added multiple filters to modify registration form, including `constant_contact_register_form`; you can now modify entire output of plugin on the registration page by using `add_filter('constant_contact_register_form', 'your_function_to_modify');`. <a href="http://codex.wordpress.org/Function_Reference/add_filter" rel="nofollow">Learn more about `add_filter` on WordPress.org</a>.
+* Events - restored Events functionality that got messed up in 2.1.1.
 
 = 2.1.1 =
 * Improved Events page layout by adding Event Status filters and updating styles
@@ -149,6 +165,23 @@ Optionally, If you want to change the default plugin options you can you edit th
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
+
+= 2.1.2 = 
+
+* Form Designer
+	* Determined that issues with Form Designer not displaying are caused by hosting configuration issues. <strong>Contact your web host and request that they "whitelist your domain for ModSecurity."</strong> View the FAQ section for more information.
+	* Improved error notices for Form Designer when hosting issues are detected.
+	* Improved the form generator javascript
+* Legacy (non-Form Designer) widget
+	* Improved speed
+	* Fixed issue with "Please select at least 1 list" when Show List Selection was not checked
+	* Restored functionality: incomplete form submissions once again fill in submitted data
+* WP Registration form
+	* Added support for Multisite registration forms
+	* Vastly improved registration form functionality, including formatting of description, labels, and more.
+	* Fixed <a href="http://wordpress.org/support/topic/432029">bug #432029</a>; "subscribe users by default" now functions properly when using the single opt-in checkbox
+	* Added multiple filters to modify registration form, including `constant_contact_register_form`; you can now modify entire output of plugin on the registration page by using `add_filter('constant_contact_register_form', 'your_function_to_modify');`. <a href="http://codex.wordpress.org/Function_Reference/add_filter" rel="nofollow">Learn more about `add_filter` on WordPress.org</a>.
+* Events - restored Events functionality that got messed up in 2.1.1.
 
 = 2.1.1 =
 * Improved Events page layout by adding Event Status filters and updating styles
@@ -259,6 +292,13 @@ You can modify the widget output by hooking into any of the filters below in a s
 8. Configure the settings shown, then click the "Save" button at the bottom of the widget form.
 9. You will see the signup widget you created on your website!
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
+
+= Form Designer isn't showing up or working = 
+Form Designer needs to be activated separately from the main plugin (see "How do I use the Form Designer?" above). Once you activate it, if it's still not working, it's likely a server issue. 
+
+The problem is that your web server may think that Form Designer is an unwelcome script. In order to fix this, you should <strong>contact your web host and request that they "whitelist your domain for ModSecurity."</strong>. 
+
+<a href="http://www.hostgator.com" rel="nofollow">HostGator</a> reps said whitelisting your own domain is <strong>not an issue that affects website security</strong>.
 
 = My gradients aren't working on the Form Designer! =
 This plugin uses <a href="http://ozh.in/kw">Ozh's gradient script</a>. Please refer to that page.

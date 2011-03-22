@@ -38,7 +38,7 @@ class constant_contact_form_widget extends WP_Widget {
 			$usedStyles = array();
 			foreach($settings as $instance) {
 				extract($instance);
-				if(in_array($formid, $usedStyles) || $formid == 0) { continue; }
+				if(!isset($instance['formid']) || in_array($formid, $usedStyles) || $formid === 0) { continue; }
 				$usedStyles[] = $formid; // We don't need to echo the same styles twice
 			}
 	}
@@ -46,6 +46,17 @@ class constant_contact_form_widget extends WP_Widget {
    /** @see WP_Widget::widget */
     function widget($args = array(), $instance = array(), $echo = true)
 	{
+		$form = constant_contact_public_signup_form($instance, false);
+		
+		if(!$form) {
+			if((is_user_logged_in() && current_user_can('install_plugins'))) {
+				_e('<div style="background-color: #FFEBE8; padding:10px 10px 0 10px; font-size:110%; border:3px solid #c00; margin:10px 0;"><h3><strong>Admin-only Notice</strong></h3><p>The Form Designer is not working because of server configuration issues.</p><p>Contact your web host and request that they "whitelist your domain for ModSecurity"</p></div>');
+			} else {
+				_e('<!-- Form triggered error. Log in and refresh to see additional information. -->');
+			}
+			return false;
+		}
+		
 		$output = '';
 		
 		/**
@@ -77,12 +88,13 @@ class constant_contact_form_widget extends WP_Widget {
 		 * Display the public signup form
 		 * Pass in widget $args, they should match the ones expected by constant_contact_public_signup_form()
 		 */
-		$output .= constant_contact_public_signup_form($instance, false);
+		
+		$output .= $form;
 		
 
 		$output .= (isset($after_widget)) ? $after_widget : '';
 
-
+		
 		echo $output;
     }
 	

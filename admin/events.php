@@ -9,7 +9,7 @@ function constant_contact_dashboard_setup() {
 function constant_contact_events_dashboard_make_table($title = 'Events', $events = array()) {
 	global $cc;
 	
-	constant_contact_create_object();
+	if(!constant_contact_create_object()) { return false; }
 
 	?>
 	<p style="color: #777;font-family: Georgia, 'Times New Roman', 'Bitstream Charter', Times, serif;font-size: 13px;font-style: italic;padding: 0;margin: 15px 0 0 0;"><?php echo $title; ?></p>
@@ -56,7 +56,7 @@ function constant_contact_events_dashboard_make_table($title = 'Events', $events
 function constant_contact_events_dashboard() {
 	global $cc;
 	
-	constant_contact_create_object();
+	if(!constant_contact_create_object()) { return false; }
 	
 	$_events = $cc->get_events();
 
@@ -96,7 +96,7 @@ function constant_contact_events()
 	global $cc;
 	
 	// Create the CC api object for use in this page. 
-	constant_contact_create_object();
+	if(!constant_contact_create_object()) { return false; }
 
 	$events = array();
 	
@@ -520,7 +520,7 @@ function constant_contact_events_list_make_table($events = array(), $title = '')
 	global $cc;
 	
 	// Create the CC api object for use in this page. 
-	constant_contact_create_object();
+	if(!constant_contact_create_object()) { return false; }
 ?>
 	<table class="post fixed widefat" cellspacing="0">
 			<thead>

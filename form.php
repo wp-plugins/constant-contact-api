@@ -1,5 +1,5 @@
 <?php
-	
+	# header('HTTP/1.1 403 Forbidden'); // For testing ModSecurity issues
 	function findFont($id = '') {
 			switch($id) {
 			

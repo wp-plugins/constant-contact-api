@@ -350,6 +350,9 @@ function constant_contact_public_signup_form($args, $echo = true) {
 		
 	}
 	
+	// If the form returns an error, we want to get out of here!
+	if(empty($form) || is_wp_error($form)) { return false; }
+	
 	/**
 	 * Display errors or Success message if the form was submitted.
 	 */
@@ -773,6 +776,55 @@ function constant_contact_set_transient($key = false, $data, $time = 172800) {
 	}
 	
 	return $data;
+}
+
+function constant_contact_create_location($v = array()) {
+	if(empty($v)) { return ''; }
+	foreach($v as $key=> $l)  { $v[$key] = (string)get_if_not_empty($l, ''); }
+	extract($v);
+	$Address1 = get_if_not_empty($Address1, '', $Address1.'<br />');
+	$Address2 = get_if_not_empty($Address2, '', $Address2.'<br />');
+	$Address3 = get_if_not_empty($Address3, '', $Address3.'<br />');
+	$City = get_if_not_empty($City,'', "{$City}, ");
+	$State = get_if_not_empty($State,'', "{$State} ");
+	$Country = get_if_not_empty($Country,'', "<br />{$Country}");
+	return "{$Location}<br />{$Address1}{$Address2}{$Address3}{$City}{$State}{$PostalCode}{$Country}";
+}
+
+function constant_contact_latest_registrant($id, $showcancelled = false) {
+	global $cc;
+	
+	if(!constant_contact_create_object()) { return false; }
+	
+	$_registrants = $cc->get_event_registrants($id);
+	
+	foreach($_registrants as $key => $reg) {
+		$latest = 0;
+		if(isset($reg['RegistrationStatus']) && strtolower($reg['RegistrationStatus']) !== 'cancelled') {
+			$timestamp = (int)$cc->convert_timestamp($reg['RegistrationDate']);
+			$_registrants[$key]['RegistrationTimestamp'] = $timestamp;
+			
+			if($timestamp > $latest) { $latest = $timestamp; }
+			
+		} else {
+			unset($_registrants[$key]);
+		}
+	}
+	if($timestamp == 0) {
+		return __('N/A', 'constant_contact_api');
+	} else {
+		return sprintf(__('%1$s at %2$s', 'constant_contact_api'), date_i18n(get_option('date_format'), $timestamp, true), date_i18n(get_option('time_format'), $timestamp, true));
+	}
+}
+
+function get_if_not_empty($check = null, $empty = '', $echo = false) {
+	if(!isset($check) || (empty($check) && $check !== 0)) { return $empty; }
+	if(!$echo) { return $check; }
+	return $echo;
+}
+
+function echo_if_not_empty($check = null, $empty = '', $echo = false) {
+	echo get_if_not_empty($check, $empty, $echo);
 }
 
 ?>

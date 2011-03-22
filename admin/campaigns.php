@@ -5,7 +5,7 @@ function constant_contact_campaigns()
 {
 	global $cc;
 	
-	if(!constant_contact_create_object()) { echo '<div id="message" class="error"><p>Campaigns Not Available</p></div>'; return; }
+	if(!constant_contact_create_object()) { echo '<div id="message" class="error"><p>Campaigns Not Available. Check your '.admin_url('admin.php?page=constant-contact-api').' API settings.</p></div>'; return; }
 	
 	$campaigns = array();
 	if(isset($_GET['id'])):

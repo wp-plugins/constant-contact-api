@@ -6,7 +6,8 @@ function constant_contact_download_activity_file()
 {
 	$cc = constant_contact_create_object();
 	if(!is_object($cc)) {
-		echo '<div id="message" class="error"><p><strong>Download failed:</strong> Could not create Constant Contact object.</p></div>'; 
+		echo '<div id="message" class="error"><p><strong>Download failed:</strong> Could not create Constant Contact object.</p></div>';
+		return false;
 	}
 	
 	if(isset($_GET['download'])):
@@ -40,7 +41,7 @@ function constant_contact_activities()
 	global $cc;
 	
 	// Create the CC api object for use in this page. 
-	constant_contact_create_object();
+	if(!constant_contact_create_object()) { echo '<div id="message" class="error"><p>Activities Not Available. Check your '.admin_url('admin.php?page=constant-contact-api').' API settings.</p></div>'; return; }
 
 	$activities = array();
 	if(isset($_GET['id'])):

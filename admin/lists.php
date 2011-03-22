@@ -69,7 +69,7 @@ function constant_contact_lists()
 		// edit list
 		
 		$id = (int) $_GET['edit'];
-		$list = $cc->get_list($id);
+		$list = constant_contact_get_list($id);
 		
 		if(!$list):
 			return '<p>Contact List Not Found</p></div>';
@@ -129,7 +129,7 @@ function constant_contact_lists()
 		if(isset($_REQUEST['delete'])):
 		// delete list		
 			$id = (int) $_REQUEST['delete'];
-			$list = $cc->get_list($id);
+			$list = constant_contact_get_list($id);
 			
 			if(!$list):
 				_e('<div id="message" class="error"><p><strong>Failed to delete contact list:</strong> Contact List Not Found</p></div>');

@@ -10,7 +10,7 @@ function constant_contact_export()
 	global $cc;
 
 	// Create the CC api object for use in this page.
-	constant_contact_create_object();
+	if(!constant_contact_create_object()) { return false; }
 
 	$errors = false;
 	$success = false;

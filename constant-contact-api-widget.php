@@ -129,7 +129,7 @@ class constant_contact_api_widget extends WP_Widget {
 					<label for="cc_firstname">First Name:</label>
 					<div class="input-text-wrap">
 						<input type="text" name="fields[first_name][value]" id="cc_firstname" value="'; 
-						$output .= (isset($_POST['cc_firstname'])) ? htmlentities($_POST['cc_firstname']) : '';
+						$output .= (isset($_POST['fields']['first_name']['value'])) ? htmlentities($_POST['fields']['first_name']['value']) : '';
 						$output .= '" />
 					</div>';
 				endif;
@@ -139,7 +139,7 @@ class constant_contact_api_widget extends WP_Widget {
 					<label for="cc_lastname">Last Name:</label>
 					<div class="input-text-wrap">
 						<input type="text" name="fields[last_name][value]" id="cc_lastname" value="';
-						$output .= (isset($_POST['cc_lastname'])) ? htmlentities($_POST['cc_lastname']) : '';
+						$output .= (isset($_POST['fields']['last_name']['value'])) ? htmlentities($_POST['fields']['last_name']['value']) : '';
 						$output .= '" />
 					</div>';
 				endif;
@@ -148,9 +148,11 @@ class constant_contact_api_widget extends WP_Widget {
 				<label for="cc_email">Email:</label>
 				<div class="input-text-wrap">
 					<input type="text" name="fields[email_address][value]" id="cc_email" value="';
-					$output .= (isset($_POST['email_address'])) ? htmlentities($_POST['email_address']) : '';
+					$output .= (isset($_POST['fields']['email_address']['value'])) ? htmlentities($_POST['fields']['email_address']['value']) : '';
 				$output .= '" />
 				</div>';
+				
+				$hide_lists_output = '';
 				
 				if($show_list_selection) {
 					if($list_selection_format != 'checkbox') {
@@ -188,9 +190,14 @@ class constant_contact_api_widget extends WP_Widget {
 						$output .=  '</ul>'."\n";
 						$output .=  '</div>'."\n";
 					}
+				} else {
+					if(!empty($showlists)){
+						foreach($showlists as $k => $v) {
+							$hide_lists_output .= '<input type="hidden" name="cc_newsletter[]" value="'.$v['id'].'" />'."\n";
+						}
+					}
 				} // end if show list selection
 				
-				$hide_lists_output = '';
 				if(!empty($hidelists)) {
 					foreach($hidelists as $k => $v) {
 						if(in_array($v['id'], $lists)) {
@@ -227,21 +234,21 @@ class constant_contact_api_widget extends WP_Widget {
 			// show only the lists they have selected
 			foreach($lists as $id):
 				if(!in_array($id, $exclude_lists)) {
-					$show_lists[$id] = $cc->get_list($id);
+					$show_lists[$id] = constant_contact_get_list($id);
 				} else {
-					$hide_lists[$id] = $cc->get_list($id);
+					$hide_lists[$id] = constant_contact_get_list($id);
 				}
 			endforeach;
 		} else {
 			// show all lists and exclude any have may have selected
-			$lists = $cc->get_all_lists();
+			$lists = constant_contact_get_lists(isset($_REQUEST['fetch_lists']));
 			
 			if($lists):
 				foreach($lists as $k => $v):
 					if(!in_array($v['id'], $exclude_lists)) {
-						$show_lists[$v['id']] = $cc->get_list($v['id']);
+						$show_lists[$v['id']] = constant_contact_get_list($v['id']);
 					} else {
-						$hide_lists[$v['id']] = $cc->get_list($v['id']);
+						$hide_lists[$v['id']] = constant_contact_get_list($v['id']);
 					}
 				endforeach;
 			endif;
@@ -494,7 +501,7 @@ class constant_contact_api_widget extends WP_Widget {
 			if($lists):
 				$newlists = array();
 				foreach($lists as $list_id):
-					$list = $cc->get_list($list_id);
+					$list = constant_contact_get_list($list_id);
 					$newlists[$list_id] = $list['Name'];
 				endforeach;
 				$lists = $newlists;
@@ -512,7 +519,7 @@ class constant_contact_api_widget extends WP_Widget {
 			$newlists = array();
 			foreach($_lists as $list_id):
 				if(is_array($auto_lists) && in_array($list_id, $auto_lists)): // 1.1.2 added is_array() check
-					$list = $cc->get_list($list_id);
+					$list = constant_contact_get_list($list_id);
 					$newlists[$list['id']] = $list['Name'];
 				endif;
 			endforeach;
