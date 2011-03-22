@@ -2066,7 +2066,7 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
             if(fwrite($fp, $request)):
                 $this->http_response = '';
                 while(!feof($fp)):
-                    $this->http_response .= fgets($fp, 8192);
+                    $this->http_response .= @fgets($fp, 8192);
                 endwhile;
             else:
                 $this->last_error = "Failed to write to $fsockurl";
