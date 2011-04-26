@@ -6,6 +6,20 @@
 function constant_contact_load_legacy_widget()
 {
 	register_widget( 'constant_contact_api_widget' );
+	
+	// Check if form designer has called it yet...
+	if(!function_exists('constant_contact_admin_widget_scripts')) {
+		function constant_contact_admin_widget_scripts_legacy() {
+			global $pagenow;
+			if($pagenow == 'widgets.php') {
+				wp_enqueue_script( 'admin-cc-widget', plugin_dir_url(__FILE__).'js/admin-cc-widget.js' );
+			}
+		}
+		constant_contact_admin_widget_scripts_legacy();
+	} else {
+		constant_contact_admin_widget_scripts();
+	}
+	
 }
 
 /*
@@ -54,13 +68,22 @@ class constant_contact_api_widget extends WP_Widget {
         parent::WP_Widget(false, $name = 'Constant Contact Signup', $widget_options, $control_options);	
     }
 	
-	
-
-   /** @see WP_Widget::widget */
-    function widget($args = array(), $instance = array())
-	{
-		$instance = wp_parse_args( (array) $instance, 
-			array(
+	function parse_args($instance) {
+		$defaults = array(
+			'show_firstname' => false, 
+			'show_lastname' => false, 
+			'description' => '',
+			'title' => '', 
+			'list_selection_title' => '', 
+			'list_selection_format' => '',  
+			'show_list_selection' => false,
+			'lists' => array(), 
+			'redirect_url' => '',
+			'exclude_lists' => array() 
+		);	
+		
+		if(!isset($instance['widgethasbeensaved'])) {
+			$defaults = array(
 				'show_firstname' => get_option('cc_widget_show_firstname'), 
 				'show_lastname' => get_option('cc_widget_show_lastname'), 
 				'description' => get_option('cc_widget_description'),
@@ -68,12 +91,21 @@ class constant_contact_api_widget extends WP_Widget {
 				'list_selection_title' => get_option('cc_widget_list_selection_title'), 
 				'list_selection_format' => get_option('cc_widget_list_selection_format'),  
 				'show_list_selection' => get_option('cc_widget_show_list_selection'),
-				'show_firstname' => get_option('cc_widget_show_firstname'),
-				'show_lastname' => get_option('cc_widget_show_lastname'),
-				'lists' => array(), 
-				'exclude_lists' => array() 
-			)
-		);
+				'redirect_url' => get_option('cc_widget_redirect_url')
+			);
+		}
+		
+		$instance = wp_parse_args( (array) $instance, $defaults );
+		
+		return $instance;
+	}
+	
+
+   /** @see WP_Widget::widget */
+    function widget($args = array(), $instance = array())
+	{
+		$instance = $this->parse_args($instance);
+		
 		extract($instance);
 		
 		$output = '';
@@ -126,7 +158,7 @@ class constant_contact_api_widget extends WP_Widget {
 			
 			if($show_firstname):
 				$output .='
-					<label for="cc_firstname">First Name:</label>
+					<label for="cc_firstname">'.__('First Name:').'</label>
 					<div class="input-text-wrap">
 						<input type="text" name="fields[first_name][value]" id="cc_firstname" value="'; 
 						$output .= (isset($_POST['fields']['first_name']['value'])) ? htmlentities($_POST['fields']['first_name']['value']) : '';
@@ -136,7 +168,7 @@ class constant_contact_api_widget extends WP_Widget {
 				
 				if($show_lastname):
 				$output .='
-					<label for="cc_lastname">Last Name:</label>
+					<label for="cc_lastname">'.__('Last Name:').'</label>
 					<div class="input-text-wrap">
 						<input type="text" name="fields[last_name][value]" id="cc_lastname" value="';
 						$output .= (isset($_POST['fields']['last_name']['value'])) ? htmlentities($_POST['fields']['last_name']['value']) : '';
@@ -145,7 +177,7 @@ class constant_contact_api_widget extends WP_Widget {
 				endif;
 				
 				$output .= '
-				<label for="cc_email">Email:</label>
+				<label for="cc_email">'.__('Email:').'</label>
 				<div class="input-text-wrap">
 					<input type="text" name="fields[email_address][value]" id="cc_email" value="';
 					$output .= (isset($_POST['fields']['email_address']['value'])) ? htmlentities($_POST['fields']['email_address']['value']) : '';
@@ -163,30 +195,31 @@ class constant_contact_api_widget extends WP_Widget {
 						} else {
 							$output .= '<select name="cc_newsletter[]" id="cc_newsletter_select">';
 						}
-							if(!empty($showlists)):
-							foreach($showlists as $k => $v):
-								if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])):
+						if(!empty($showlists)) {
+							foreach($showlists as $k => $v) {
+								if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])) {
 									$output .=  '<option selected value="'.$v['id'].'">'.$v['ShortName'].'</option>';
-								else:
+								} else {
 									$output .=  '<option value="'.$v['id'].'">'.$v['ShortName'].'</option>';
-								endif;
-							endforeach;
-							endif;
+								}
+							}
+						}
 						$output .= '
 						</select>
 						</div>';
-					
 					} else {
 						$output .=  $list_selection_title;
 						$output .=  '<div class="input-text-wrap">';
 						$output .=  '<ul>'."\n";
-						foreach($showlists as $k => $v):
-							if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])):
-								$output .=  '<li><label for="cc_newsletter-'.$v['id'].'"><input checked="checked" type="checkbox" name="cc_newsletter[]" id="cc_newsletter-'.$v['id'].'" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '</label></li>'."\n"; // ZK added label, ID, converted to <LI>
-							else:
-								$output .=  '<li><label for="cc_newsletter-'.$v['id'].'"><input type="checkbox" name="cc_newsletter[]" id="cc_newsletter-'.$v['id'].'" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '</label></li>'."\n"; // ZK added label, ID
-							endif;
-						endforeach;
+						if(!empty($showlists)) {
+							foreach($showlists as $k => $v) {
+								if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])) {
+									$output .=  '<li><label for="cc_newsletter-'.$v['id'].'"><input checked="checked" type="checkbox" name="cc_newsletter[]" id="cc_newsletter-'.$v['id'].'" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '</label></li>'."\n"; // ZK added label, ID, converted to <LI>
+								} else {
+									$output .=  '<li><label for="cc_newsletter-'.$v['id'].'"><input type="checkbox" name="cc_newsletter[]" id="cc_newsletter-'.$v['id'].'" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '</label></li>'."\n"; // ZK added label, ID
+								}
+							}
+						}
 						$output .=  '</ul>'."\n";
 						$output .=  '</div>'."\n";
 					}
@@ -209,7 +242,9 @@ class constant_contact_api_widget extends WP_Widget {
 				$output .= '
 				<div>
 					'.$hide_lists_output.'
-					<input type="hidden" id="cc_referral_url" name="cc_referral_url" value="'.urlencode(constant_contact_current_page_url()).'" />';
+					<input type="hidden" id="cc_referral_url" name="cc_referral_url" value="'.urlencode(constant_contact_current_page_url()).'" />
+					<input type="hidden" id="cc_redirect_url" name="cc_redirect_url" value="'.urlencode($redirect_url).'" />
+					';
 					$submit_button = '<input type="submit" name="constant-contact-signup-submit" value="Signup" class="button submit" />';
 					$output .= apply_filters('constant_contact_form_submit', $submit_button);
 					$output .= '
@@ -255,6 +290,7 @@ class constant_contact_api_widget extends WP_Widget {
 		}
 		$new['showlists'] = $show_lists;
 		$new['hidelists'] = $hide_lists;
+		$new['widgethasbeensaved'] = true;
 		return $new;
 	}
 	
@@ -275,21 +311,8 @@ class constant_contact_api_widget extends WP_Widget {
   /** @see WP_Widget::form */
     function form($instance)
 	{
-		$instance = wp_parse_args( (array) $instance, 
-			array(
-				'show_firstname' => get_option('cc_widget_show_firstname'), 
-				'show_lastname' => get_option('cc_widget_show_lastname'), 
-				'description' => get_option('cc_widget_description'),
-				'title' => get_option('cc_signup_widget_title'), 
-				'list_selection_title' => get_option('cc_widget_list_selection_title'), 
-				'list_selection_format' => get_option('cc_widget_list_selection_format'),  
-				'show_list_selection' => get_option('cc_widget_show_list_selection'),
-				'show_firstname' => get_option('cc_widget_show_firstname'),
-				'show_lastname' => get_option('cc_widget_show_lastname'),
-				'lists' => array(), 
-				'exclude_lists' => array() 
-			)
-		);
+		$instance = $this->parse_args($instance);
+
 		extract($instance);
 		
 		@include_once('functions.php');
@@ -395,15 +418,6 @@ class constant_contact_api_widget extends WP_Widget {
 			<label for="<?php echo $this->get_field_id('list_selection_format_checkbox'); ?>"><input <?php checked($instance['list_selection_format'], 'checkbox') ?> type="radio" name="<?php echo $this->get_field_name('list_selection_format'); ?>" value="checkbox" id="<?php echo $this->get_field_id('list_selection_format_checkbox'); ?>" /> Checkboxes</label>
 			<label for="<?php echo $this->get_field_id('list_selection_format_dropdown'); ?>"><input <?php checked($instance['list_selection_format'], 'dropdown') ?> type="radio" name="<?php echo $this->get_field_name('list_selection_format'); ?>" value="dropdown" id="<?php echo $this->get_field_id('list_selection_format_dropdown'); ?>" /> Dropdown List</label>
 			<label for="<?php echo $this->get_field_id('list_selection_format_select'); ?>"><input <?php checked($instance['list_selection_format'], 'select') ?> type="radio" name="<?php echo $this->get_field_name('list_selection_format'); ?>" value="select" id="<?php echo $this->get_field_id('list_selection_format_select'); ?>" /> Multi-Select</label>
-			<script type="text/javascript"><!--
-			 jQuery(document).ready(function($) {
-				$('a.moreInfo').live('click', function(e) {
-					e.preventDefault();
-					jQuery("div.moreInfo").toggle();
-					return false; 
-				});
-			});
-			--></script>
 			<p class="description">This controls what kind of list is shown. <a href="#listTypeInfo" class="moreInfo">More info</a></p>
 			<div class="moreInfo" id="listTypeInfo" style="display:none;">
 				<ul class="howto" style="list-style:disc outside!important; display:list-item!important;">
@@ -437,129 +451,11 @@ class constant_contact_api_widget extends WP_Widget {
 
 } // class constant_contact_api_widget
 
+if(!function_exists('tempty')) {
 	function tempty($val) { 
 		$val = trim($val);
     	return empty($val) && $val !== 0; 
 	}
+}
 	
-    /** function used to handle submitting the widget */
-	function constant_contact_submit_widget()
-	{
-		$errors = array();
-		
-		// proces the submitted form
-		if(!isset($_POST['constant-contact-signup-submit'], $_POST['cc_email'])):
-			return; false;
-		endif;
-		
-		$email = strip_tags($_POST['cc_email']);
-		$fields = array();
-		
-		if(get_option('cc_widget_show_firstname') && isset($_POST['cc_firstname'])):
-			if(tempty($_POST['cc_firstname'])):
-				$errors[] = array('Please enter your first name', 'cc_firstname');
-			else:
-				$fields['FirstName'] = strip_tags($_POST['cc_firstname']);
-			endif;
-		endif;
-			
-		if(get_option('cc_widget_show_lastname') && isset($_POST['cc_lastname'])):
-			if(tempty($_POST['cc_lastname'])):
-				$errors[] = array('Please enter your last name', 'cc_lastname');
-			else:
-				$fields['LastName'] = strip_tags($_POST['cc_lastname']);
-			endif;
-		endif;
-			
-		if(tempty($email)):
-			$errors[] = array('Please enter your email', 'cc_email');
-		elseif(!is_email($email)):
-			$errors[] = array('Please enter a valid email address', 'cc_email');
-		endif;
-			
-			
-		// return errors if any exist
-		if($errors):
-			$GLOBALS['cc_errors'] = $errors;
-			return;
-		endif;
-			
-		// subscribe user, redirect to thank you page if set
-		$auto_lists = get_option('cc_widget_lists');
-		$show_selection = get_option('cc_widget_show_list_selection');
-		$selection_format = get_option('cc_widget_list_selection_format');
-		$redirect_to = get_option('cc_widget_redirect_url');
-				
-		$cc = constant_contact_create_object();
-		if(!is_object($cc)):
-			return;
-		endif;
-					
-		if($show_selection):
-			$lists = (isset($_POST['cc_newsletter'])) ? $_POST['cc_newsletter'] : array();
-					
-			if($lists):
-				$newlists = array();
-				foreach($lists as $list_id):
-					$list = constant_contact_get_list($list_id);
-					$newlists[$list_id] = $list['Name'];
-				endforeach;
-				$lists = $newlists;
-			endif;
-					
-		elseif(!$show_selection):
-			$_lists = $cc->get_all_lists();
-								
-			if($_lists):
-			foreach($_lists as $k => $v):
-				$_lists[$k] = $v['id'];
-			endforeach;
-			endif;
-							
-			$newlists = array();
-			foreach($_lists as $list_id):
-				if(is_array($auto_lists) && in_array($list_id, $auto_lists)): // 1.1.2 added is_array() check
-					$list = constant_contact_get_list($list_id);
-					$newlists[$list['id']] = $list['Name'];
-				endif;
-			endforeach;
-			$lists = $newlists;
-		else:
-			$lists = array();
-		endif;
-		
-		if(!count($lists)):
-			$GLOBALS['cc_errors'][] = 'Please select at least 1 list.';
-			return;
-		endif;
-					
-		$cc->set_action_type('contact'); /* important, tell CC that the contact made this action */
-		$contact = $cc->query_contacts($email);
-				
-		$lists = array_keys($lists);
-		
-		
-		if($contact):
-			$contact = $cc->get_contact($contact['id']);
-			$status = $cc->update_contact($contact['id'], $email, $lists, $fields);
-		else:
-			$status = $cc->create_contact($email, $lists, $fields);
-		endif;
-			  
-		if(!$status):
-			$GLOBALS['cc_errors'][] = 'Sorry there was a problem, please try again later';
-			return;
-		elseif($redirect_to):
-			header("Location: $redirect_to");
-			exit;
-		else:
-			$url = add_query_arg('cc_success', true, urldecode($_POST['cc_referral_url']));
-			header("Location: " . $url );
-			exit;
-		endif;
-		
-		// return false so we display no errors when viewing the form
-		// the script should not get this far
-		return false;
-	}
 ?>

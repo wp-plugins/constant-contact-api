@@ -598,7 +598,7 @@ function constant_contact_handle_public_signup_form() {
 	endif;
 
 	// URL to send user to upon successful subscription
-	$redirect_to = $_POST['cc_redirect_url'];
+	$redirect_to = isset($_POST['cc_redirect_url']) ? urldecode($_POST['cc_redirect_url']) : false; // Added logic and urldecode in 2.1.3
 
 	/**
 	 * Determine $subscribe_lists - flat array of IDs of lists that we will subscribe this user to

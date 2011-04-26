@@ -3,7 +3,7 @@ Contributors: katzwebdesign, jamesbenson
 Donate link: http://www.seodenver.com
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 2.9
-Tested up to: 3.1
+Tested up to: 3.1.2
 Stable tag: trunk
 
 Integrate Constant Contact into your website with this full-featured plugin.
@@ -75,6 +75,12 @@ Optionally, If you want to change the default plugin options you can you edit th
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
 == Changelog ==
+
+= 2.1.3 =
+* Fixed issues with legacy widget not updating "Show First Name" and "Show Last Name" settings (<a href="http://wordpress.org/support/topic/548028" rel="nofollow">issue #548028</a>)
+* Improved legacy widget to show "More info" content and reflect changes to "Show List Selection?" checkbox setting
+* Fixed "Invalid Argument" Line 183 error (<a href="http://wordpress.org/support/topic/547609" rel="nofollow">issue #547609</a>)
+* Fixed issue with forms not redirecting upon success (<a href="http://wordpress.org/support/topic/547609" rel="nofollow">issue #547609</a>)
 
 = 2.1.2 = 
 
