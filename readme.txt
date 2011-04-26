@@ -172,6 +172,12 @@ Optionally, If you want to change the default plugin options you can you edit th
 
 == Upgrade Notice ==
 
+= 2.1.3 =
+* Fixed issues with legacy widget not updating "Show First Name" and "Show Last Name" settings (<a href="http://wordpress.org/support/topic/548028" rel="nofollow">issue #548028</a>)
+* Improved legacy widget to show "More info" content and reflect changes to "Show List Selection?" checkbox setting
+* Fixed "Invalid Argument" Line 183 error (<a href="http://wordpress.org/support/topic/547609" rel="nofollow">issue #547609</a>)
+* Fixed issue with forms not redirecting upon success (<a href="http://wordpress.org/support/topic/547609" rel="nofollow">issue #547609</a>)
+
 = 2.1.2 = 
 
 * Form Designer
