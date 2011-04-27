@@ -2037,9 +2037,9 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
         $this->http_headers_add('', "$method $the_path HTTP/1.1");
         $this->http_headers_add('Host', $the_host);
 
-        if($this->http_content_type):
+        if($this->http_content_type) {
             $this->http_headers_add('Content-Type', $this->http_content_type);
-        endif;
+        }
 
         $this->http_headers_add('User-Agent', $this->http_user_agent);
         $this->http_headers_add('Content-Length', strlen($params));
@@ -2047,67 +2047,40 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
 
         $request = $this->http_build_request_headers();
 
+		$body = '';
         if(trim($params) != ''):
-            $request .= "$params{$this->http_linebreak}";
+            $body = "$params{$this->http_linebreak}";
         endif;
 
         $this->http_request = $request;
-
+		
         if($this->http_url_bits['scheme']=='https'):
-            $port = 443;
-            $fsockurl = "ssl://$the_host";
+            $url = "https://$the_host";
         else:
-            $port = 80;
-            $fsockurl = $the_host;
+            $url = "http://$the_host";
         endif;
-
-        // if an error occurs we log that and break out of the function
-        if($fp = @fsockopen($fsockurl, $port, $errno, $errstr, $this->http_request_timeout)):
-            if(fwrite($fp, $request)):
-                $this->http_response = '';
-                while(!feof($fp)):
-                    $this->http_response .= @fgets($fp, 8192);
-                endwhile;
-            else:
-                $this->last_error = "Failed to write to $fsockurl";
-            endif;
-            fclose($fp);
-        else:
-            $this->last_error = "Failed to connect to $fsockurl $errstr ($errno)";
-            return false;
-        endif;
-
-        $this->http_parse_response();
+        
+        $args = array(
+        	'body' => $body, 
+        	'headers'=> $request, 
+        	'method' => strtoupper($method), // GET, POST, PUT, DELETE, etc.
+        	'sslverify' => false,
+        	'timeout' => $this->http_request_timeout, 
+        	'httpversion' => '1.1'
+        );
+    
+        $response = wp_remote_request($url.$the_path, $args);
+ 		
+		if($response && !is_wp_error($response)) {
+			$this->http_response = $response;
+			$this->http_parse_response();
+			return true;
+		} elseif(is_wp_error($response)) {
+			$this->last_error = $response->get_error_message();
+		}
+		return false;
     }
 
-
-    /**
-     * dechunk an http 'transfer-encoding: chunked' message
-     *
-     * @param string $chunk the encoded message
-     * @return string the decoded message.  If $chunk wasn't encoded properly it will be returned unmodified.
-     */
-    function http_chunked_decode($chunk)
-    {
-        $pos = 0;
-        $len = strlen($chunk);
-        $dechunk = null;
-
-        while(($pos < $len)
-            && ($chunkLenHex = substr($chunk,$pos, ($newlineAt = strpos($chunk,"\n",$pos+1))-$pos)))
-        {
-            if (! $this->is_hex($chunkLenHex)) {
-                trigger_error('Data is not properly chunk encoded', E_USER_ERROR);
-                return $chunk;
-            }
-
-            $pos = $newlineAt + 1;
-            $chunkLen = hexdec(rtrim($chunkLenHex,"\r\n"));
-            $dechunk .= substr($chunk, $pos, $chunkLen);
-            $pos = strpos($chunk, "\n", $pos + $chunkLen) + 1;
-        }
-        return $dechunk;
-    }
 
     /**
      * determine if a string can represent a number in hexadecimal
@@ -2137,7 +2110,6 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
         $this->http_headers_add('Connection', "Close{$this->http_linebreak}");
         $request = $this->http_headers_to_s($this->http_request_headers);
         $this->http_request_headers = array();
-
         return $request;
     }
 
@@ -2150,14 +2122,16 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
      */
     function http_parse_response()
     {
-        list($headers, $body) = explode("\r\n\r\n", $this->http_response, 2);
-        $this->http_parse_headers($headers);
-
-        if(isset($this->http_response_headers['Transfer-Encoding']) && 'chunked' == $this->http_response_headers['Transfer-Encoding']):
-            $this->http_response_body = $this->http_chunked_decode($body);
-        else:
-            $this->http_response_body =  $body;
-        endif;
+    	if(empty($this->http_response)) { return false; }
+        $headers = wp_remote_retrieve_headers($this->http_response);
+        
+        foreach($headers as $header => $value) {
+        	if(is_string($value)) { $value = trim($value); }
+        	$this->http_response_headers[$header] = $value;
+        }
+        
+        $this->http_response_body = $body = wp_remote_retrieve_body($this->http_response);
+        $this->http_response_code = wp_remote_retrieve_response_code($this->http_response);
 
         $this->http_set_content_type($this->http_default_content_type);
     }
@@ -2275,16 +2249,17 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
      */
     function http_get_response_code_error($code)
     {
+    	if(empty($code)) { return ''; }
         $errors = array(
         200 => '<strong>Success</strong> - The request was successful',
         201 => '<strong>Created (Success)</strong> - The request was successful. The requested object/resource was created.',
-        400 => '<strong>Invalid Request</strong> - There are many possible causes for this error, but most commonly there is a problem with the structure or content of XML your application provided. Carefully review your XML. One simple test approach is to perform a GET on a URI and use the GET response as an input to a PUT for the same resource. With minor modifications, the input can be used for a POST as well.',
-        401 => '<strong>UNAUTHORIZED REQUEST</strong> - There was a critical failure to authenticate with Constant Contact</p><p>Debug info: Posisble causes of this error are that the API call has either not provided a valid API Key, Account Owner Name and Associated Password or the API call attempted to access a resource (URI) which does not match the same as the Account Owner provided in the login credientials.',
-        404 => '<strong>URL Not Found</strong> - The URI which was provided was incorrect. Compare the URI you provided with the documented URIs. Start here.',
-        409 => '<strong>Conflict</strong> - There is a problem with the action you are trying to perform. Commonly, you are trying to "Create" (POST) a resource which already exists such as a Contact List or Email Address that already exists. In general, if a resource already exists, an application can "Update" the resource with a "PUT" request for that resource.',
-        415 => '<strong>Unsupported Media Type</strong> - The Media Type (Content Type) of the data you are sending does not match the expected Content Type for the specific action you are performing on the specific Resource you are acting on. Often this is due to an error in the content-type you define for your HTTP invocation (GET, PUT, POST). You will also get this error message if you are invoking a method (PUT, POST, DELETE) which is not supported for the Resource (URI) you are referencing.
-        To understand which methods are supported for each resource, and which content-type is expected, see the documentation for that Resource.',
-        500  => '<strong>Server Error</strong>',
+        400 => '<p><strong>Invalid Request (400)</strong></p><p>There are many possible causes for this error, but most commonly there is a problem with the structure or content of XML your application provided. Please <a href="http://wordpress.org/tags/constant-contact-api?forum_id=10">Let the plugin developers know about the issue</a>, and make sure to mention what you were doing when you got this error.</p>',
+        401 => '<p><strong>This plugin is not configured with a valid Constant Contact account.</strong></p>
+				<p>Please enter a valid username and password then press the Save Changes button before continuing.</p>',
+        404 => '<p><strong>URL Not Found (404)</strong></p> <p>The URI which was provided was incorrect.  Please <a href="http://wordpress.org/tags/constant-contact-api?forum_id=10">Let the plugin developers know about the issue</a>, and make sure to mention what you were doing when you got this error.</p>',
+        409 => '<p><strong>Conflict (409)</strong></p><p>There is a problem with the action you are trying to perform. Commonly, you are trying to "Create" (POST) a resource which already exists such as a Contact List or Email Address that already exists. In general, if a resource already exists, an application can "Update" the resource with a "PUT" request for that resource.</p>',
+        415 => '<p><strong>Unsupported Media Type (415)</strong></p><p>The Media Type (Content Type) of the data you are sending does not match the expected Content Type for the specific action you are performing on the specific Resource you are acting on. Please <a href="http://wordpress.org/tags/constant-contact-api?forum_id=10">Let the plugin developers know about the issue</a>, and make sure to mention what you were doing when you got this error.</p>',
+        500  => '<p><strong>Server Error (500)</strong></p><p>Constant Contact is likely having server issues. Even though it is likely a Constant Contact issue, please <a href="http://wordpress.org/tags/constant-contact-api?forum_id=10">Let the plugin developers know about the issue</a>, and make sure to mention what you were doing when you got this error.</p>',
         );
 
         if(array_key_exists($code, $errors)):

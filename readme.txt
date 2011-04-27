@@ -76,6 +76,11 @@ Optionally, If you want to change the default plugin options you can you edit th
 
 == Changelog ==
 
+= 2.1.4 = 
+* Converted the plugin to using the <a href="http://codex.wordpress.org/HTTP_API" rel="nofollow">WordPress HTTP API</a> and `wp_remote_request()`. This should fix issues some users have been having with setting up the plugin (such as <a href="http://wordpress.org/support/topic/565047" rel="nofollow">issue #565047</a>)
+* Fixed issue where if the Constant Contact username & password settings were incorrect, then saved again (and still incorrect), there would be an error `Warning: Cannot modify header information - headers already sent by...`
+* Improved error messages so you'll know whether Constant Contact is having an issue of if it's a settings configuration issue.
+
 = 2.1.3 =
 * Fixed issues with legacy widget not updating "Show First Name" and "Show Last Name" settings (<a href="http://wordpress.org/support/topic/548028" rel="nofollow">issue #548028</a>)
 * Improved legacy widget to show "More info" content and reflect changes to "Show List Selection?" checkbox setting
@@ -171,6 +176,10 @@ Optionally, If you want to change the default plugin options you can you edit th
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
+
+= 2.1.4 = 
+* Converted the plugin to using the <a href="http://codex.wordpress.org/HTTP_API" rel="nofollow">WordPress HTTP API</a>. This should fix issues some users have been having with setting up the plugin (such as <a href="http://wordpress.org/support/topic/565047" rel="nofollow">issue #565047</a>)
+* Fixed issue where if the Constant Contact username & password settings were incorrect, then saved again (and still incorrect), there would be an error `Warning: Cannot modify header information - headers already sent by...`
 
 = 2.1.3 =
 * Fixed issues with legacy widget not updating "Show First Name" and "Show Last Name" settings (<a href="http://wordpress.org/support/topic/548028" rel="nofollow">issue #548028</a>)

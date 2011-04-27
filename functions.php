@@ -163,7 +163,7 @@ function constant_contact_create_object($force_new = false)
 		// If there is a problem with $cc show an error
 		if(!is_object($cc)) {
 			constant_contact_admin_credentials_error();
-			return;
+			return false;
 		} else {
 			return $cc;
 		}
@@ -213,18 +213,13 @@ function constant_contact_create_object($force_new = false)
 
 		// if we get an unauthorized 401 error code reset the username and password
 		// if we don't do this the CC account will be temporarily blocked eventually
-		if(intval($new_cc->http_response_code) === 401):
-			// Leave the wrong info there, but show the error message // ZK - 1.1
-			#update_option('cc_username', '');
-			#update_option('cc_password', '');
-			if(is_admin() && !isset($_POST['error_displayed'])) { // error_diplayed for showing only once, it was showing twice
-				$_POST['error_displayed'] = true;
-				echo "<div id='constant-contact-warning' class='error'>
-					<p>$error</p>
-				</div>";
-			}
-
-		endif;
+		if(is_admin() && !isset($_POST['error_displayed']) && did_action('admin_head')) { // error_diplayed for showing only once, it was showing twice
+		// did_action('admin_head') prevents from showing before content and screwing up saving post data
+			$_POST['error_displayed'] = true;
+			echo "<div id='constant-contact-warning' class='error'>
+				".wpautop($error)."
+			</div>";
+		}
 
 	} // if http_response_code
 

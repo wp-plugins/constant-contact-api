@@ -71,7 +71,7 @@ function constant_contact_settings()
 	 $cc = constant_contact_create_object(true);
 	 ?>
 	 	
-	<?php if(is_object($cc)) { ?>
+	<?php if($cc && is_object($cc)) { ?>
 	<div class="widefat">
 	<div class="wrap" style="padding-bottom:10px;">
 	<h2>Plugin Pages</h2>
@@ -100,19 +100,9 @@ function constant_contact_settings()
 	<h3>Account Details</h3>
 
 	<?php
-
-
-    if (is_object($cc)) :
+    if ($cc && is_object($cc)) {
 	    echo "<div id='message' class='updated'><p>Your username and password seem to be working.</p></div>";
-    else :
-		?>
-		<div class='error'>
-			<p><strong>This plugin is not configured with a valid Constant Contact account.</strong></p>
-			<p>Please enter a valid username and password then press the Save Changes button before continuing.</p>
-		</div>
-		<?php
-    endif;
-
+    }
 	?>
 	<table class="form-table widefat">
 	<tr>
