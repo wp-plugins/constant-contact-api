@@ -46,7 +46,7 @@ class constant_contact_events_widget extends WP_Widget {
 	function styles() {
 		if(isset($this->number) && is_integer($this->number)) {
 			$settings = $this->get_settings();
-			if((isset($settings["{$this->number}"]['style']) && isset($settings["{$this->number}"]['widgethasbeensaved'])) || !isset($settings["{$this->number}"]['widgethasbeensaved'])) {
+			if((!empty($settings["{$this->number}"]['style']) && isset($settings["{$this->number}"]['widgethasbeensaved'])) || !isset($settings["{$this->number}"]['widgethasbeensaved'])) {
 				wp_register_style( 'cc_events', plugin_dir_url(__FILE__).'css/events.css');
 				wp_enqueue_style('cc_events');
 			}

@@ -849,7 +849,7 @@ function constant_contact_get_events_output($args = array(), $sidebar = false) {
 	
 	extract( $settings );
 	
-	if($style) { constant_contact_events_print_widget_styles(); }
+	if(!empty($style)) { constant_contact_events_print_widget_styles(); }
 	
 	if($id === false) {
 		$events = constant_contact_get_active_events();
