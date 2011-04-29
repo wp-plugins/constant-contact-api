@@ -150,11 +150,11 @@ function constant_contact_last_error($status_code = 0)
  */
 function constant_contact_create_object($force_new = false)
 {
-	global $cc;
+	global $cc, $createcount;
 
 	// If there is already the object, leave it alone
 	if(!$force_new && is_object($cc)) { return $cc; }
-	
+
 	// If the cc object has been stored, 
 	if(!$force_new && $trans_api = get_transient('cc_object')) {
 		require_once CC_FILE_PATH . 'class.cc.php';
@@ -777,13 +777,169 @@ function constant_contact_create_location($v = array()) {
 	if(empty($v)) { return ''; }
 	foreach($v as $key=> $l)  { $v[$key] = (string)get_if_not_empty($l, ''); }
 	extract($v);
-	$Address1 = get_if_not_empty($Address1, '', $Address1.'<br />');
-	$Address2 = get_if_not_empty($Address2, '', $Address2.'<br />');
-	$Address3 = get_if_not_empty($Address3, '', $Address3.'<br />');
-	$City = get_if_not_empty($City,'', "{$City}, ");
-	$State = get_if_not_empty($State,'', "{$State} ");
-	$Country = get_if_not_empty($Country,'', "<br />{$Country}");
-	return "{$Location}<br />{$Address1}{$Address2}{$Address3}{$City}{$State}{$PostalCode}{$Country}";
+	$Location = @get_if_not_empty($Location,'', "{$Location}<br />");
+	$LocationForMap = @get_if_not_empty($LocationForMap,'', "<br />{$LocationForMap}");
+	$Address1 = @get_if_not_empty($Address1, '', $Address1.'<br />');
+	$Address2 = @get_if_not_empty($Address2, '', $Address2.'<br />');
+	$Address3 = @get_if_not_empty($Address3, '', $Address3.'<br />');
+	$City = @get_if_not_empty($City,'', "{$City}, ");
+	$State = @get_if_not_empty($State,'', "{$State} ");
+	$Country = @get_if_not_empty($Country,'', "<br />{$Country}");
+	return apply_filters('constant_contact_create_location', "{$Location}{$Address1}{$Address2}{$Address3}{$City}{$State}{$PostalCode}{$Country}");
+}
+
+function constant_contact_event_date($value = null) {
+	global $cc;
+	$timestamp = (int)$cc->convert_timestamp($value);
+	return sprintf(__('%1$s at %2$s', 'constant_contact_api'), date_i18n(get_option('date_format'), $timestamp, true), date_i18n(get_option('time_format'), $timestamp, true));
+}
+
+
+function constant_contact_get_active_events() {
+	global $cc;
+	
+	if(!constant_contact_create_object()) { return false; }
+	
+	$_events = $cc->get_events();
+
+	if(!empty($_events)) {
+		$draft = $active = array();
+		foreach($_events as $k => $v) {
+			if($v['Status'] == 'ACTIVE') {
+				$active[$v['id']] = $v;
+			}
+		}
+	}
+
+	return $active;
+
+}
+
+function constant_contact_events_print_widget_styles() {
+	add_action('wp_print_footer_scripts', 'constant_contact_events_widget_styles_echo');
+}
+
+if(!function_exists('constant_contact_events_widget_styles_echo')) {
+	function constant_contact_events_widget_styles_echo() {
+		if(!wp_style_is('cc_events', 'done')) {
+			echo "\n".'<link href="'.plugin_dir_url(__FILE__).'css/events.css'.'" type="text/css" media="all" rel="stylesheet" />'."\n";
+		}
+	}
+}
+
+// Create events shortcode
+add_shortcode('ccevents', 'constant_contact_get_events_output');
+add_shortcode('constantcontactevents', 'constant_contact_get_events_output');
+		
+function constant_contact_get_events_output($args = array(), $sidebar = false) {
+	global $cc;
+	$class = 'cc_event';
+	
+	if(!constant_contact_create_object()) { return false; }
+	
+	$output = $oddeven = '';
+
+	$settings = shortcode_atts(array('title' => '', 'description' => '', 'limit' => 3, 'showdescription' => true, 'datetime' => true, 'location' => false, 'calendar' => false, 'directtoregistration' => false, 'style' => true, 'id' => false, 'newwindow' => false, 'map' => false), $args);
+	
+	foreach($settings as $key => $arg) {
+		if(strtolower($arg) == 'false' || empty($arg)) {
+			$settings["{$key}"] = false;
+		}
+	}
+	
+	extract( $settings );
+	
+	if($style) { constant_contact_events_print_widget_styles(); }
+	
+	if($id === false) {
+		$events = constant_contact_get_active_events();
+		$class .= ' multiple_events';
+	} else {
+		$class .= ' single_event';
+		$events = array($cc->get_event($id));
+	}
+	
+	$class .= ($sidebar) ? ' cc_event_sidebar' : ' cc_event_shortcode';
+
+		if(!empty($events)) {
+			
+			$startOut = $descriptionOut = $dateOut = $calendarOut = $locationOut = $titleOut = $endOut = '';
+			
+			$i = 0;
+			foreach($events as $event) {
+				if($i >= $limit) { continue; }
+				$oddeven = ($oddeven == ' even') ? ' odd' : ' even'; 
+				
+				$event = $cc->get_event($event['id'], 60*60*24);
+				
+				if(empty($event)) { continue; }
+				
+				extract($event);
+				
+				if(!empty($directtoregistration)) {
+					$link = str_replace('/register/event?', '/register/eventReg?', $RegistrationURL);
+				} else {
+					$link = str_replace('https://', 'http://', $RegistrationURL);
+				}
+				
+				$linkTitle = apply_filters('cc_event_linktitle', sprintf( __('View event details for "%s"'), $Title));
+				if(!empty($linkTitle)) { $linkTitle = ' title="'.esc_html($linkTitle).'"'; }
+				
+				$class = apply_filters('cc_event_class', $class);
+				$target = $newwindow ? apply_filters('cc_event_new_window', ' target="_blank"') : '';
+				$startOut = '
+				<dl class="'.$class.$oddeven.'">';
+					$titleOut = '
+					<dt class="cc_event_title"><a'.$target.' href="'.$link.'"'.$linkTitle.'>'.$Title.'</a></dt>';
+					if(!empty($showdescription) && !empty($Description)) {
+					$descriptionOut = '
+					<dd class="cc_event_description">'.wpautop($Description).'</dd>';
+					}
+					if(!empty($datetime)) {
+					$dateOut = '
+					<dt class="cc_event_startdate_dt">'.apply_filters('cc_event_startdate_dt', __('Start: ')).'</dt>
+						<dd class="cc_event_startdate_dd">'.apply_filters('cc_event_startdate', $StartDate).'</dd>
+					<dt class="cc_event_enddate_dt">'.apply_filters('cc_event_enddate_dt', __('End: ')).'</dt>
+						<dd class="cc_event_enddate_dd">'.apply_filters('cc_event_enddate', $EndDate).'</dd>
+						';
+					}
+					if(!empty($calendar)) {
+						$link = str_replace('/register/event?', '/register/addtocalendar?', $RegistrationURL);
+						$linkTitle = apply_filters('cc_event_linktitle', sprintf( __('Add "%s" to your calendar'), $Title));
+						if(!empty($linkTitle)) { $linkTitle = ' title="'.esc_html($linkTitle).'"'; }
+						$calendarOut = '
+					<dd class="cc_event_calendar"><a'.$target.' href="'.$link.'"'.$linkTitle.'>'.__('Add to Calendar').'</a></dd>
+						';
+					}
+					if(!empty($location)) {
+						$locationText = constant_contact_create_location($EventLocation);
+						if($map) {
+							if(isset($EventLocation['Location'])) { $EventLocation['NewLocation'] = '('.$EventLocation['Location'].')'; unset($EventLocation['Location']); }
+							#if(isset($EventLocation['Address3'])) { unset($EventLocation['Address3']); }
+							$locationformap = trim(constant_contact_create_location($EventLocation));
+							$address_qs = str_replace("<br />", ", ", $locationformap.'<br />'.$EventLocation['NewLocation']); //replacing <br/> with spaces
+							$address_qs = urlencode($address_qs);
+							$locationText .= "<br/>".apply_filters('cc_event_map_link', "<a href='http://maps.google.com/maps?q=$address_qs'".$target." class='cc_event_map_link'>".__('Map Location')."</a>", $EventLocation, $address_qs);
+						}
+						
+						$locationOut = '
+					<dt class="cc_event_location cc_event_location_dt">'.apply_filters('cc_event_location_dt', __('Location: ')).'</dt>
+						<dd class="cc_event_location_dd cc_event_location">'.apply_filters('cc_event_location', $locationText).'</dd>';
+					}
+					
+				$endOut = '
+				</dl>';
+				
+				$output .= apply_filters('cc_event_output_single', $startOut.$titleOut.$descriptionOut.$dateOut.$calendarOut.$locationOut.$endOut, array('start'=>$startOut,'title'=>$titleOut,'description'=>$descriptionOut,'date'=>$dateOut,'calendar'=>$calendarOut,'location' => $locationOut, 'end'=>$endOut));
+				
+				$i++;	
+			}
+			
+		} else {
+			$output = apply_filters('cc_event_no_events_text', '<p>'.__('There are currently no events.').'</p>');
+		}
+	$output = apply_filters('cc_event_output', $output);
+	return $output;
 }
 
 function constant_contact_latest_registrant($id, $showcancelled = false) {
@@ -805,7 +961,7 @@ function constant_contact_latest_registrant($id, $showcancelled = false) {
 			unset($_registrants[$key]);
 		}
 	}
-	if($timestamp == 0) {
+	if(empty($timestamp)) {
 		return __('N/A', 'constant_contact_api');
 	} else {
 		return sprintf(__('%1$s at %2$s', 'constant_contact_api'), date_i18n(get_option('date_format'), $timestamp, true), date_i18n(get_option('time_format'), $timestamp, true));

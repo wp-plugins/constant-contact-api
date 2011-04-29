@@ -22,39 +22,6 @@ function constant_contact_load_legacy_widget()
 	
 }
 
-/*
-Version 1.1
-Changes made by Zack Katz; katzwebdesign on March 27, 2010
-	Replaced $_SESSION with $GLOBALS in case servers have register_globals issues, which mine was having
-	Converted trim() to tempty()
-	Converted errors to <LI>s
-	Converted errors to array for <LABEL>ing
-	Used add_query_args for ?cc_success on referral page instead of referring to home page
-	Added referral URL input in form using urlencode($this->curPageURL()) to generate current page
-	Added 
-	  apply_filters('constant_contact_form', $output); to widget output
-	  apply_filters('constant_contact_form_success', $success);
-	  apply_filters('constant_contact_form_description', $description);
-	  apply_filters('constant_contact_form_errors', $errors);
-	  apply_filters('constant_contact_form_submit', $submit_button);
-	Converted widget code from echo to $output .=
-
-Version 1.1.0.1
-Changes made by Zack Katz; katzwebdesign on April 5, 2010
-	Removed <br /> before widget form
-	Fixed widget description and title display issues by renaming variables from `$title` to `$widget_title` and `$description` to `$widget_description`.
-
-Version 1.1.1
-Changes made by Zack Katz; katzwebdesign on May 27, 2010
-	Added `cc_widget_lists_array` option to store Constant Contact lists, so that the API doesn't need to be called every page load. Now, API is only called when the plugin settings are saved.
-	Wrapped the List Selection Title for the multi-select form element in a `label` tag, and removed line break.
-
-Version 1.1.2
-Changes made by Zack Katz; katzwebdesign on June 4, 2010
-	Added is_array() to `if(is_array($auto_lists) && in_array($list_id, $auto_lists)):`
-*/
-
-
 class constant_contact_api_widget extends WP_Widget {
 
     /** constructor */

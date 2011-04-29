@@ -1020,7 +1020,7 @@ $xml_data .= '
      *
      * @access     public
      */
-    function get_events($action = 'events')
+    function get_events($action = 'events', $timeout = 3600)
     {
     	$events = get_transient('cc_events');
 		if($events && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'events')) { return maybe_unserialize($events); }
@@ -1050,7 +1050,7 @@ $xml_data .= '
             endif;
         endif;
         
-        set_transient('cc_events', maybe_serialize($events), 60*60);
+        set_transient('cc_events', maybe_serialize($events), $timeout);
 
         return $events;
     }
@@ -1060,7 +1060,7 @@ $xml_data .= '
      *
      * @access     public
      */
-    function get_event($id)
+    function get_event($id = null, $timeout = 3600)
     {
     	$transient_title = 'ccev_'.sha1($id);
 		$events = get_transient($transient_title);
@@ -1081,7 +1081,7 @@ $xml_data .= '
             $events['FileName'] = $this->get_id_from_link($events['FileName']);
         endif;
 		
-		set_transient($transient_title, maybe_serialize($events), 60*60);
+		set_transient($transient_title, maybe_serialize($events), $timeout);
         
         return $events;
     }

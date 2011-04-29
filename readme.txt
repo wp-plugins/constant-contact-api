@@ -76,6 +76,10 @@ Optionally, If you want to change the default plugin options you can you edit th
 
 == Changelog ==
 
+= 2.2 = 
+* Added an Events widget and shortcode
+* Updated the readme to have Form Designer shortcode instructions (see FAQ)
+
 = 2.1.4 = 
 * Converted the plugin to using the <a href="http://codex.wordpress.org/HTTP_API" rel="nofollow">WordPress HTTP API</a> and `wp_remote_request()`. This should fix issues some users have been having with setting up the plugin (such as <a href="http://wordpress.org/support/topic/565047" rel="nofollow">issue #565047</a>)
 * Fixed issue where if the Constant Contact username & password settings were incorrect, then saved again (and still incorrect), there would be an error `Warning: Cannot modify header information - headers already sent by...`
@@ -177,6 +181,10 @@ Optionally, If you want to change the default plugin options you can you edit th
 
 == Upgrade Notice ==
 
+= 2.2 = 
+* Added an Events widget and shortcode
+* Updated the readme to have Form Designer shortcode instructions (see FAQ)
+
 = 2.1.4 = 
 * Converted the plugin to using the <a href="http://codex.wordpress.org/HTTP_API" rel="nofollow">WordPress HTTP API</a>. This should fix issues some users have been having with setting up the plugin (such as <a href="http://wordpress.org/support/topic/565047" rel="nofollow">issue #565047</a>)
 * Fixed issue where if the Constant Contact username & password settings were incorrect, then saved again (and still incorrect), there would be an error `Warning: Cannot modify header information - headers already sent by...`
@@ -269,6 +277,8 @@ This version fixes a major bug and all users should upgrade immediately.
 3. An example of a form you can create with the custom form designer.
 4. Add users to your registration process
 5. View campaign details on the Campaigns screen
+6. Example events widget display on the default WordPress theme, twentyten
+7. Event widget configuration
 
 == Frequently Asked Questions ==
 
@@ -276,6 +286,52 @@ This version fixes a major bug and all users should upgrade immediately.
 This plugin requires a [Constant Contact account](http://bit.ly/tryconstantcontact 'Sign up for Constant Contact').
 
 Constant Contact is a great email marketing company -- their rates are determined by the number of contacts in your list, not how many emails you send. This means you can send unlimited emails per month for one fixed rate! [Give it a test run](http://bit.ly/constant-contact-signup 'Try out Constant Contact today').
+
+= Is there shortcode support? =
+
+### Form Shortcode ###
+
+There is shortcode support for the Form Designer forms: `[constantcontactapi]` with the following options:
+
+<pre>
+'formid' => 0, // REQUIRED
+'before' => null,
+'after' => null,
+'redirect_url' => false,
+'lists' => array(),
+'title' => '',
+'exclude_lists' => array(),
+'description' => '',
+'show_list_selection' => false,
+'list_selection_title' => 'Add me to these lists:',
+'list_selection_format' => 'checkbox'
+</pre>
+
+So to add a form, you would add the following in your content: `[constantcontactapi formid="3"]`
+
+### Event Shortcode ###
+
+To show event details, you can use the `[ccevents]` shortcode with the following options:
+
+<pre>
+'id' => null, // Show a specific event; enter Event ID (found on the Events page) to use
+'limit' => 3, // Number of events to show by default
+'showdescription' => true, // Show event Description
+'datetime' => true, // Show event Date & Time
+'location' => false, // Show event Location
+'map' => false,  // Show map link for Location (if Location is shown)
+'calendar' => false, // Show "Add to Calendar" link
+'directtoregistration' => false, // Link directly to registration page, rather than event homepage
+'newwindow' => false, // Open event links in a new window
+'style' => true // Use plugin styles. Disable if you want to use your own styles (CSS)
+</pre>
+
+<strong>Sample Event Shortcodes</strong>
+
+* To show event details for 5 events using the default settings, you would use `[ccevents limit=3]`
+* To show event details for a single event with the id of `abc123` and also show the location details and map link, you would use: `[ccevents id="abc123" location=true map=true]`
+* To use your own CSS file, you would use `[ccevents style=false]`
+
 
 = How do I use the new `apply_filters()` functionality? (Added 1.1) =
 If you want to change some code in the widget, you can use the WordPress `add_filter()` function to achieve this.
@@ -293,6 +349,21 @@ add_filter('constant_contact_form', 'my_example_function');
 </pre>
 
 You can modify the widget output by hooking into any of the filters below in a similar manner.
+
+To modify the Events widget output, start with the following code, again in your theme's `functions.php` file:
+
+<pre>
+add_filter('cc_event_output_single', 'cc_event_output_single', 1, 2);
+
+function cc_event_output_single($output, $pieces = array('start'=> '','title'=>'','description'=>'','date'=>'','calendar'=>'','location' => '', 'end'=>'')) {
+	// The pieces of each event are stored in the $pieces array
+	// So you can modify them and cut and paste in what order you
+	// want the pieces to display
+	return $pieces['start'].'<dt>Description</dt>'.$pieces['description'].$pieces['date'].$pieces['end'];	
+}
+</pre>
+
+<strong>Some example filters:</strong>
 
 * Entire form output: `constant_contact_form`
 * Successful submission message: `constant_contact_form_success`

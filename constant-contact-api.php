@@ -4,7 +4,7 @@ Plugin Name: Constant Contact API
 Plugin URI: http://integrationservic.es/constant-contact/wordpress-plugin.php
 Description: Powerfully integrates <a href="http://conta.cc/bRojlN" target="_blank">Constant Contact</a> into your WordPress website.
 Author: Katz Web Services, Inc. & James Benson
-Version: 2.1.4
+Version: 2.2
 Author URI: http://www.katzwebservices.com
 */
 
@@ -12,7 +12,8 @@ Author URI: http://www.katzwebservices.com
 	require_once dirname(__FILE__) . '/config.php';
 	require_once CC_FILE_PATH . 'functions.php';
 	require_once CC_FILE_PATH . 'user.php';
-	require_once CC_FILE_PATH . 'constant-contact-api-widget.php';
+	require_once CC_FILE_PATH . 'widget-legacy.php';
+	require_once CC_FILE_PATH . 'widget-events.php'; // Added 2.2
 
 	// load admin only files
 	if(is_admin()) {
@@ -43,6 +44,7 @@ Author URI: http://www.katzwebservices.com
 	
 	// register legacy widget
 	add_action('widgets_init', 'constant_contact_load_legacy_widget');
+	add_action('widgets_init', 'constant_contact_load_events_widget'); // Added 2.2
 
 	// register post handlers
 	add_action('init', 'constant_contact_handle_public_signup_form');

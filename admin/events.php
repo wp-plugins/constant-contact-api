@@ -425,7 +425,7 @@ function constant_contact_events()
 		?>
 
 		<div class="wrap nosubsub">
-			<h2>Constant Contact Events</h2>
+			<h2><?php _e('Constant Contact Events'); ?></h2>
 			<?php if(empty($_events)) {?>	
 				<style type="text/css">
 				#free_trial {
@@ -527,12 +527,13 @@ function constant_contact_events_list_make_table($events = array(), $title = '')
 				<tr>
 					<th scope="col" id="name" class="manage-column column-title" style="">Name</th>
 					<th scope="col" id="title" class="manage-column column-title" style="">Title</th>
+					<th scope="col" id="eventid" class="manage-column column-id" style="">ID <span class="help" title="Use the ID inside the [ccevents] shortcode to display a single event in your post or page content; for example: [ccevents id='abc1244']" style="display:inline-block; background: url(<?php echo str_replace('/admin/', '/', plugin_dir_url(__FILE__)).'images/help.png'; ?>) left top no-repeat; width:16px; height:16px; overflow:hidden; text-indent:-99999px; text-align:left;">What is this for?</span></th>
 					<?php if(!isset($_GET['event_status']) || $_GET['event_status'] == 'all') {?>
-					<th scope="col" id="status" class="manage-column column-author" style="">Status</th>
+					<th scope="col" id="status" class="manage-column column-date" style="">Status</th>
 					<?php } ?>
 					<th scope="col" id="start" class="manage-column column-author" style="">Start</th>
-					<th scope="col" id="registered" class="manage-column column-author" style=""># Registered</th>
-					<th scope="col" id="cancelled" class="manage-column column-author" style=""># Cancelled</th>
+					<th scope="col" id="registered" class="manage-column column-date" style=""># Registered</th>
+					<!-- <th scope="col" id="cancelled" class="manage-column column-date" style=""># Cancelled</th> -->
 				</tr>
 			</thead>
 			<tbody>
@@ -556,6 +557,9 @@ function constant_contact_events_list_make_table($events = array(), $title = '')
 						<td class="column-title post-title" style="padding:8px;">
 							<?php echo $v['Title']; ?>
 						</td>
+						<td class="column-title post-title" style="padding:8px;">
+							<?php echo $v['id']; ?>
+						</td>
 				<?php if(!isset($_GET['event_status']) || $_GET['event_status'] == 'all') {?>
 						<td class="column-role" style="padding:8px;">
 							<?php echo ucwords(strtolower(esc_html($v['Status']))); ?>
@@ -567,9 +571,11 @@ function constant_contact_events_list_make_table($events = array(), $title = '')
 						<td class="column-id" style="padding:8px;">
 							<?php echo_if_not_empty($v['Registered'],0); ?>
 						</td>
+						<!--
 						<td class="column-id" style="padding:8px;">
 							<?php echo_if_not_empty($v['CancelledCount'],0); ?>
 						</td>
+						-->
 					</tr>
 					<?php
 				}
