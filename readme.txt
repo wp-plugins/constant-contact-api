@@ -55,12 +55,6 @@ To install the plugin follow the steps below:
 4. Click the new main menu item called "Constant Contact".
 5. You'll need to enter your username and password on the settings page then save the page to see your contact lists.
 6. Now Configure the "Register Page Settings" to get the checkbox or list selection displayed on the user register page.
-7. Alternatively configure the signup widget in the admin area, if widgets are not supported in your theme you'll have to place the code below somewhere into one of your PHP theme files:
-<pre>
-&lt;?php $sbw = new constant_contact_api_widget(); $sbw-&gt;widget(); ?&gt;
-</pre>
-
-Optionally, If you want to change the default plugin options you can you edit the config.php file before installing, this is not required because all the options are editable via the wp admin interface but doing so means you can install the plugin with your preferred settings or provide the plugin to clients using a default set of options.
 
 ### Using the new Form Designer
 1. Install this plugin.
