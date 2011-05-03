@@ -108,6 +108,7 @@ class constant_contact_events_widget extends WP_Widget {
   /** @see WP_Widget::form */
     function form($instance)
 	{
+		$limit = null;
 		extract($instance);
 		
 		@include_once('functions.php');
