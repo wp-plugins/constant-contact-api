@@ -10,7 +10,7 @@ Integrate Constant Contact into your website with this full-featured plugin.
 
 == Description ==
 
-> __This plugin requires a <a href="http://bit.ly/tryconstantcontact" title="Sign up for a free Constant Contact trial" rel="nofollow">Constant Contact account</a>.__ <br />*Don't have an account?* Constant Contact offers a <a href="http://bit.ly/constant-contact-email" rel="nofollow">free 60 day trial</a>, so sign up and give this plugin a whirl!
+> __This plugin requires a <a href="http://www.constantcontact.com/index.jsp?pn=katzwebdesign&cc=api" title="Sign up for a free Constant Contact trial" rel="nofollow">Constant Contact account</a>.__ <br />*Don't have an account?* Constant Contact offers a <a href="http://www.constantcontact.com/email-marketing/index.jsp?pn=katzwebdesign&cc=api" rel="nofollow">free 60 day trial</a>, so sign up and give this plugin a whirl!
 
 <h4>Fully integrate Constant Contact with your WordPress website.</h4>
 
@@ -277,9 +277,9 @@ This version fixes a major bug and all users should upgrade immediately.
 == Frequently Asked Questions ==
 
 = Do I need a Constant Contact account for this plugin? =
-This plugin requires a [Constant Contact account](http://bit.ly/tryconstantcontact 'Sign up for Constant Contact').
+This plugin requires a [Constant Contact account](http://www.constantcontact.com/index.jsp?pn=katzwebdesign&cc=api 'Sign up for Constant Contact').
 
-Constant Contact is a great email marketing company -- their rates are determined by the number of contacts in your list, not how many emails you send. This means you can send unlimited emails per month for one fixed rate! [Give it a test run](http://bit.ly/constant-contact-signup 'Try out Constant Contact today').
+Constant Contact is a great email marketing company -- their rates are determined by the number of contacts in your list, not how many emails you send. This means you can send unlimited emails per month for one fixed rate! [Give it a test run](http://www.constantcontact.com/features/signup.jsp?pn=katzwebdesign&cc=api 'Try out Constant Contact today').
 
 = Is there shortcode support? =
 
