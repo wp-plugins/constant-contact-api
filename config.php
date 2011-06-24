@@ -56,4 +56,9 @@ define('CC_FILE_PATH', dirname(__FILE__) . '/');
 // The full path to this file
 define('CC_FILE_URL', plugin_dir_url(__FILE__));
 
+// To store the object in a session.
+if(!session_id()) {
+	session_start();
+}
+
 ?>

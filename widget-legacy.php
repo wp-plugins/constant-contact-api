@@ -125,7 +125,7 @@ class constant_contact_api_widget extends WP_Widget {
 			
 			if($show_firstname):
 				$output .='
-					<label for="cc_firstname">'.__('First Name:').'</label>
+					<label for="cc_firstname">'.__('First Name:','constant-contact-api').'</label>
 					<div class="input-text-wrap">
 						<input type="text" name="fields[first_name][value]" id="cc_firstname" value="'; 
 						$output .= (isset($_POST['fields']['first_name']['value'])) ? htmlentities($_POST['fields']['first_name']['value']) : '';
@@ -135,7 +135,7 @@ class constant_contact_api_widget extends WP_Widget {
 				
 				if($show_lastname):
 				$output .='
-					<label for="cc_lastname">'.__('Last Name:').'</label>
+					<label for="cc_lastname">'.__('Last Name:','constant-contact-api').'</label>
 					<div class="input-text-wrap">
 						<input type="text" name="fields[last_name][value]" id="cc_lastname" value="';
 						$output .= (isset($_POST['fields']['last_name']['value'])) ? htmlentities($_POST['fields']['last_name']['value']) : '';
@@ -144,7 +144,7 @@ class constant_contact_api_widget extends WP_Widget {
 				endif;
 				
 				$output .= '
-				<label for="cc_email">'.__('Email:').'</label>
+				<label for="cc_email">'.__('Email:','constant-contact-api').'</label>
 				<div class="input-text-wrap">
 					<input type="text" name="fields[email_address][value]" id="cc_email" value="';
 					$output .= (isset($_POST['fields']['email_address']['value'])) ? htmlentities($_POST['fields']['email_address']['value']) : '';
@@ -210,7 +210,7 @@ class constant_contact_api_widget extends WP_Widget {
 				<div>
 					'.$hide_lists_output.'
 					<input type="hidden" id="cc_referral_url" name="cc_referral_url" value="'.urlencode(constant_contact_current_page_url()).'" />
-					<input type="hidden" id="cc_redirect_url" name="cc_redirect_url" value="'.urlencode($redirect_url).'" />
+					<input type="hidden" id="cc_redirect_url" name="cc_redirect_url" value="'.apply_filters('constant_contact_form_redirect_url', urlencode($redirect_url)).'" />
 					';
 					$submit_button = '<input type="submit" name="constant-contact-signup-submit" value="Signup" class="button submit" />';
 					$output .= apply_filters('constant_contact_form_submit', $submit_button);

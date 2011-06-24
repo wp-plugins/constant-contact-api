@@ -4,9 +4,12 @@ Plugin Name: Constant Contact API
 Plugin URI: http://integrationservic.es/constant-contact/wordpress-plugin.php
 Description: Powerfully integrates <a href="http://conta.cc/bRojlN" target="_blank">Constant Contact</a> into your WordPress website.
 Author: Katz Web Services, Inc. & James Benson
-Version: 2.2
+Version: 2.3
 Author URI: http://www.katzwebservices.com
 */
+	
+	// For language internationalization
+	load_plugin_textdomain( 'constant-contact-api', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 
 	// load our config file, this sets the default path and default PHP constants
 	require_once dirname(__FILE__) . '/config.php';
@@ -27,6 +30,8 @@ Author URI: http://www.katzwebservices.com
 		require_once CC_FILE_PATH . 'admin/registration.php'; // Added 2.0
 		require_once CC_FILE_PATH . 'admin/campaigns.php'; // Added 2.0
 		require_once CC_FILE_PATH . 'admin/events.php'; // Added 2.1
+		require_once CC_FILE_PATH . 'admin/contacts.php'; // Added 2.3
+		require_once CC_FILE_PATH . 'constant-analytics.php'; // Added 2.3
 		
 		// register admin menu action
 		add_action('admin_menu', 'constant_contact_admin_menu');
@@ -40,6 +45,25 @@ Author URI: http://www.katzwebservices.com
 
 		// Add the handy Settings link on the plugins page
 		add_filter( 'plugin_action_links', 'constant_contact_settings_link', 10, 2 );
+		
+		add_action('admin_footer', 'constant_contact_plugin_page_list');
+		
+		add_action('admin_print_scripts', 'constant_contact_enquque_core_scripts');
+		add_action('admin_print_styles', 'constant_contact_enquque_core_styles');
+	}
+	
+	function constant_contact_enquque_core_styles() {
+		if(constant_contact_is_plugin_page()) {
+			wp_enqueue_style('constant-contact-api-admin', plugins_url('constant-contact-api/admin/constant-contact-admin-css.css'), false, false, 'all');
+			wp_enqueue_style('constant-contact-api-admin-qtip', plugins_url('constant-contact-api/css/jquery.qtip.min.css'), false, false, 'all');
+		}
+	}
+	
+	function constant_contact_enquque_core_scripts() {
+		if(constant_contact_is_plugin_page()) {
+			wp_enqueue_script('constant-contact-api-admin-page', plugins_url('constant-contact-api/js/admin-cc-page.js'), array('jquery'));
+			wp_enqueue_script('constant-contact-api-admin-qtip', plugins_url('constant-contact-api/js/jquery.qtip.pack.js'), array('jquery', 'constant-contact-api-admin-page'));
+		}
 	}
 	
 	// register legacy widget

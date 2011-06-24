@@ -4,7 +4,7 @@ Plugin Name: Constant Contact API: Form Designer (Alpha)
 Plugin URI: http://integrationservic.es/constant-contact/wordpress-plugin.php
 Description: Create fancy-lookin' forms for the Constant Contact API plugin that have tons of neat configuration options.
 Author: Katz Web Services, Inc.
-Version: 2.2
+Version: 2.3
 Author URI: http://www.katzwebservices.com
 */
 
@@ -175,7 +175,7 @@ function cc_form_process() {
 				if ( is_wp_error($delete_cc_form) ) {
 					$messages[] = '<div id="message" class="error"><p>' . $delete_cc_form->get_error_message() . '</p></div>';
 				} else {
-					$messages[] = '<div id="message" class="updated"><p>' . __('The form '.$deleted_form['form-name'].' has been successfully deleted.') . '</p></div>';
+					$messages[] = '<div id="message" class="updated"><p>' . __('The form '.$deleted_form['form-name'].' has been successfully deleted.','constant-contact-api') . '</p></div>';
 					// Select the next available menu
 					$cc_form_selected_id = -1;
 					$_cc_forms = wp_get_cc_forms( array('orderby' => 'name') );
@@ -206,7 +206,7 @@ function cc_form_process() {
 					if ( is_wp_error( $cc_form_selected_id ) ) {
 						$messages[] = '<div id="message" class="error"><p>' . $cc_form_selected_id->get_error_message() . '</p></div>';
 					} else {
-						$messages[] = '<div id="message" class="updated"><p>' . sprintf( __('The <strong>%s</strong> form has been successfully created.'), $new_form_title ) . '</p></div>';
+						$messages[] = '<div id="message" class="updated"><p>' . sprintf( __('The <strong>%s</strong> form has been successfully created.','constant-contact-api'), $new_form_title ) . '</p></div>';
 					}
 	
 			// update existing form
@@ -215,7 +215,7 @@ function cc_form_process() {
 				if(wp_get_cc_form($cc_form_selected_id)) {
 					$request = wp_update_cc_form_object($cc_form_selected_id, $_REQUEST);
 					if(!is_wp_error($request)) {
-						$messages[] = '<div id="message" class="updated after-h2"><p>' . sprintf( __('The <strong>%s</strong> form has been updated.'), $request['form-name'] ) . '</p></div>';
+						$messages[] = '<div id="message" class="updated after-h2"><p>' . sprintf( __('The <strong>%s</strong> form has been updated.','constant-contact-api'), $request['form-name'] ) . '</p></div>';
 					} else {
 						$messages[] = '<div id="message" class="error"><p>' . $cc_form_selected_id->get_error_message() . '</p></div>';
 					}
@@ -307,19 +307,19 @@ function wp_cc_form_setup() {
 	$form = wp_get_cc_form($cc_form_selected_id);
 	#r($form);
 	$getHolder = $_GET;
-	add_meta_box( 'formfields_select', __( 'Form Fields' ), 'cc_form_meta_box_formfields_select' , 'constant-contact-form', 'side', 'default', array($form));
-	add_meta_box( 'presetoptions', __( 'Design Presets' ), 'cc_form_meta_box_presetoptions' , 'constant-contact-form', 'side', 'default', array($form));
-	add_meta_box( 'backgroundoptions', __('Background'), 'cc_form_meta_box_backgroundoptions' , 'constant-contact-form', 'side', 'default', array($form));
-	add_meta_box( 'border', __('Border'), 'cc_form_meta_box_border' , 'constant-contact-form', 'side', 'default', array($form));
-	add_meta_box( 'fontstyles', __('Text Styles & Settings'), 'cc_form_meta_box_fontstyles' , 'constant-contact-form', 'side', 'default', array($form));
-	add_meta_box( 'formdesign', __('Padding & Align'), 'cc_form_meta_box_formdesign' , 'constant-contact-form', 'side', 'default', array($form));
+	add_meta_box( 'formfields_select', __( 'Form Fields','constant-contact-api' ), 'cc_form_meta_box_formfields_select' , 'constant-contact-form', 'side', 'default', array($form));
+	add_meta_box( 'presetoptions', __( 'Design Presets','constant-contact-api' ), 'cc_form_meta_box_presetoptions' , 'constant-contact-form', 'side', 'default', array($form));
+	add_meta_box( 'backgroundoptions', __('Background','constant-contact-api'), 'cc_form_meta_box_backgroundoptions' , 'constant-contact-form', 'side', 'default', array($form));
+	add_meta_box( 'border', __('Border','constant-contact-api'), 'cc_form_meta_box_border' , 'constant-contact-form', 'side', 'default', array($form));
+	add_meta_box( 'fontstyles', __('Text Styles & Settings','constant-contact-api'), 'cc_form_meta_box_fontstyles' , 'constant-contact-form', 'side', 'default', array($form));
+	add_meta_box( 'formdesign', __('Padding & Align','constant-contact-api'), 'cc_form_meta_box_formdesign' , 'constant-contact-form', 'side', 'default', array($form));
 	$_GET = $getHolder;
 }
 
 function constant_contact_design_forms() {
 	
 	if (!current_user_can('manage_options'))  {
-		wp_die( __('You do not have sufficient permissions to access this page.') );
+		wp_die( __('You do not have sufficient permissions to access this page.','constant-contact-api') );
 	}
 	if(!check_ccfg_compatibility()) { return false; }
 	require_once( 'form-designer-functions.php' );
@@ -398,8 +398,7 @@ wp_cc_form_setup();
 ?>
 <div class="wrap">
 <div>
-	<div id="icon-themes" class="icon32"></div>
-	<h2><?php esc_html_e('Constant Contact - Form Design'); ?></h2>
+	<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> Form Designer</h2>
 	<?php
 	if(isset($messages) && is_array($messages)) {
 	foreach( $messages as $message ) :
@@ -466,7 +465,7 @@ wp_cc_form_setup();
 						</a><?php endif;
 				endforeach;
 				if ( -1 == $cc_form_selected_id ) : ?><span class="nav-tab menu-add-new nav-tab-active">
-					<?php printf( '<abbr title="%s">+</abbr>', esc_html__( 'Add form' ) ); ?>
+					<?php printf( '<abbr title="%s">+</abbr>', esc_html__( 'Add form','constant-contact-api' ) ); ?>
 				</span><?php else : ?><a href="<?php
 					echo esc_url(add_query_arg(
 						array(
@@ -476,7 +475,7 @@ wp_cc_form_setup();
 						admin_url( 'admin.php?page=constant-contact-forms' )
 					));
 				?>" class="nav-tab menu-add-new">
-					<?php printf( '<abbr title="%s">+</abbr>', esc_html__( 'Add form' ) ); ?>
+					<?php printf( '<abbr title="%s">+</abbr>', esc_html__( 'Add form','constant-contact-api' ) ); ?>
 				</a><?php endif; ?>
 			</div>
 			</div>

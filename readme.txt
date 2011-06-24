@@ -21,23 +21,23 @@ You can place a signup checkbox or list selection on your register page or use t
 <h3>Now featuring Event Marketing!</h3>
 Version 2.1 of the plugin introduces <a href="http://conta.cc/hB5lnC" title="Learn more about Constant Contact Event Marketing" rel="nofollow">Constant Contact Event Marketing</a> functionality by allowing you to track events, registration, and registrants using the plugin. Simply navigate to Constant Contact > Events. Manage your events from inside WordPress!
 
-<h3>Version 2.0</h3>
-Version 2.0 of the Constant Contact API plugin brings great new capabilities, improved interface, and expanded instructions.  New capabilities include Campaign details (email sending statistics) and caching of data to dramatically improve load speed. The plugin has been majorly reconstructed to improve the way the API is accessed and reduce the number of calls to the API. Each administration screen has improved interfaces to make the plugin look and feel more like a native extension of WordPress. Great care has been taken to conform to WordPress standards of design.
+<h3>Built-in Form Designer</h3>
+<strong>The Constant Contact Form Designer (CCFD)</strong> gives the Constant Contact API a form generation tool. The Form Designer allows users to generate unlimited number of unique forms and gives a wide variety of options that can be configured, including what fields to show in the signup form. There and tons of design options, including custom background images, border width, colors, fonts and much more.
 
-<strong>The new Constant Contact Form Designer (CCFD)</strong> gives the Constant Contact API a form generation tool. The Form Designer allows users to generate unlimited number of unique forms and gives a wide variety of options that can be configured, including what fields to show in the signup form. There and tons of design options, including custom background images, border width, colors, fonts and much more.
+<h3>Constant Analytics: In-Depth Google Analytics</h3>
+View your Google Analytics data in your dashboard with Constant Analytics. View traffic by source, geography, and popularity. See the impact of blog posts and email campaigns with the great graphing tools.
 
 <h4>Plugin features:</h4>
 * Add signup checkbox and list selection to your register page and update profile page
 * Add / edit / delete contact lists without visiting constantcontact.com
 * Includes a powerful form designer
+* Built-in Google Analytics visualization
 * View your events registration details and get updated with a dashboard widget
 * Show contact list selection on register page with ability to exclude certain lists
 * Automatically subscribe your user to one or more contact lists on the register page
 * Customize the register page signup box (and list selection) title and description
 * Add / edit / delete users from your constant contact account
 * Add a signup widget to your sidebar or anywhere in your template
-* Add extra fields to your signup form
-* Uses the REST API
 
 <h4>Plugin Support</h4>
 To obtain support please use this link to the [wordpress forums](http://wordpress.org/tags/constant-contact-api).
@@ -56,7 +56,7 @@ To install the plugin follow the steps below:
 5. You'll need to enter your username and password on the settings page then save the page to see your contact lists.
 6. Now Configure the "Register Page Settings" to get the checkbox or list selection displayed on the user register page.
 
-### Using the new Form Designer
+### Using the Form Designer
 1. Install this plugin.
 2. Activate the Constant Contact API: Form Designer plugin
 3. Configure the settings on the form designer by updating the settings in the boxes on the left. 
@@ -69,6 +69,20 @@ To install the plugin follow the steps below:
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
 == Changelog ==
+
+= 2.3 =
+* Added Contacts capability
+	- <strong>Add new contacts from inside WordPress</strong>
+	- View and edit all your contacts
+	- Edit contact information, subscribed lists, etc.
+	- View all the contacts in a list
+* Added Constant Analytics, a great Google Analytics statistics tool that helps you visualize your blog traffic as well as blog posts and email campaigns in the same chart.
+	- Switch between Google Analytics profiles & accounts
+* New feature: hover over the Constant Contact logo to easily switch between plugin pages.
+* Improved plugin load time on the administration
+* Update should fix issue where updating users from the User administration page doesn't work properly (<a href="http://wordpress.org/support/topic/566686" rel="nofollow">issue 566686</a>)
+* Added a hook for internationalization of plugin (multiple language support)
+* Fixed issue where updating username & password settings may not change account except when closing browser window. This bug also affected if users de-activated plugin with the `Remove all data stored in database` selected. If users re-activated the plugin, the plugin would still seem to be configured properly because this information was stored in the browser session.
 
 = 2.2 = 
 * Added an Events widget and shortcode
@@ -174,6 +188,20 @@ To install the plugin follow the steps below:
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
+
+= 2.3 =
+* Added Contacts capability
+	- <strong>Add new contacts from inside WordPress</strong>
+	- View and edit all your contacts
+	- Edit contact information, subscribed lists, etc.
+	- View all the contacts in a list
+* Added Constant Analytics, a great Google Analytics statistics tool that helps you visualize your blog traffic as well as blog posts and email campaigns in the same chart.
+	- Switch between Google Analytics profiles & accounts
+* New feature: hover over the Constant Contact logo to easily switch between plugin pages.
+* Improved plugin load time on the administration
+* Update should fix issue where updating users from the User administration page doesn't work properly (<a href="http://wordpress.org/support/topic/566686" rel="nofollow">issue 566686</a>)
+* Added a hook for internationalization of plugin (multiple language support)
+* Fixed issue where updating username & password settings may not change account except when closing browser window. This bug also affected if users de-activated plugin with the `Remove all data stored in database` selected. If users re-activated the plugin, the plugin would still seem to be configured properly because this information was stored in the browser session.
 
 = 2.2 = 
 * Added an Events widget and shortcode
@@ -364,6 +392,11 @@ function cc_event_output_single($output, $pieces = array('start'=> '','title'=>'
 * Form description text: `constant_contact_form_description` (after it has been modified by `wpautop()`)
 * Error message: `constant_contact_form_errors`
 * Submit button: `constant_contact_form_submit` (includes entire `input` string)
+
+= My email campaign click data isn't being tracked in Constant Analytics =
+Constant Contact does not have built-in Google Analytics "tagging" that would track the click data. When you create links in your Constant Contact campaigns, <strong><a href="http://www.google.com/support/analytics/bin/answer.py?answer=55578" rel="nofollow">use the Google URL Builder</a></strong> to add tags to your links. <strong>Make sure to set the Campaign Medium to `email`!</strong>
+
+When you do that, email click stats will be segmented for you in the Site Traffic box.
 
 = How do I use the Form Designer? =
 

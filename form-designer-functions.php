@@ -108,7 +108,7 @@ function wp_update_cc_form_object( $form_id = -1, $data = array()) {
 		$form = apply_filters("wp_update_cc_form_$form_id", $form );
 		$forms[$form_id] = $form;
 	} else {
-		return new WP_Error('wp_update_cc_form_object_failed', __('The form both does not exist and does exist. Can not process!'));
+		return new WP_Error('wp_update_cc_form_object_failed', __('The form both does not exist and does exist. Can not process!','constant-contact-api'));
 	}
 	// That cached version's gotta go.
 	delete_transient("cc_form_$form_id");
@@ -144,7 +144,9 @@ function r($content, $die = false, $echo=true) {
 			        if (is_array($value)) {
 			            $data[$key] = htmlentities_recursive($value);
 			        } else {
+			        	if(is_string($value)) {
 			            $data[$key] = htmlentities($value);
+			            }
 			        }
 			    }
 			    return $data;

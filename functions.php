@@ -15,6 +15,7 @@ function constant_contact_get_lists($force_update = false) {
 	global $cc;
 
 	if(!$force_update) {
+		
 		// First check the transient to see if it is still fresh enough
 		$lists = get_transient('cc_lists_cache');
 	
@@ -151,11 +152,42 @@ function constant_contact_last_error($status_code = 0)
 function constant_contact_create_object($force_new = false)
 {
 	global $cc, $createcount;
-
+	
 	// If there is already the object, leave it alone
 	if(!$force_new && is_object($cc)) { return $cc; }
+	
+	// If the settings have been updated, force new session
+	if(is_admin() && current_user_can('manage_options') && 
+		(
+			isset($_POST['cc_password']) ||
+			(isset($_GET['page']) && $_GET['page'] == 'constant-contact-api' && isset($_GET['settings-updated']))
+		)
+	) {
+		$force_new = true;
+	}
+	
+	// If a new object is forced, reset things...
+	if($force_new) {
+		if(isset($_SESSION['ccObject'])) { unset($_SESSION['ccObject']); }
+		delete_transient('cc_object');
+		$cc = false;
+	}
+	
+	//
+	// Try to get the cached object
+	//
+	
+	// If the object's been stored in the session
+	if(!$force_new && session_id() && !empty($_SESSION['ccObject'])) {
+		#r($_SESSION['ccObject']);
+		require_once CC_FILE_PATH . 'class.cc.php';
+		$cc = maybe_unserialize($_SESSION['ccObject']);
+		if(is_object($cc)) {
+			return $cc;
+		}
+	}
 
-	// If the cc object has been stored, 
+	// If the cc object has been stored as a transient
 	if(!$force_new && $trans_api = get_transient('cc_object')) {
 		require_once CC_FILE_PATH . 'class.cc.php';
 		$cc = maybe_unserialize($trans_api);
@@ -167,9 +199,12 @@ function constant_contact_create_object($force_new = false)
 		} else {
 			return $cc;
 		}
-	} else {
-		delete_transient('cc_object');
 	}
+	
+	
+	// 
+	// Get a new object
+	//
 
 	// Get the username and password
 	$username = get_option('cc_username');
@@ -195,6 +230,8 @@ function constant_contact_create_object($force_new = false)
 	if(is_object($new_cc) && $new_cc->get_service_description()) {
 		// If we have connected copy the object into the global
 		$cc = $new_cc;
+		
+		$_SESSION['ccObject'] = maybe_serialize($cc);
 		
 		// Save some processing time!
 		set_transient('cc_object', maybe_serialize($cc), 60*60*12);
@@ -702,7 +739,7 @@ function constant_contact_make_textfield($initiated = false, $required=false, $d
     
 	$input = '
 	<p>
-		<label for="'.$fieldid.'">'.__($title).'
+		<label for="'.$fieldid.'">'.__($title,'constant-contact-api').'
 		<input type="text" class="widefat" id="'.$fieldid.'" name="'.$fieldname.'" value="'.$setting.'"/>
 		</label>
 	</p>';
@@ -715,7 +752,7 @@ function constant_contact_make_textarea($initiated = false, $required=false, $de
     
 	$input = '
 	<p>
-		<label for="'.$fieldid.'">'.__($title).'
+		<label for="'.$fieldid.'">'.__($title,'constant-contact-api').'
 		<textarea class="widefat" id="'.$fieldid.'" name="'.$fieldname.'" cols="40" rows="5">'.$setting.'</textarea>
 		</label>
 	</p>';
@@ -732,7 +769,7 @@ function constant_contact_get_checkbox($setting = '', $fieldid = '', $fieldname=
 			if($checked || !empty($setting)) { $checkbox .= ' checked="checked"'; }
 			if($disabled)  { $checkbox .= ' disabled="disabled"';}
 			$checkbox .= ' class="checkbox" />
-		<label for="'.$fieldid.'">'.__($title).'</label>';
+		<label for="'.$fieldid.'">'.__($title,'constant-contact-api').'</label>';
     return $checkbox;
 }
 
@@ -791,7 +828,7 @@ function constant_contact_create_location($v = array()) {
 function constant_contact_event_date($value = null) {
 	global $cc;
 	$timestamp = (int)$cc->convert_timestamp($value);
-	return sprintf(__('%1$s at %2$s', 'constant_contact_api'), date_i18n(get_option('date_format'), $timestamp, true), date_i18n(get_option('time_format'), $timestamp, true));
+	return sprintf(__('%1$s at %2$s','constant-contact-api'), date_i18n(get_option('date_format'), $timestamp, true), date_i18n(get_option('time_format'), $timestamp, true));
 }
 
 
@@ -849,7 +886,7 @@ function constant_contact_get_events_output($args = array(), $sidebar = false) {
 	
 	extract( $settings );
 	
-	if($style) { constant_contact_events_print_widget_styles(); }
+	if(!empty($style)) { constant_contact_events_print_widget_styles(); }
 	
 	if($id === false) {
 		$events = constant_contact_get_active_events();
@@ -882,7 +919,7 @@ function constant_contact_get_events_output($args = array(), $sidebar = false) {
 					$link = str_replace('https://', 'http://', $RegistrationURL);
 				}
 				
-				$linkTitle = apply_filters('cc_event_linktitle', sprintf( __('View event details for "%s"'), $Title));
+				$linkTitle = apply_filters('cc_event_linktitle', sprintf( __('View event details for "%s"','constant-contact-api'), $Title));
 				if(!empty($linkTitle)) { $linkTitle = ' title="'.esc_html($linkTitle).'"'; }
 				
 				$class = apply_filters('cc_event_class', $class);
@@ -897,18 +934,18 @@ function constant_contact_get_events_output($args = array(), $sidebar = false) {
 					}
 					if(!empty($datetime)) {
 					$dateOut = '
-					<dt class="cc_event_startdate_dt">'.apply_filters('cc_event_startdate_dt', __('Start: ')).'</dt>
+					<dt class="cc_event_startdate_dt">'.apply_filters('cc_event_startdate_dt', __('Start: ','constant-contact-api')).'</dt>
 						<dd class="cc_event_startdate_dd">'.apply_filters('cc_event_startdate', $StartDate).'</dd>
-					<dt class="cc_event_enddate_dt">'.apply_filters('cc_event_enddate_dt', __('End: ')).'</dt>
+					<dt class="cc_event_enddate_dt">'.apply_filters('cc_event_enddate_dt', __('End: ','constant-contact-api')).'</dt>
 						<dd class="cc_event_enddate_dd">'.apply_filters('cc_event_enddate', $EndDate).'</dd>
 						';
 					}
 					if(!empty($calendar)) {
 						$link = str_replace('/register/event?', '/register/addtocalendar?', $RegistrationURL);
-						$linkTitle = apply_filters('cc_event_linktitle', sprintf( __('Add "%s" to your calendar'), $Title));
+						$linkTitle = apply_filters('cc_event_linktitle', sprintf( __('Add "%s" to your calendar','constant-contact-api'), $Title));
 						if(!empty($linkTitle)) { $linkTitle = ' title="'.esc_html($linkTitle).'"'; }
 						$calendarOut = '
-					<dd class="cc_event_calendar"><a'.$target.' href="'.$link.'"'.$linkTitle.'>'.__('Add to Calendar').'</a></dd>
+					<dd class="cc_event_calendar"><a'.$target.' href="'.$link.'"'.$linkTitle.'>'.__('Add to Calendar','constant-contact-api').'</a></dd>
 						';
 					}
 					if(!empty($location)) {
@@ -919,11 +956,11 @@ function constant_contact_get_events_output($args = array(), $sidebar = false) {
 							$locationformap = trim(constant_contact_create_location($EventLocation));
 							$address_qs = str_replace("<br />", ", ", $locationformap.'<br />'.$EventLocation['NewLocation']); //replacing <br/> with spaces
 							$address_qs = urlencode($address_qs);
-							$locationText .= "<br/>".apply_filters('cc_event_map_link', "<a href='http://maps.google.com/maps?q=$address_qs'".$target." class='cc_event_map_link'>".__('Map Location')."</a>", $EventLocation, $address_qs);
+							$locationText .= "<br/>".apply_filters('cc_event_map_link', "<a href='http://maps.google.com/maps?q=$address_qs'".$target." class='cc_event_map_link'>".__('Map Location','constant-contact-api')."</a>", $EventLocation, $address_qs);
 						}
 						
 						$locationOut = '
-					<dt class="cc_event_location cc_event_location_dt">'.apply_filters('cc_event_location_dt', __('Location: ')).'</dt>
+					<dt class="cc_event_location cc_event_location_dt">'.apply_filters('cc_event_location_dt', __('Location: ','constant-contact-api')).'</dt>
 						<dd class="cc_event_location_dd cc_event_location">'.apply_filters('cc_event_location', $locationText).'</dd>';
 					}
 					
@@ -936,7 +973,7 @@ function constant_contact_get_events_output($args = array(), $sidebar = false) {
 			}
 			
 		} else {
-			$output = apply_filters('cc_event_no_events_text', '<p>'.__('There are currently no events.').'</p>');
+			$output = apply_filters('cc_event_no_events_text', '<p>'.__('There are currently no events.','constant-contact-api').'</p>');
 		}
 	$output = apply_filters('cc_event_output', $output);
 	return $output;
@@ -962,10 +999,152 @@ function constant_contact_latest_registrant($id, $showcancelled = false) {
 		}
 	}
 	if(empty($timestamp)) {
-		return __('N/A', 'constant_contact_api');
+		return __('N/A','constant-contact-api');
 	} else {
-		return sprintf(__('%1$s at %2$s', 'constant_contact_api'), date_i18n(get_option('date_format'), $timestamp, true), date_i18n(get_option('time_format'), $timestamp, true));
+		return sprintf(__('%1$s at %2$s','constant-contact-api'), date_i18n(get_option('date_format'), $timestamp, true), date_i18n(get_option('time_format'), $timestamp, true));
 	}
+}
+
+function constant_contact_reset_lists_transients() {
+	$lists = constant_contact_get_lists();
+				
+	foreach($lists as $key => $details) {
+		delete_transient('listmembers'.$details['id']);	
+	}
+	return;
+}
+
+function constant_contact_admin_refresh($name = '') {
+		$matches = array();
+	if(!empty($name)) {
+		$matches[1] = $name;
+	} else{ 
+		if(isset($_GET['page'])) {
+			preg_match('/constant\-contact\-(.*)/ism', $_GET['page'], $matches);
+		}
+	}
+	if(empty($matches[1])) { return; }
+	if(isset($_GET['id'])) { 
+		$single= true; 
+		if(substr($matches[1], -3, 3) == 'ies') {
+			$matches[1] = substr($matches[1], 0, (strlen($matches[1]) -3));
+			$matches[1] .= 'y';
+		}else if(substr($matches[1], -1, 1) == 's') {
+			$matches[1] = substr($matches[1], 0, (strlen($matches[1]) -1));
+		}
+	} else { $single = false; }
+	?>
+	
+	<p class="alignright"><label class="howto" for="refresh_<?php echo $matches[1]; ?>"><span><?php echo $single ? 'Is' : 'Are'; ?> the displayed <?php echo $matches[1]; ?> inaccurate?</span> <a href="<?php echo add_query_arg('refresh', $matches[1], remove_query_arg(array('add', 'edit', 'delete', 'refresh'))); ?>" class="button-secondary action" id="refresh_<?php echo $matches[1]; ?>">Refresh <?php echo ucwords($matches[1]); ?></a></label></p>
+	<?php
+	
+}
+
+function constant_contact_plugin_page_list($hide = true) {
+	?>
+	<div class="wrap constant_contact_plugin_page_list <?php if($hide !== false) { echo ' cc_hidden'; } ?>" style="padding-bottom:10px; background:white;<?php if($hide !== false) { echo ' display:none;'; } ?>">
+		<h2>Plugin Pages</h2>
+		<h3>Plugin Configuration</h3>
+		<ul class="ul-disc">
+			<li><a href="<?php echo admin_url('admin.php?page=constant-contact-registration'); ?>">Registration &amp; Profile</a> - Configure plugin settings for adding newletter signup capabilities to the WordPress registration form.</li>
+			<li><a href="<?php echo admin_url('admin.php?page=constant-analytics'); ?>">Constant Analytics Settings</a> - Configure Google Analytics reports.</li>
+			<?php if(defined('CC_FORM_GEN_PATH')) { ?>
+			<li><a href="<?php echo admin_url('admin.php?page=constant-contact-forms'); ?>">Form Designer</a> - Design a signup form from the ground up.</li>
+			<?php } ?>
+		</ul>
+		<h3>Account Actions</h3>
+		<ul class="ul-disc">
+			<li><a href="<?php echo admin_url('index.php?page=constant-analytics.php'); ?>">Constant Analytics</a> - View Google Analytics and Constant Contact data directly in your dashboard.</li>
+			<li><a href="<?php echo admin_url('admin.php?page=constant-contact-contacts'); ?>">Contacts</a> - View, add, edit and delete your contacts.</li>
+			<li><a href="<?php echo admin_url('admin.php?page=constant-contact-lists'); ?>">Lists</a> - Add, remove, and edit your contact lists.</li>
+			<li><a href="<?php echo admin_url('admin.php?page=constant-contact-events'); ?>">Events</a> - View your Constant Contact Event Marketing data: events and registrant information.</li>
+			<li><a href="<?php echo admin_url('admin.php?page=constant-contact-import'); ?>">Import</a> - Import contacts into your choice of user lists.</li>
+			<li><a href="<?php echo admin_url('admin.php?page=constant-contact-export'); ?>">Export</a> - Export contacts to <code>.csv</code> and <code>.txt</code> format.</li>
+			<li><a href="<?php echo admin_url('admin.php?page=constant-contact-activities'); ?>">Activities</a> - View your account's recent activity, including: sent campaigns, exports, and imports.</li>
+			<li><a href="<?php echo admin_url('admin.php?page=constant-contact-campaigns'); ?>">Campaigns</a> - View details of your sent &amp; draft email campaigns, <strong>including email campaign stats</strong> such as # Sent, Opens, Clicks, Bounces, OptOuts, and Spam Reports.</li>
+		</ul>
+	</div>
+<?php
+}
+
+function constant_contact_generate_google_profiles() {
+	global $ccStats_ga_token;
+	
+	list($profiles, $profile_options, $ccStats_ga_profile_id) = array(array(), array(),array());
+	
+	if (!empty($ccStats_ga_token)) {
+		$url = 'https://www.google.com/analytics/feeds/accounts/default';
+					
+		$wp_http = ccStats_get_wp_http();
+		$request_args = array(
+			'headers' => ccStats_get_authsub_headers(),
+			'sslverify' => false
+		);
+		$result = $wp_http->request(
+			$url,
+			$request_args
+		);
+
+		if (is_wp_error($result)) {
+			$connection_errors = $result->get_error_messages();
+		}
+		else {
+			$http_code = $result['response']['code'];
+			$ga_auth_error = '';
+			if ($http_code != 200) {
+				$ga_auth_error = $result['response']['code'].': '.$result['response']['message'];
+				//$ga_auth_error = $result['body'];
+			}
+			else {
+				$xml = simplexml_load_string($result['body']);
+
+				$profiles = array();
+				foreach($xml->entry as $entry) {
+					$properties = array();
+					$children = $entry->children('http://schemas.google.com/analytics/2009');
+					foreach($children->property as $property) {
+						$attr = $property->attributes();
+						$properties[str_replace('ga:', '', $attr->name)] = strval($attr->value);
+					}
+					$properties['title'] = strval($entry->title);
+					$properties['updated'] = strval($entry->updated);
+					$profiles[$properties['profileId']] = $properties;
+				}
+				if (count($profiles)) {
+					global $ccStats_ga_profile_id;
+					if (empty($ccStats_ga_profile_id)) {
+						$ccStats_ga_profile_id = $properties['profileId'];	// just use the last one
+						update_option('ccStats_ga_profile_id', $ccStats_ga_profile_id);
+					}
+					if (count($profiles) > 1) {
+						$profile_options = array();
+						foreach ($profiles as $id => $profile) {
+							$profile_options[] = '<option value="'.$id.'"'.($ccStats_ga_profile_id == $id ? 'selected="selected"' : '').'>'.$profile['title'].'</option>';
+						}
+					}
+				}
+			}
+		}
+	}
+	return array($profiles, $profile_options, $ccStats_ga_profile_id);
+}
+
+function constant_contact_google_authentication_url() {
+	return 'https://www.google.com/accounts/AuthSubRequest?'.http_build_query(array(
+		'next' => admin_url('admin.php?ccStats_action=capture_ga_token'),
+		'scope' => 'https://www.google.com/analytics/feeds/',
+		'secure' => is_ssl(),
+		'session' => 1
+	));
+}
+
+function constant_contact_is_plugin_page() {
+	global $page_hook,$current_screen;
+#	print_r($GLOBALS);
+	if(preg_match('/constant-(contact|analytics)/ism', $current_screen->id)) {
+		return true;
+	} 
+	return false;	
 }
 
 function get_if_not_empty($check = null, $empty = '', $echo = false) {

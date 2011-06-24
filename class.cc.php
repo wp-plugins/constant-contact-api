@@ -227,7 +227,7 @@ class cc {
      */
     function cc($api_username, $api_password)
     {
-        $this->api_username = $api_username;
+    	$this->api_username = $api_username;
         $this->api_password = $api_password;
 
         $this->api_url .= '/ws/customers/' . rawurlencode($api_username) . '/';
@@ -665,6 +665,30 @@ class cc {
     }
 
 
+	function get_all_list_members($listid) {
+		$contacts = get_transient('listmembers'.$listid);
+		if($contacts && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'list')) { return maybe_unserialize($contacts); }
+		
+		$contacts = array();
+		$_contacts = array($this->get_list_members($listid));
+		if(!empty($_contacts)) {
+			
+			while(!empty($this->member_meta_data->next_page)) {
+				$_contacts[] = $this->get_list_members($listid, $this->member_meta_data->next_page);	
+			}
+			foreach($_contacts as $contactList) {
+				foreach($contactList as $k => $v) {
+					$contacts[$v['id']] = $v;
+				}
+			}
+			#r($contacts);
+			
+		}
+		
+		set_transient('listmembers'.$listid, maybe_serialize($contacts));
+		return $contacts;
+	}
+
 
     /**
      * Creates a new contact
@@ -779,7 +803,29 @@ $xml_data .= '
     }
 
 
+	function get_all_contacts($timeout = 21600) {
+		$contacts = get_transient('cc_contacts');
+		if($contacts && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'contacts')) { return maybe_unserialize($contacts); }
 
+		$contacts = array();
+		$_contacts = array($this->get_contacts());
+		if(!empty($_contacts)) {
+			
+			while(!empty($this->contact_meta_data->next_page)) {
+				$_contacts[] = $this->get_contacts($this->contact_meta_data->next_page);	
+			}
+			foreach($_contacts as $contactList) {
+				foreach($contactList as $k => $v) {
+					$contacts[$v['id']] = $v;
+				}
+			}
+			#r($contacts);
+			
+		}
+		
+		set_transient('cc_contacts', maybe_serialize($contacts), $timeout);
+		return $contacts;
+	}
 
 
     /**
@@ -787,9 +833,9 @@ $xml_data .= '
      *
      * @access     public
      */
-    function get_contacts($action = 'contacts')
+    function get_contacts($action = 'contacts', $timeout = 3600)
     {
-        $xml = $this->load_url($action);
+    	$xml = $this->load_url($action);
 
         if(!$xml):
             return false;
@@ -798,7 +844,6 @@ $xml_data .= '
         // parse into nicer array
         $contacts = array();
         $_contacts = (isset($xml['feed']['entry'])) ? $xml['feed']['entry'] : false;
-
 
         if(isset($xml['feed']['link']['2_attr']['rel']) && $xml['feed']['link']['2_attr']['rel'] == 'first'):
             $this->contact_meta_data->first_page = $this->get_id_from_link($xml['feed']['link']['2_attr']['href']);
@@ -809,7 +854,6 @@ $xml_data .= '
             $this->contact_meta_data->current_page = $this->get_id_from_link($xml['feed']['link']['3_attr']['href']);
             $this->contact_meta_data->first_page = $this->get_id_from_link($xml['feed']['link']['4_attr']['href']);
         endif;
-
 
         if(is_array($_contacts)):
             if(isset($_contacts[0]['link_attr']['href'])):
@@ -826,8 +870,8 @@ $xml_data .= '
                 $contacts[] = $contact;
             endif;
         endif;
-
-        return $contacts;
+		
+		return $contacts;
     }
 
 
@@ -836,8 +880,12 @@ $xml_data .= '
      *
      * @access     public
      */
-    function get_contact($id)
+    function get_contact($id = null, $timeout = 3600)
     {
+    	$transient_title = 'cccon'.sha1($id);
+		$contact = get_transient($transient_title);
+		if(!empty($timeout) && $contact && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'contact')) { return maybe_unserialize($contact); }
+		
         $xml = $this->load_url("contacts/$id");
 
         if(!$xml):
@@ -884,6 +932,8 @@ $xml_data .= '
             $contact['lists'] = $lists;
             $contact['id'] = $id;
         endif;
+
+		set_transient($transient_title, maybe_serialize($contact), $timeout);
 
         return $contact;
     }
@@ -964,12 +1014,12 @@ $xml_data .= '
         if(!$xml):
             return false;
         endif;
-
+			
         // parse into nicer array
         $_activity = (isset($xml['entry'])) ? $xml['entry'] : false;
         $activity = $_activity['content']['Activity'];
         $activity['id'] = $id;
-
+		
         if(isset($activity['FileName'])):
             $activity['FileName'] = $this->get_id_from_link($activity['FileName']);
         endif;
@@ -1050,7 +1100,9 @@ $xml_data .= '
             endif;
         endif;
         
-        set_transient('cc_events', maybe_serialize($events), $timeout);
+        if(!empty($events)) {
+	        set_transient('cc_events', maybe_serialize($events), $timeout);
+	    }
 
         return $events;
     }
@@ -1081,7 +1133,9 @@ $xml_data .= '
             $events['FileName'] = $this->get_id_from_link($events['FileName']);
         endif;
 		
-		set_transient($transient_title, maybe_serialize($events), $timeout);
+		if(!empty($events)) {
+			set_transient($transient_title, maybe_serialize($events), $timeout);
+		}
         
         return $events;
     }
@@ -1119,7 +1173,9 @@ $xml_data .= '
 
         endif;
         
-        set_transient($transient_title, maybe_serialize($registrants), 60*60);
+        if(!empty($registrants)) {
+	        set_transient($transient_title, maybe_serialize($registrants), 60*60);
+	    }
 
         return $registrants;
     }
@@ -1148,7 +1204,9 @@ $xml_data .= '
             $registrant['id'] = $id;
         endif;
 		
-		set_transient($transient_title, maybe_serialize($registrant), 60*60);
+		if(!empty($registrant)) {
+			set_transient($transient_title, maybe_serialize($registrant), 60*60);
+		}
 		
         return $registrant;
     }
@@ -1251,9 +1309,13 @@ $xml_data .= '
 
         $this->load_url("activities", 'post', $params, 201);
 
-        if(isset($this->http_response_headers['Location']) && trim($this->http_response_headers['Location']) != ''):
-            return $this->get_id_from_link($this->http_response_headers['Location']);
-        endif;
+        if((isset($this->http_response_headers['Location']) && trim($this->http_response_headers['Location']) != '') || isset($this->http_response_headers['location']) && trim($this->http_response_headers['location']) != '') {
+        	if(isset($this->http_response_headers['Location']) && trim($this->http_response_headers['Location']) != '') { 
+        		return $this->get_id_from_link($this->http_response_headers['Location']);
+        	} else {
+	        	return $this->get_id_from_link($this->http_response_headers['location']);
+        	}     	   
+        }
 
         return false;
     }
@@ -1312,9 +1374,13 @@ $xml_data .= '
 
         $this->load_url("activities", 'post', $params, 201);
 
-        if(isset($this->http_response_headers['Location']) && trim($this->http_response_headers['Location']) != ''):
-            return $this->get_id_from_link($this->http_response_headers['Location']);
-        endif;
+        if((isset($this->http_response_headers['Location']) && trim($this->http_response_headers['Location']) != '') || (isset($this->http_response_headers['location']) && trim($this->http_response_headers['location']) != '')) {
+          	if(isset($this->http_response_headers['Location']) && trim($this->http_response_headers['Location']) != '') {
+            	return $this->get_id_from_link($this->http_response_headers['Location']);
+            } else {
+            	return $this->get_id_from_link($this->http_response_headers['location']);
+            }
+        }
 
         return false;
     }
@@ -1331,7 +1397,7 @@ $xml_data .= '
     	$transient_title = 'cc_campaigns';
 		$campaigns = get_transient($transient_title);
 		if($campaigns && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'campaigns')) { return maybe_unserialize($campaigns); }
-		
+
 		$xml = $this->load_url($action);
 
         if(!$xml):
@@ -1523,6 +1589,10 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
      */
     function query_campaigns($status = 'SENT')
     {
+    	$transient_title = 'cccam'.$status;
+		$campaigns = get_transient($transient_title);
+		if($campaigns && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'campaigns')) { return maybe_unserialize($campaigns); }
+    	
         $xml = $this->load_url('campaigns?status=' . urlencode($status));
 
         if(!$xml):
@@ -1548,6 +1618,8 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
                 $campaigns[] = $campaign;
             endif;
         endif;
+
+		set_transient($transient_title, maybe_serialize($campaigns), 60*60*6);
 
         return $campaigns;
     }
@@ -1718,6 +1790,7 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
             if($type == "open") {//The starting of the tag '<tag>'
                 $parent[$level-1] = &$current;
                 if(!is_array($current) or (!in_array($tag, array_keys($current)))) { //Insert New tag
+                	if(!is_array($current)) { $current = array(); } // Added in 2.3
                     $current[$tag] = $result;
                     if($attributes_data) $current[$tag. '_attr'] = $attributes_data;
                     $repeated_tag_index[$tag.'_'.$level] = 1;
@@ -1918,7 +1991,7 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
 
 //	echor(debug_backtrace());
 
-
+	
 	$this->http_send($this->api_url . $action, $method, $params);
 
         // handle status codes

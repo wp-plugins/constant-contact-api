@@ -108,7 +108,7 @@ class constant_contact_events_widget extends WP_Widget {
   /** @see WP_Widget::form */
     function form($instance)
 	{
-		$limit = null;
+	
 		extract($instance);
 		
 		@include_once('functions.php');
@@ -138,6 +138,7 @@ class constant_contact_events_widget extends WP_Widget {
 		<tr valign="top">
 			<th scope="row"><p><label for="<?php echo $this->get_field_id('limit');?>"><span><span title="Number">#</span> of Events Shown</span></label></p></th>
 			<td>
+				<?php $limit = isset($limit) ? $limit : null; ?>
 				<select class="select" name="<?php echo $this->get_field_name('limit');?>" id="<?php echo $this->get_field_id('limit');?>">
 					<option value="1"<?php selected($limit, 1); ?>>1</option>
 					<option value="2"<?php selected($limit, 2); ?>>2</option>
