@@ -31,17 +31,18 @@ function constant_contact_import()
 		if(trim($_FILES['importfile']['tmp_name']) != '' && is_uploaded_file($_FILES['importfile']['tmp_name'])):
 			
 			$status = $cc->create_contacts($_FILES['importfile']['tmp_name'], $lists);
+			
 			if($status):
-				$success = __("<strong>Import success:</strong> The imported contact data has been sent to the constant contact API and will be processed shortly, the ID for this activity is <code>$status</code>. <a href='?page=constant-contact-activities&id=$status' class='action button'>View Activity</a>",'constant-contact-api');
+				$success = __("<strong>Import success:</strong> The imported contact data has been sent to the constant contact API and will be processed shortly, the ID for this activity is <code>$status</code>. <a href='?page=constant-contact-activities&id=$status' class='action button'>View Activity</a>");
 			else:
-				$errors[] = __('Your subscribers could not be imported: ' . constant_contact_last_error($cc->http_response_code),'constant-contact-api');
+				$errors[] = __('Your subscribers could not be imported: ' . constant_contact_last_error($cc->http_response_code));
 			endif;
 		else:
 #			print_r($_POST);
 			if(empty($_POST['file'])) {
-				$errors[] = __('You did not select a file to upload!','constant-contact-api');
+				$errors[] = __('You did not select a file to upload!');
 			} else {
-				$errors[] = __('We could not recognise the file you uploaded','constant-contact-api');
+				$errors[] = __('We could not recognise the file you uploaded');
 			}
 		endif;
 	endif;
@@ -49,7 +50,7 @@ function constant_contact_import()
 ?>
 
 	<div class="wrap">
-	<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> Import Contacts</h2>
+	<h2>Constant Contact - Import Contacts</h2>
 	<?php
 	if($success):
 	?>
@@ -57,7 +58,6 @@ function constant_contact_import()
 			<p><?php echo $success; ?></p>
 		</div>
 	<?php
-	
 	elseif($errors):
 	?>
 		<div class="error">
@@ -74,7 +74,7 @@ function constant_contact_import()
 	<?php
 	endif;
 	?>
-	<p class="alignright"><label class="howto" for="refresh_lists"><span>Are the displayed lists inaccurate?</span> <a href="<?php echo add_query_arg('refresh', 'lists'); ?>" class="button-secondary action" id="refresh_lists">Refresh Lists</a></label></p>
+<p class="alignright"><label class="howto" for="refresh_lists"><span>Are the displayed lists inaccurate?</span> <a href="<?php echo add_query_arg('refresh_lists', true); ?>" class="button-secondary action" id="refresh_lists">Refresh Lists</a></label></p>
 <div class="clear"></div>
 <form name="import" id="import" method="post" action="<?php echo remove_query_arg('refresh_lists'); ?>" enctype="multipart/form-data">
 <div id="poststuff" class="metabox-holder">

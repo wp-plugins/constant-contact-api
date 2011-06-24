@@ -20,8 +20,7 @@ function constant_contact_campaigns()
 		// display single activity
 		?>
 		<div class="wrap nosubsub">
-			<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> Campaigns - <?php echo $id; ?></h2>
-			<?php constant_contact_admin_refresh(); ?>
+			<h2>Constant Contact Campaigns - <?php echo $id; ?></h2>
 			
 			<h3>Campaign Stats:</h3>
 			<table class="widefat form-table" cellspacing="0">
@@ -81,12 +80,10 @@ function constant_contact_campaigns()
 		?>
 
 		<div class="wrap nosubsub">
-			<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> Campaigns</h2>
-			<?php constant_contact_admin_refresh(); ?>
-
-		<?php if(!$_campaigns): ?>
-			<div id="message" class="updated"><p>No Campaigns Found</p></div>
+			<h2>Constant Contact Campaigns</h2>
 		<?php
+		if(!$_campaigns):
+			echo '<div id="message" class="updated"><p>No Campaigns Found</p></div>';
 			return;
 		endif;
 		?>

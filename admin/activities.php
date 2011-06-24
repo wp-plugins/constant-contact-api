@@ -48,17 +48,15 @@ function constant_contact_activities()
 		$id = htmlentities($_GET['id']);
 		$activity = $cc->get_activity($id);
 		
+		if(!$activity):
+			return '<p>Activity Not Found</p></div>';
+		endif;
+		
+		
 		// display single activity
 		?>
 		<div class="wrap nosubsub">
-			<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> <a href="<?php echo remove_query_arg(array('id', 'refresh')); ?>">Activities</a> &gt; Activity #<?php echo $id; ?></h2>
-			<?php constant_contact_admin_refresh(); 
-			
-			if(!$activity):
-			echo '<p>Activity Not Found</p></div>';
-			return;
-		endif;
-			?>
+			<h2>Constant Contact Activity - <?php echo $id; ?></h2>
 		
 		<table class="form-table widefat" cellspacing="0">
 		<?php	
@@ -69,34 +67,7 @@ function constant_contact_activities()
 		$html .= '<tr><th scope="row">ID</th><td>'.$activity['id'].'</td></tr>';
 		$html .= '<tr><th scope="row">Type</th><td>'.$activity['Type'].'</td></tr>';
 		$html .= '<tr><th scope="row">Status</th><td>'.$activity['Status'].'</td></tr>';
-		$html .= '<tr><th scope="row">Errors</th><td>';
-			if(isset($activity['Errors']) && is_array($activity['Errors'])) {
-				$html .= "
-				<table class='form-table '>
-					<thead>
-						<th scope='col'><strong>Error #</strong></th>
-						<th scope='col'><strong>Line Number</strong></th>
-						<th scope='col'><strong>Message</strong></th>
-						<th scope='col'><strong>Email</strong></th>
-					</thead>
-					<tbody>";
-				$errors = $activity['Errors'];
-				foreach($errors['Error'] as $key => $error) {
-#					print_r($error);
-					extract($error);
-					$html .= "
-					<tr>
-						<td>{$key}</td>
-						<td>Error on line {$LineNumber}</td>
-						<td>{$Message}</td>
-						<td>{$EmailAddress}</td>
-					</tr>";
-				}
-				$html .= "</tbody></table>";
-			} else { 
-				$html .= 'None';
-			}
-		$html .= '</td></tr>';
+		$html .= '<tr><th scope="row">Errors</th><td>'.(isset($activity['Errors']) ? $activity['Errors'] : 'None').'</td></tr>';
 		$html .= '<tr><th scope="row">Transactions</th><td>'.(isset($activity['TransactionCount']) ? $activity['TransactionCount'] : 'None').'</td></tr>';
 		$html .= '<tr><th scope="row">Created</th><td>'.date($dateformat, $cc->convert_timestamp($activity['InsertTime'])).'</td></tr>';
 		
@@ -129,9 +100,7 @@ function constant_contact_activities()
 		?>
 
 		<div class="wrap nosubsub">
-			<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> Activities</h2>
-			<?php constant_contact_admin_refresh(); ?>
-			
+			<h2>Constant Contact Activities</h2>
 			<table class="form-table widefat" cellspacing="0">
 			<thead>
 				<tr>
@@ -145,9 +114,9 @@ function constant_contact_activities()
 			</thead>
 			<tbody>
 			<?php
+			
 			if(empty($_activities)) {
-				echo '<tr><td colspan="6"><h3>No Activities Found</h3>
-					<p class="description" style="font-size:110%;">Activities are events such as importing or exporting contacts. It&rsquo;s usually not a problem if you don&rsquo;t see any activities here.</p></td></tr></table>';
+				echo '<tr><td colspan="6"><h3>No Activities Found</h3></td></tr></table>';
 				return;
 			}
 				$alt = '';
