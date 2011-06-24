@@ -67,7 +67,7 @@
 		if(!get_option('cc_username') || !get_option('cc_password')):
 			function constant_contact_warning() {
 				echo "
-				<div id='constant-contact-warning' class='updated fade'><p><strong>".__('The plugin is almost ready.')."</strong> ".sprintf(__('You must <a href="%1$s">enter your Constant Contact username and password</a> for it to work.'), "admin.php?page=constant-contact-settings")."</p></div>
+				<div id='constant-contact-warning' class='updated fade'><p><strong>".__('The plugin is almost ready.')."</strong> ".sprintf(__('You must <a href="%1$s">enter your Constant Contact username and password</a> for it to work.','constant-contact-api'), "admin.php?page=constant-contact-settings")."</p></div>
 				";
 			}
 			add_action('admin_notices', 'constant_contact_warning');
@@ -107,8 +107,10 @@
 		
 		if(get_option('cc_uninstall_method') == 'remove'):
 			// remove username and password aswell
+			if(isset($_SESSION['ccObject'])) { unset($_SESSION['ccObject']); }
 			$options[] = 'cc_username';
 			$options[] = 'cc_password';
+			delete_transient('cc_object');
 		endif;
 		
 		function deleteOptions($options)

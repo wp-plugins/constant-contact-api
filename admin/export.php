@@ -32,16 +32,16 @@ function constant_contact_export()
 		$status = $cc->export_contacts($list_id, $format);
 			
 		if($status):
-			$success[] = __("The export request has been sent to the constant contact API and will be processed shortly, the ID for this activity is <code>$status</code><a href='".admin_url('admin.php?page=constant-contact-activities&id='.$status)."' class='button-secondary'>View Activity</a>");
+			$success[] = __("The export request has been sent to the constant contact API and will be processed shortly, the ID for this activity is <code>$status</code> <a href='".admin_url('admin.php?page=constant-contact-activities&id='.$status)."' class='button-secondary'>View Activity</a>",'constant-contact-api');
 		else:
-			$errors[] = __('The subscribers could not be exported: ' . constant_contact_last_error($cc->http_response_code));
+			$errors[] = __('The subscribers could not be exported: ' . constant_contact_last_error($cc->http_response_code),'constant-contact-api');
 		endif;
 	endif;
 	  
 ?>
 
 	<div class="wrap">
-	<h2>Constant Contact - Export Contacts</h2>
+	<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> Export Contacts</h2>
 	<?php
 	if($success):
 	?>
