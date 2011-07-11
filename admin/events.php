@@ -60,7 +60,7 @@ function constant_contact_events_dashboard() {
 	
 	$_events = $cc->get_events();
 
-	if(!empty($_events)) {
+	if(!empty($_events) && is_array($_events)) {
 		$draft = $active = array();
 		foreach($_events as $k => $v) {
 			if($v['Status'] == 'ACTIVE') {

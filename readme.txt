@@ -3,8 +3,8 @@ Contributors: katzwebdesign, jamesbenson
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackkatz%40gmail%2ecom&item_name=Constant%20Contact%20API%20Plugin&no_shipping=0&no_note=1&tax=0&currency_code=USD&lc=US&bn=PP%2dDonationsBF&charset=UTF%2d8
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 2.9
-Tested up to: 3.1.2
-Stable tag: 2.3
+Tested up to: 3.2
+Stable tag: 2.3.1
 
 Integrate Constant Contact into your website with this full-featured plugin.
 
@@ -69,6 +69,18 @@ To install the plugin follow the steps below:
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
 == Changelog ==
+
+= 2.3.1 = 
+* Updated Constant Analytics Javascript for WordPress 3.2 compatibility
+* Fixed some not-so-minor issues
+	* Fixed issue with legacy widget where hidden lists were not being added to the form properly
+	* Fixed `Fatal error: Call to undefined method WP_Http::_getTransport() in .../constant-contact-api/constant-analytics.php on line 624` (<a href="http://wordpress.org/support/topic/604275">issue 604275</a>)
+* Squashed minor bugs, notices and errors
+	* Removed word "Array" some users are seeing at the top of their Form Designer forms (<a href="http://wordpress.org/support/topic/597622">issue 597622</a>)
+	* Fixed `Invalid argument supplied for foreach() .../constant-contact-api/functions.php on line 844` notice (<a href="http://wordpress.org/support/topic/596160">issue 596160</a>)
+	* Fixed `Undefined index: lists`, `exclude_lists` in legacy widget
+	* Fixed issue where if shown contact lists were the same as hidden lists, an empty select input or list may be shown.
+	* Fixed `Notice: rss.php is deprecated since version 3.0!` notice
 
 = 2.3 =
 * Added Contacts capability
@@ -188,6 +200,18 @@ To install the plugin follow the steps below:
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
+
+= 2.3.1 = 
+* Updated Constant Analytics Javascript for WordPress 3.2 compatibility
+* Fixed some not-so-minor issues
+	* Fixed issue with legacy widget where hidden lists were not being added to the form properly
+	* Fixed `Fatal error: Call to undefined method WP_Http::_getTransport() in .../constant-contact-api/constant-analytics.php on line 624` (<a href="http://wordpress.org/support/topic/604275">issue 604275</a>)
+* Squashed minor bugs, notices and errors
+	* Removed word "Array" some users are seeing at the top of their Form Designer forms (<a href="http://wordpress.org/support/topic/597622">issue 597622</a>)
+	* Fixed `Invalid argument supplied for foreach() .../constant-contact-api/functions.php on line 844` notice (<a href="http://wordpress.org/support/topic/596160">issue 596160</a>)
+	* Fixed `Undefined index: lists`, `exclude_lists` in legacy widget
+	* Fixed issue where if shown contact lists were the same as hidden lists, an empty select input or list may be shown.
+	* Fixed `Notice: rss.php is deprecated since version 3.0!` notice
 
 = 2.3 =
 * Added Contacts capability

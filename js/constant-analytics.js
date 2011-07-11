@@ -56,7 +56,11 @@
 	ccStats.renderers = {
 		vml: {
 			setFillColor: function(element, color) {
-				$(element).attr('fillcolor', color);
+				if($().prop) {
+					$(element).prop('fillcolor', color);
+				} else {
+					$(element).attr('fillcolor', color);
+				}
 			},
 			setStrokeColor: function(element, color) {
 				$(element).get(0).stroked = true;
@@ -95,19 +99,39 @@
 		},
 		svg: {
 			setFillColor: function(element, color) {
-				$(element).attr('fill', color);
+				if($().prop) {
+					$(element).prop('fill', color);
+				} else {
+					$(element).attr('fill', color);
+				}
 			},
 			setStrokeColor: function(element, color) {
-				$(element).attr('stroke', color);
+				if($().prop) {
+					$(element).prop('stroke', color);
+				} else {
+					$(element).attr('stroke', color);
+				}
 			},
 			setStrokeWeight: function(element, weight) {
-				$(element).attr('stroke-width', weight);
+				if($().prop) {
+					$(element).prop('stroke-width', weight);
+				} else {
+					$(element).attr('stroke-width', weight);
+				}
 			},
 			setRadius: function(element, radius) {
-				$(element).attr('r').baseVal.value = radius;
+				if($().prop) {
+					$(element).prop('r').baseVal.value = radius;
+				} else {
+					$(element).attr('r').baseVal.value = radius;
+				}
 			},
 			setY: function(element, value) {
-				$(element).attr('cy').baseVal.value = value;
+				if($().prop) {
+					$(element).prop('cy').baseVal.value = value;
+				} else {
+					$(element).attr('cy').baseVal.value = value;
+				}
 			},
 			getDimensions: function(element) {
 				return { width: parseFloat($(element).get(0).getAttribute('width')), height: parseFloat($(element).get(0).getAttribute('height')) };
@@ -866,8 +890,12 @@ else if (row.dimensions.medium == 'email') {
 
 				var circles = ccStats.lineChart.jqCircles = $(ccStats.gfx.circleName, graphics);
 				circles.each(function(index) {
-
-					$(this).attr('onclick', null);
+					
+					if($().prop) {
+						$(this).prop('onclick', null);
+					} else {
+						$(this).attr('onclick', null);
+					}
 
 					$(this).hover(function() {
 						ccStats.gfx.setStrokeWeight($(this), $(this).data('strokeWeight') + 1);

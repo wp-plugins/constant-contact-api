@@ -2,6 +2,12 @@ a.toplevel_page_constant-contact-api {
 	white-space: nowrap;
 	font-size: .975em!important;
 }
+.toplevel_page_constant-contact-api div.widefat {
+	background-color: white;
+}
+.toplevel_page_constant-contact-api .widefat .wrap {
+	padding: 10px;
+}
 .wrap h2.cc_logo {
 	min-height: 90px;
 	line-height:90px;

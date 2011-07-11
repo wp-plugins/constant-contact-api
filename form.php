@@ -127,7 +127,7 @@
 			$fields = '<div class="kws_input_fields">'.$fields.'</div>';
 		}
 		if($safesubscribe != 'no') {
-			$safesubscribelink = '<a href="http://snurl.com/as4c4" target="_blank" class="cc_safesubscribe" rel="nofollow">Privacy by SafeSubscribe</a>';
+			$safesubscribelink = '<a href="http://katz.si/safesubscribe" target="_blank" class="cc_safesubscribe" rel="nofollow">Privacy by SafeSubscribe</a>';
 		} else {
 			$safesubscribelink = '';
 		}

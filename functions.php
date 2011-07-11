@@ -309,6 +309,14 @@ function constant_contact_signup_form_shortcode($atts, $content=null) {
 	return constant_contact_public_signup_form($atts, false);
 };
 
+
+// Added for people experiencing Array at the top of their forms
+add_filter('constant_contact_form', 'constant_contact_form_remove_array_text');
+
+function constant_contact_form_remove_array_text($form = null) {
+	return str_replace('Array()','', str_replace('Array ()','', str_replace('Array','', str_replace('array()','', str_replace('array','', $form))))); 
+}
+
 /**
  * HTML Signup form to be used in widget and shortcode
  *
@@ -374,7 +382,6 @@ function constant_contact_public_signup_form($args, $echo = true) {
 		$lists_to_show[$details['id']] = $details;
 	endforeach;
 
-
 	if($formid !== '' && function_exists('constant_contact_retrieve_form')) {
 		
 		$force = isset($_REQUEST['cache']) ? true : false;
@@ -384,6 +391,9 @@ function constant_contact_public_signup_form($args, $echo = true) {
 	
 	// If the form returns an error, we want to get out of here!
 	if(empty($form) || is_wp_error($form)) { return false; }
+	
+	// Modify lists with this filter
+	$lists_to_show = apply_filters('constant_contact_form_designer_lists', apply_filters('constant_contact_form_designer_lists_'.$formid, $lists_to_show));
 	
 	/**
 	 * Display errors or Success message if the form was submitted.
@@ -842,7 +852,7 @@ function constant_contact_get_active_events() {
 	if(!empty($_events) && is_array($_events)) {
 		$draft = $active = array();
 		foreach($_events as $k => $v) {
-			if($v['Status'] == 'ACTIVE') {
+			if(isset($v['Status']) && $v['Status'] == 'ACTIVE') {
 				$active[$v['id']] = $v;
 			}
 		}
