@@ -325,6 +325,7 @@ This version fixes a major bug and all users should upgrade immediately.
 5. View campaign details on the Campaigns screen
 6. Example events widget display on the default WordPress theme, twentyten
 7. Event widget configuration
+8. A view of Constant Analytics - there are many delicious-looking graphs and charts
 
 == Frequently Asked Questions ==
 
