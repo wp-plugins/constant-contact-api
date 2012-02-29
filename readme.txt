@@ -83,6 +83,7 @@ To install the plugin follow the steps below:
 	- Submit button text now updates in the form preview.
 	- Added a background & border to the Form Slide so that it's obvious why clicking doesn't work when Slide is turned on.
 	- If a form exists, it is selected to edit by default (instead of Create New Form). This should help prevent confusion and duplicate forms.
+* Added check for configuration to Constant Analytics dashboard
 * Technical
 	- Wrapped the plugin startup actions & hooks in a `plugins_loaded` hook
 	- Removed config.php file; wasn't necessary
@@ -232,6 +233,7 @@ To install the plugin follow the steps below:
 	- Submit button text now updates in the form preview.
 	- Added a background & border to the Form Slide so that it's obvious why clicking doesn't work when Slide is turned on.
 	- If a form exists, it is selected to edit by default (instead of Create New Form). This should help prevent confusion and duplicate forms.
+* Added check for configuration to Constant Analytics dashboard
 * Technical
 	- Wrapped the plugin startup actions & hooks in a `plugins_loaded` hook
 	- Removed config.php file; wasn't necessary
