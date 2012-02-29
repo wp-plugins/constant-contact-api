@@ -48,7 +48,8 @@ function constant_contact_registration_settings()
 	</script>
 
 	<div class="wrap">
-	<h2>Constant Contact - Registration &amp; User Profile Settings</h2>
+		<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> Registration &amp; User Profile Settings</h2>
+			<?php constant_contact_admin_refresh(); ?>
 	<form method="post" action="options.php">
 	<?php settings_fields( 'constant-contact-registration' ); ?>
 	<div class="alignright" style="width:510px; display:none;" id="registrationScreenshots">

@@ -1,15 +1,5 @@
 <?php // $Id$
 
-/* 
-	Version 1.1.0.1
-	Changes made by Zack Katz; katzwebdesign on April 5, 2010
-		Converted settings page description fields to `<textarea>` to allow for better description visibility.
-		
-	Version 1.1.1
-	Changes made by Zack Katz; katzwebdesign on May 27, 2010
-		Wrapped list checkboxes in labels
-*/
-
 // Hook settings registration function
 add_action( 'admin_init', 'constant_contact_register_settings' );
 
@@ -29,19 +19,6 @@ function constant_contact_register_settings()
 	register_setting('constant-contact-registration', 'cc_register_page_method');
 	register_setting('constant-contact-registration', 'cc_default_opt_in');
 	register_setting('constant-contact-registration', 'cc_list_selection_format');
-/*
-	register_setting('constant-contact-legacy-widget', 'cc_signup_widget_title');
-	register_setting('constant-contact-legacy-widget', 'cc_signup_widget_description');
-    register_setting('constant-contact-legacy-widget', 'cc_widget_lists');
-    register_setting('constant-contact-legacy-widget', 'cc_widget_exclude_lists');
-    register_setting('constant-contact-legacy-widget', 'cc_widget_show_list_selection');
-    register_setting('constant-contact-legacy-widget', 'cc_widget_show_firstname');
-    register_setting('constant-contact-legacy-widget', 'cc_widget_show_lastname');
-    register_setting('constant-contact-legacy-widget', 'cc_widget_list_selection_format');
-    register_setting('constant-contact-legacy-widget', 'cc_widget_redirect_url');
-    register_setting('constant-contact-legacy-widget', 'cc_widget_list_selection_title');
-    register_setting('constant-contact-legacy-widget', 'cc_use_legacy_widget');
-*/
 }
 
 // show the admin settings page
@@ -64,72 +41,58 @@ function constant_contact_settings()
 ?>
 
 	<div class="wrap">
-	<h2>Constant Contact Settings</h2>
+	
+		<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> <?php _e('Settings', 'constant-contact-api'); ?></h2>
 	<?php 	/**
 	 * Show the account status message
 	 */
-	 $cc = constant_contact_create_object(true);
+	 
+	 $cc = constant_contact_create_object(isset($_POST['cc_username']));
 	 ?>
 	 	
 	<?php if($cc && is_object($cc)) { ?>
 	<div class="widefat">
-	<div class="wrap" style="padding-bottom:10px;">
-	<h2>Plugin Pages</h2>
-	<h3>Plugin Configuration</h3>
-	<ul class="ul-disc">
-		<li><a href="<?php echo admin_url('admin.php?page=constant-contact-registration'); ?>">Registration &amp; Profile</a> - Configure plugin settings for adding newletter signup capabilities to the WordPress registration form.</li>
-		<?php if(defined('CC_FORM_GEN_PATH')) { ?>
-		<li><a href="<?php echo admin_url('admin.php?page=constant-contact-forms'); ?>">Form Design</a> - Design a signup form from the ground up.</li>
-		<?php } ?>
-	</ul>
-	<h3>Account Actions</h3>
-	<ul class="ul-disc">
-		<li><a href="<?php echo admin_url('admin.php?page=constant-contact-activities'); ?>">Activities</a> - View your account's recent activity, including: sent campaigns, exports, and imports.</li>
-		<li><a href="<?php echo admin_url('admin.php?page=constant-contact-events'); ?>">Events</a> - View your Constant Contact Event Marketing data: events and registrant information.</li>
-		<li><a href="<?php echo admin_url('admin.php?page=constant-contact-import'); ?>">Import</a> - Import contacts into your choice of user lists.</li>
-		<li><a href="<?php echo admin_url('admin.php?page=constant-contact-export'); ?>">Export</a> - Export contacts to <code>.csv</code> and <code>.txt</code> format.</li>
-		<li><a href="<?php echo admin_url('admin.php?page=constant-contact-lists'); ?>">Lists</a> - Add, remove, and edit your contact lists.</li>
-		<li><a href="<?php echo admin_url('admin.php?page=constant-contact-campaigns'); ?>">Campaigns</a> - View details of your sent &amp; draft email campaigns, <strong>including email campaign stats</strong> such as # Sent, Opens, Clicks, Bounces, OptOuts, and Spam Reports.</li>
-	</ul></div>
-	</div>
-<?php } ?>
+	
+<?php 
+		constant_contact_plugin_page_list(false);
+	} ?>
 
 	<form method="post" action="options.php">
 	<?php settings_fields( 'constant-contact' ); ?>
+	 <?php wp_nonce_field('constant_contact','update_cc_options'); ?>
 
 	<h3>Account Details</h3>
 
 	<?php
-    if ($cc && is_object($cc)) {
-	    echo "<div id='message' class='updated'><p>Your username and password seem to be working.</p></div>";
+    if ($cc && is_object($cc) && get_option('cc_password') && get_option('cc_username')) {
+    	
+	    echo "<div id='message' class='updated'><p>".__('Your username and password seem to be working.', 'constant-contact-api')."</p></div>";
     }
 	?>
 	<table class="form-table widefat">
 	<tr>
-		<th scope="row"><p><label for="cc_username"><span>Constant Contact Username</span></label></p></th>
+		<th scope="row"><p><label for="cc_username"><span><?php _e('Constant Contact Username', 'constant-contact-api'); ?></span></label></p></th>
 		<td>
 		<input type="text" name="cc_username" id="cc_username" value="<?php echo get_option('cc_username'); ?>" autocomplete="off" size="50" />
 		</td>
 	</tr>
 	<tr>
-		<th scope="row"><p><label for="cc_password"><span>Constant Contact Password</span></label></th>
+		<th scope="row"><p><label for="cc_password"><span><?php _e('Constant Contact Password', 'constant-contact-api'); ?></span></label></th>
 		<td>
 		<input type="password" name="cc_password" id="cc_password" value="<?php echo get_option('cc_password'); ?>" autocomplete="off" size="50" />
 		</td>
 	</tr>
 	<tr valign="top">
-		<th scope="row"><p><label for="cc_uninstall_method_keep"><span>Uninstall Method</span></label></th>
+		<th scope="row"><p><label for="cc_uninstall_method_keep"><span><?php _e('Uninstall Method', 'constant-contact-api'); ?></span></label></th>
 		<td>
-		<p><label for="cc_uninstall_method_keep" class="howto"><input <?php echo (!get_option('cc_uninstall_method') || get_option('cc_uninstall_method')=='keep') ? 'checked="checked"':''; ?> type="radio" name="cc_uninstall_method" id="cc_uninstall_method_keep" value="keep" /> <span><strong>Keep data in database</strong>, will be there if re-activated</span></label>
-		<label for="cc_uninstall_method_remove" class="howto"><input <?php echo (get_option('cc_uninstall_method')=='remove') ? 'checked="checked"':''; ?> type="radio" name="cc_uninstall_method" id="cc_uninstall_method_remove" value="remove" /> <span><strong>Remove all data</strong> stored in database</span></label></p>
-		<p class="description">
-			When you deactivate the plugin you can keep your username and password or remove them, if your upgrading you should keep them but if your completely removing the plugin you should remove them, no other settings will be kept.
-		</p>
+		<p><label for="cc_uninstall_method_keep" class="howto"><input <?php echo (!get_option('cc_uninstall_method') || get_option('cc_uninstall_method')=='keep') ? 'checked="checked"':''; ?> type="radio" name="cc_uninstall_method" id="cc_uninstall_method_keep" value="keep" /> <span><?php _e(sprintf('%sKeep data in database%s, will be there if re-activated', '<strong>', '</strong>'), 'constant-contact-api'); ?></span></label>
+		<label for="cc_uninstall_method_remove" class="howto"><input <?php echo (get_option('cc_uninstall_method')=='remove') ? 'checked="checked"':''; ?> type="radio" name="cc_uninstall_method" id="cc_uninstall_method_remove" value="remove" /> <span><?php _e(sprintf('%sRemove all data%s stored in database', '<strong>', '</strong>'), 'constant-contact-api'); ?></span></label></p>
+		<p class="description"><?php _e('When you deactivate the plugin you can keep your username and password or remove them, if your upgrading you should keep them but if your completely removing the plugin you should remove them, no other settings will be kept.', 'constant-contact-api'); ?></p>
 		</td>
 	</tr>
 	</table>
 	<p class="submit">
-		<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
+		<input type="submit" class="button-primary" value="<?php _e('Save Changes', 'constant-contact-api') ?>" />
 	</p>
 	</form>
 	</div>

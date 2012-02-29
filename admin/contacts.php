@@ -1,5 +1,5 @@
 <?php
- 
+
 // Contacts
 function constant_contact_contacts()
 {
@@ -206,7 +206,7 @@ function constant_contact_contacts()
 		</div>
 <?php
 	}
-	else if(isset($_GET['id']) && is_numeric($_GET['id'])) {
+	else if(isset($_GET['id']) && is_numeric($_GET['id']) && !isset($_GET['delete'])) {
 	
 			
 	
@@ -258,26 +258,6 @@ function constant_contact_contacts()
 			}
 			echo '</div>';
 		}
-		
-		/*
-if(isset($_GET['delete'])) {
-			
-			$deleted = $cc->delete_contact($_GET['id']);
-			
-			if($deleted) {
-				echo '
-					<div class="updated">
-						<h4>'.__('The contact has been successfully deleted.').'</h4>
-					</div>';
-			} else {
-				$error = '';
-				if(isset($cc->last_error)) {
-					$error = ': <strong>'.$cc->last_error.'</strong>';
-				}
-				echo '<div class="error"><p>There was an error deleting the contact'.$error.'</p></div>';
-			}
-		}
-*/
 		
 		if(isset($_GET['edit'])) {
 		?>
@@ -561,6 +541,24 @@ EOD;
 		<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> Contacts <a href="<?php echo add_query_arg(array('add' => 1), remove_query_arg('refresh')); ?>" class="button add-new-h2" title="Add New Contact">Add New</a></h2>
 		<?php 
 		
+		if(isset($_GET['delete'])) {
+		
+			$deleted = $cc->delete_contact($_GET['id']);			
+		
+			if($deleted) {
+				echo '<div class="updated">
+						<h4>'.__('The contact has been successfully deleted.').'</h4>
+					</div>';
+				$_GET['refresh'] = 'contacts'; // Re-load contact lists.
+			} else {
+				$error = '';
+				if(isset($cc->last_error)) {
+					$error = ': <strong>'.$cc->last_error.'</strong>';
+				}
+				echo '<div class="error"><p>There was an error deleting the contact'.$error.'</p></div>';
+			}
+		}
+		
 		// Instead of having to fetch the whole list before knowing if there's a transient or not,
 		// let's just see if a valid timeout is set.
 		$contacts_timeout = get_option( '_transient_timeout_cc_contacts' );
@@ -673,31 +671,20 @@ EOD;
 				</tr>
 			</thead>
 			<tbody>
-		<?php
-		/*
+<?php 		
+/*
 <script type="text/javascript">
-		jQuery(document).ready(function($) { 
-			
-			$('a.delete').click(function(e) {
-				return confirm('Do you want to delete this contact?');
-			});
-			
-		});
-		</script>
+	jQuery(document).ready(function($) { 
 		
+		$('a.delete').click(function(e) {
+			return confirm('Do you want to delete this contact? This will remove the contact permanently from Constant Contact.');
+		});
+		
+	});
+</script>
 */
-			#$first = $first_item_index + 1;
-			#$last = ($first_item_index + $page_size) > $contact_count ? $contact_count : $first_item_index + $page_size;
-			
+
 			$alt = $html = '';
-			/*
-			$contactList = array();
-			foreach($contacts as $contact) {
-				$contactList[] = $contact;
-			}
-			$contacts = $contactList;
-						r($contacts); 
-*/
 			foreach($contacts as $id => $v) {
 				if($alt == 'alt') { $alt = '';} else { $alt = 'alt'; }
 				$v['Name'] = (!empty($v['Name']) && !is_array($v['Name']) && $v['Name'] !== 'Array') ? htmlentities($v['Name']) : '';
@@ -711,12 +698,10 @@ EOD;
 					<td class="column-name">
 						<a href="'.admin_url('admin.php?page=constant-contact-contacts&id='.$v['id']).'" title="'.__('View contact details','constant-contact-api').'">'.__('View','constant-contact-api').'</a> | 
 						<a href="'.admin_url('admin.php?page=constant-contact-contacts&id='.$v['id']).'&edit=true" title="'.__('Edit this contact','constant-contact-api').'">'.__('Edit','constant-contact-api').'</a>
-					
 					</td>
 				</tr>';
+				// | <a href="'.admin_url('admin.php?page=constant-contact-contacts&id='.$v['id']).'&delete=true" title="'.__('Delete this contact').'" style="color:red;" class="delete">'.__('Delete').'</a>
 			}
-			/* |
-						<a href="'.admin_url('admin.php?page=constant-contact-contacts&id='.$v['id']).'&delete=true" title="'.__('Delete this contact').'" style="color:red;" class="delete">'.__('Delete').'</a> */
 			echo $html;
 		?>
 			</tbody>

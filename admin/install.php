@@ -48,26 +48,25 @@
 		// set default settings
 		add_option('cc_extra_fields', $constant_contact_extra_fields, '', 'no');
 		add_option('cc_extra_field_mappings', $mappings, '', 'no');
-		add_option('cc_register_page_method', CC_REGISTER_PAGE_METHOD, '', 'no');
-		add_option('cc_default_opt_in', CC_DEFAULT_OPT_IN, '', 'no');
-		add_option('cc_signup_title', CC_SIGNUP_TITLE, '', 'no');
-		add_option('cc_signup_description', CC_SIGNUP_DESCRIPTION, '', 'no');
-		add_option('cc_signup_widget_title', CC_SIGNUP_WIDGET_TITLE, '', 'no');
-		add_option('cc_signup_widget_description', CC_SIGNUP_WIDGET_DESCRIPTION, '', 'no');
-		add_option('cc_list_selection_format',CC_LIST_SELECTION_FORMAT, '', 'no');
-		add_option('cc_widget_show_list_selection',CC_WIDGET_SHOW_LIST_SELECTION, '', 'no');
-		add_option('cc_uninstall_method',CC_UNINSTALL_METHOD, '', 'no');
-		add_option('cc_widget_show_firstname',CC_WIDGET_SHOW_FIRSTNAME, '', 'no');
-		add_option('cc_widget_show_lastname',CC_WIDGET_SHOW_LASTNAME, '', 'no');
-		add_option('cc_widget_list_selection_format',CC_WIDGET_LIST_SELECTION_FORMAT, '', 'no');
-		add_option('cc_widget_list_selection_title', cc_widget_list_selection_title, '', 'no');
-		add_option('cc_widget_list_selection_title', cc_widget_list_selection_title, '', 'no');
+		add_option('cc_register_page_method', 'none', '', 'no');
+		add_option('cc_default_opt_in', 1, '', 'no');
+		add_option('cc_signup_title', __('Newsletter'), '', 'no');
+		add_option('cc_signup_description', 'Subscribe to the Newsletter', '', 'no');
+		add_option('cc_signup_widget_title', 'Newsletter', '', 'no');
+		add_option('cc_signup_widget_description', 'Subscribe to the Newsletter', '', 'no');
+		add_option('cc_list_selection_format','checkbox', '', 'no');
+		add_option('cc_widget_show_list_selection',1, '', 'no');
+		add_option('cc_uninstall_method','keep', '', 'no');
+		add_option('cc_widget_show_firstname',1, '', 'no');
+		add_option('cc_widget_show_lastname',1, '', 'no');
+		add_option('cc_widget_list_selection_format','checkbox', '', 'no');
+		add_option('cc_widget_list_selection_title', 'Contact Lists:', '', 'no');
 		add_option('cc_use_legacy_widget', true, '', 'no');
 		
 		if(!get_option('cc_username') || !get_option('cc_password')):
 			function constant_contact_warning() {
 				echo "
-				<div id='constant-contact-warning' class='updated fade'><p><strong>".__('The plugin is almost ready.')."</strong> ".sprintf(__('You must <a href="%1$s">enter your Constant Contact username and password</a> for it to work.'), "admin.php?page=constant-contact-settings")."</p></div>
+				<div id='constant-contact-warning' class='updated fade'><p><strong>".__('The plugin is almost ready.')."</strong> ".sprintf(__('You must <a href="%1$s">enter your Constant Contact username and password</a> for it to work.','constant-contact-api'), "admin.php?page=constant-contact-settings")."</p></div>
 				";
 			}
 			add_action('admin_notices', 'constant_contact_warning');
@@ -107,8 +106,10 @@
 		
 		if(get_option('cc_uninstall_method') == 'remove'):
 			// remove username and password aswell
+			if(isset($_SESSION['ccObject'])) { unset($_SESSION['ccObject']); }
 			$options[] = 'cc_username';
 			$options[] = 'cc_password';
+			delete_transient('cc_object');
 		endif;
 		
 		function deleteOptions($options)

@@ -32,16 +32,16 @@ function constant_contact_export()
 		$status = $cc->export_contacts($list_id, $format);
 			
 		if($status):
-			$success[] = __("The export request has been sent to the constant contact API and will be processed shortly, the ID for this activity is <code>$status</code><a href='".admin_url('admin.php?page=constant-contact-activities&id='.$status)."' class='button-secondary'>View Activity</a>");
+			$success[] = __("The export request has been sent to the constant contact API and will be processed shortly, the ID for this activity is <code>$status</code> <a href='".admin_url('admin.php?page=constant-contact-activities&id='.$status)."' class='button-secondary'>View Activity</a>",'constant-contact-api');
 		else:
-			$errors[] = __('The subscribers could not be exported: ' . constant_contact_last_error($cc->http_response_code));
+			$errors[] = __('The subscribers could not be exported: ' . constant_contact_last_error($cc->http_response_code),'constant-contact-api');
 		endif;
 	endif;
 	  
 ?>
 
 	<div class="wrap">
-	<h2>Constant Contact - Export Contacts</h2>
+	<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> Export Contacts</h2>
 	<?php
 	if($success):
 	?>
@@ -87,8 +87,8 @@ function constant_contact_export()
 	<tr>
 		<th valign="top"  scope="row"><p><label for="link_image">File Format</label></p></th>
 		<td>
-			<label class="howto" for="format_csv"><input type="radio" checked="checked" name="format" id="format_csv" value="CSV" /> <span>CSV</span></label>
-			<label class="howto" for="format_txt"><input type="radio" name="format" id="format_txt" value="TXT" /> <span>TXT</span></label>
+			<label class="description" for="format_csv"><input type="radio" checked="checked" name="format" id="format_csv" value="CSV" /> <span>CSV</span></label>
+			<label class="description" for="format_txt" style="display:block;"><input type="radio" name="format" id="format_txt" value="TXT" /> <span>TXT</span></label>
 			<span class="description">Choose what format you want the exported file</span>
 		</td>
 	</tr>
