@@ -29,14 +29,14 @@ View your Google Analytics data in your dashboard with Constant Analytics. View 
 
 <h4>Plugin features:</h4>
 * Add signup checkbox and list selection to your register page and update profile page
-* Add / edit / delete contact lists without visiting constantcontact.com
+* Add / edit contact lists without visiting constantcontact.com
 * Includes a powerful form designer
 * Built-in Google Analytics visualization
 * View your events registration details and get updated with a dashboard widget
 * Show contact list selection on register page with ability to exclude certain lists
 * Automatically subscribe your user to one or more contact lists on the register page
 * Customize the register page signup box (and list selection) title and description
-* Add / edit / delete users from your constant contact account
+* Add / edit users from your constant contact account
 * Add a signup widget to your sidebar or anywhere in your template
 
 <h4>Plugin Support</h4>
@@ -69,6 +69,24 @@ To install the plugin follow the steps below:
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
 == Changelog ==
+
+= 2.3.2 =
+* Fixed major issues with `[constantcontactapi]` shortcode not parsing passed attributes.
+* Fixed bug where submitting a form with empty email field showed success
+* Added a check for valid email domain name. This will prevent some fake email addresses (such as asdasdsa@adsamlcsac.com)
+* Added a shortcode hint in the Form Designer
+* When Form Designer forms are submitted and errors exist, submitted data is now filled into the forms. Users won't need to fill out the form again.
+* Removed ability to delete users & lists, since it doesn't work for some reason
+* Fixed some Form Designer bugs
+	- Now Form Field checkboxes stay checked
+	- When saving a form, the error message no longer displays
+	- Submit button text now updates in the form preview.
+	- Added a background & border to the Form Slide so that it's obvious why clicking doesn't work when Slide is turned on.
+	- If a form exists, it is selected to edit by default (instead of Create New Form). This should help prevent confusion and duplicate forms.
+* Technical
+	- Wrapped the plugin startup actions & hooks in a `plugins_loaded` hook
+	- Removed config.php file; wasn't necessary
+	- Removed redundant & unused code from Form Designer
 
 = 2.3.1 = 
 * Updated Constant Analytics Javascript for WordPress 3.2 compatibility
@@ -201,6 +219,24 @@ To install the plugin follow the steps below:
 
 == Upgrade Notice ==
 
+= 2.3.2 =
+* Fixed major issues with `[constantcontactapi]` shortcode not parsing passed attributes.
+* Fixed bug where submitting a form with empty email field showed success
+* Added a check for valid email domain name. This will prevent some fake email addresses (such as asdasdsa@adsamlcsac.com)
+* Added a shortcode hint in the Form Designer
+* When Form Designer forms are submitted and errors exist, submitted data is now filled into the forms. Users won't need to fill out the form again.
+* Removed ability to delete users & lists, since it doesn't work for some reason
+* Fixed some Form Designer bugs
+	- Now Form Field checkboxes stay checked
+	- When saving a form, the error message no longer displays
+	- Submit button text now updates in the form preview.
+	- Added a background & border to the Form Slide so that it's obvious why clicking doesn't work when Slide is turned on.
+	- If a form exists, it is selected to edit by default (instead of Create New Form). This should help prevent confusion and duplicate forms.
+* Technical
+	- Wrapped the plugin startup actions & hooks in a `plugins_loaded` hook
+	- Removed config.php file; wasn't necessary
+	- Removed redundant & unused code from Form Designer
+
 = 2.3.1 = 
 * Updated Constant Analytics Javascript for WordPress 3.2 compatibility
 * Fixed some not-so-minor issues
@@ -325,6 +361,7 @@ This version fixes a major bug and all users should upgrade immediately.
 5. View campaign details on the Campaigns screen
 6. Example events widget display on the default WordPress theme, twentyten
 7. Event widget configuration
+8. A view of Constant Analytics - there are many delicious-looking graphs and charts
 
 == Frequently Asked Questions ==
 

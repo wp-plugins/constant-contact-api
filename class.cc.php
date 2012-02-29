@@ -488,7 +488,7 @@ class cc {
      *
      * @access     public
      */
-    function delete_list($listid)
+    function delete_list($listid = 0)
     {
         $this->http_set_content_type('text/html');
         $this->load_url("lists/$listid", 'delete', array(), 204);
@@ -1482,6 +1482,7 @@ $xml_data .= '
      *
      * @access     public
      */
+/*
     function create_campaign($title, $contact_lists = array(), $options = array())
     {
         $email = (isset($options['EmailAddress'])) ? $options['EmailAddress'] : '';
@@ -1574,6 +1575,207 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
 
         return false;
     }
+*/
+    
+    
+    	/**
+	 * Creates a new campaign
+	 *
+	 * @access 	public
+	 */
+	function create_campaign($title = '', $email_subject = '', $email_head = '', $email_html = '', $email_text = '', $contact_lists = array(),$options = array(), $content_type = 'HTML')
+	{
+		$defaults = array(
+			'FromName' => get_option('blogname'),
+			#'EmailAddress' => '', //get_option('admin_email'),
+			'ViewAsWebpage' => 'NO',
+			'ViewAsWebpageText' => '',
+			'ViewAsWebpageLinkText' => '',
+			'IncludeForwardEmail' => 'NO',
+			'IncludeSubscribeLink' => 'NO',
+			'GreetingSalutation' => 'Dear',
+			'GreetingName' => 'FirstName',
+			'GreetingString' => 'Greetings!',
+			'OrganizationName' => '',
+			'OrganizationAddress1' => '',
+			'OrganizationAddress2' => '',
+			'OrganizationAddress3' => '',
+			'OrganizationCity' => '',
+			'OrganizationState' => '',
+			'OrganizationInternationalState' => '',
+			'OrganizationCountry' => '',
+			'OrganizationPostalCode' => '',
+			'StyleSheet' => '',
+			'Status' => 'Draft',
+			'ForwardEmailLinkText' => '',
+			'PermissionReminderText' => '',
+			'SubscribeLinkText' => '',
+			'EmailContentFormat' => 'XHTML'
+		);
+	
+		$options = wp_parse_args($options, $defaults);
+	  
+	  if(get_option('gmt_offset')) {
+	  	$offset = get_option('gmt_offset') * 60;
+	  } else {
+	  	$offset = (60 * -5);
+	  }
+	  
+		// build the XML post data
+		$xml_post = '
+<?xml version="1.0" encoding="UTF-8"?>
+<entry xmlns="http://www.w3.org/2005/Atom">
+  <link href="/ws/customers/'.$this->api_username.'/campaigns" rel="edit" />
+  <id>'.$this->get_http_api_url().'campaigns</id>
+  <title type="text">'.esc_html($title).'</title>
+  <updated>'.date('Y').'-'.date('m').'-'.date('d').'T'.date('G').':'.date('i').':'.date('s').'.'.$offset.'Z</updated>
+  <author>
+  	<name>Constant Contact for WordPress</name>
+  </author>
+  <content type="application/vnd.ctct+xml">
+    <Campaign xmlns="http://ws.constantcontact.com/ns/1.0/" id="'.$this->get_http_api_url().'campaigns">
+      <Name>'.esc_html($title).'</Name>
+      <Date>'.date('Y').'-'.date('m').'-'.date('d').'T'.date('G').':'.date('i').':'.date('s').'.'.$offset.'Z</Date>
+      <Subject>'.esc_html($email_subject).'</Subject>
+	  ';
+	  
+	  
+	if($options['ViewAsWebpage'] == 'YES') {
+		$xml_post .= '
+		<ViewAsWebpage>YES</ViewAsWebpage>
+		<ViewAsWebpageLinkText>'.esc_html($options['ViewAsWebpageLinkText']).'</ViewAsWebpageLinkText>
+		<ViewAsWebpageText>'.esc_html($options['ViewAsWebpageText']).'</ViewAsWebpageText>
+		';
+	}
+	unset($options['ViewAsWebpage'], $options['ViewAsWebpageLinkText'], $options['ViewAsWebpageText']);
+  
+	if(isset($options['PermissionReminder']) && $options['PermissionReminder'] == 'YES') {
+		$xml_post .= '
+		<PermissionReminder>YES</PermissionReminder>
+		<PermissionReminderText>'.esc_html($options['PermissionReminderText']).'</PermissionReminderText>';
+	}
+	unset($options['PermissionReminder'], $options['PermissionReminderText']);
+	
+	if($options['IncludeForwardEmail'] == 'YES') {
+		$xml_post .= '
+		<IncludeForwardEmail>YES</IncludeForwardEmail>
+		<ForwardEmailLinkText>'.esc_html($options['ForwardEmailLinkText']).'</ForwardEmailLinkText>
+		';
+	} else {
+		$xml_post .= '
+		<IncludeForwardEmail>NO</IncludeForwardEmail>
+		<ForwardEmailLinkText></ForwardEmailLinkText>
+		';
+	}
+	unset($options['IncludeForwardEmail'], $options['ForwardEmailLinkText']);
+	
+	if($options['IncludeSubscribeLink'] == 'YES') {
+		$xml_post .= '
+		<IncludeSubscribeLink>YES</IncludeSubscribeLink>
+		<SubscribeLinkText>'.esc_html($options['SubscribeLinkText']).'</SubscribeLinkText>
+		';
+	} else {
+		$xml_post .= '
+		<IncludeSubscribeLink>NO</IncludeSubscribeLink>
+		<SubscribeLinkText></SubscribeLinkText>
+		';
+	}
+	unset($options['IncludeSubscribeLink'], $options['SubscribeLinkText']);
+		
+		if(!empty($options['EmailAddress'])) {
+            $email = $this->get_emails($options['EmailAddress']);
+
+            if(!isset($email['id'])) {
+                $this->last_error = 'Invalid Email Address, the email address must exist in your constant contact account to be able to send an email from this address';
+                return false;
+            }
+        
+       		unset($options['EmailAddress']);
+	
+		
+		$xml_post .= '
+		<FromEmail>
+			<Email id="'.$this->get_http_api_url().'settings/emailaddresses/'.$email['id'].'">
+				<link xmlns="http://www.w3.org/2005/Atom" href="'.$this->api_uri.'settings/emailaddresses/'.$email['id'].'" rel="self" />
+			</Email>
+			<EmailAddress>'.$email['EmailAddress'].'</EmailAddress>
+		</FromEmail>
+		<ReplyToEmail>
+			<Email id="'.$this->get_http_api_url().'settings/emailaddresses/'.$email['id'].'">
+				<link xmlns="http://www.w3.org/2005/Atom" href="'.$this->api_uri.'settings/emailaddresses/'.$email['id'].'" rel="self" />
+			</Email>
+			<EmailAddress>'.$email['EmailAddress'].'</EmailAddress>
+		</ReplyToEmail>
+		';
+		foreach($options as $field => $value) {
+			$xml_post .= '<'.$field.'>'.esc_html($value).'</'.$field.'>'."\n\t\t";
+			unset($options[$field]);
+		}
+		
+			$xml_post .= '
+		<EmailContent>'.esc_html('<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" 
+xmlns:cctd="http://www.constantcontact.com/cctd">
+			'.$email_head.'
+			<body><CopyRight>Copyright (c) 1996-2009 Constant Contact. All rights reserved.  Except as permitted under a separate written agreement with Constant Contact, neither the Constant Contact software, nor any content that appears on any Constant Contact site, including but not limited to, web pages, newsletters, or templates may be reproduced, republished, repurposed, or distributed without the prior written permission of Constant Contact.  For inquiries regarding reproduction or distribution of any Constant Contact material, please contact '.$email['EmailAddress'].'</CopyRight>
+			<OpenTracking/>
+			<CustomBlock name="letter.intro" title="Personalization">
+			    <Greeting/>
+			</CustomBlock>
+			'.$email_html.'
+			</body>
+			</html>').'
+		</EmailContent>
+		<EmailTextContent>&lt;Text&gt;'.esc_html($email_text).'&lt;/Text&gt;</EmailTextContent>
+	';
+		if(is_array($contact_lists)):
+			$xml_post  .= '<ContactLists>';
+			foreach($contact_lists as $id):
+				$xml_post  .= '
+				<ContactList id="'.$this->get_list_url($id).'">
+					<link xmlns="http://www.w3.org/2005/Atom" href="'.$this->get_list_url($id,0).'" rel="self" />
+				</ContactList>
+			  ';
+			endforeach;
+			$xml_post .= '</ContactLists>';
+		endif;
+           
+        } else {
+        	return false;
+        }
+			  
+		$xml_post .= '
+		</Campaign>
+	</content>
+	<source>
+	    <id>'.$this->get_http_api_url().'campaigns</id>
+	    <title type="text">Campaigns for customer: '.$this->api_username.'</title>
+	    <link href="campaigns" />
+	    <link href="campaigns" rel="self" />
+	    <author>
+	      <name>'.$this->api_username.'</name>
+	    </author>
+	    <updated>'.date('Y').'-'.date('m').'-'.date('d').'T'.date('G').':'.date('i').':'.date('s').'.'.$offset.'Z</updated>
+	</source>
+</entry>';
+		
+		$this->http_set_content_type('application/atom+xml');
+		
+		#die(htmlentities(print_r($xml_post, true)));
+		
+		$xml = $this->load_url("campaigns", 'post', trim(rtrim($xml_post)), 201);
+		
+	#	if(!is_admin()) {
+	#		print_r($xml_post);
+	#		print_r($xml);
+	#		echo '</pre>';
+	#	}
+		
+		if(isset($this->http_response_headers['Location']) && trim($this->http_response_headers['Location']) != ''):
+			return $this->get_id_from_link($this->http_response_headers['Location']);
+		endif;
+		
+		return false;
+	}
 
 
 
@@ -2127,11 +2329,15 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
 
         $this->http_request = $request;
 		
-        if($this->http_url_bits['scheme']=='https'):
+    /*
+		if($this->http_url_bits['scheme']=='https'):
             $url = "https://$the_host";
         else:
             $url = "http://$the_host";
         endif;
+	*/
+        
+        $url = "https://$the_host";
         
         $args = array(
         	'body' => $body, 
@@ -2141,10 +2347,12 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
         	'timeout' => $this->http_request_timeout, 
         	'httpversion' => '1.1'
         );
-    
+    	
         $response = wp_remote_request($url.$the_path, $args);
- 		
-		if($response && !is_wp_error($response)) {
+        
+#        r(array('url' => $url.$the_path, 'args' => $args, 'response' => $response));
+        
+ 		if($response && !is_wp_error($response)) {
 			$this->http_response = $response;
 			$this->http_parse_response();
 			return true;

@@ -1,5 +1,22 @@
 <?php // $Id$
 
+function constant_contact_enquque_core_styles() {
+		
+	// Keep this outside so that the navigation menu text is nowrap
+	wp_enqueue_style('constant-contact-api-admin', plugins_url('constant-contact-api/admin/constant-contact-admin-css.css'), false, false, 'all');
+	
+	if(constant_contact_is_plugin_page()) {
+		wp_enqueue_style('constant-contact-api-admin-qtip', plugins_url('constant-contact-api/css/jquery.qtip.min.css'), false, false, 'all');
+	}
+}
+
+function constant_contact_enquque_core_scripts() {
+	if(constant_contact_is_plugin_page()) {
+		wp_enqueue_script('constant-contact-api-admin-page', plugins_url('constant-contact-api/js/admin-cc-page.js'), array('jquery'));
+		wp_enqueue_script('constant-contact-api-admin-qtip', plugins_url('constant-contact-api/js/jquery.qtip.pack.js'), array('jquery', 'constant-contact-api-admin-page'));
+	}
+}
+
 /**
  * Fetch array of all contact lists from the transient cache, checking API and updating cache if necessary or forced.
  *
@@ -55,6 +72,8 @@ function constant_contact_get_list($id) {
 		if ($details['id'] == $id)
 			return $details;
 	endforeach;
+	
+	return false;
 }
 
 /**
@@ -151,7 +170,9 @@ function constant_contact_last_error($status_code = 0)
  */
 function constant_contact_create_object($force_new = false)
 {
-	global $cc, $createcount;
+	global $cc, $cc_create_count;
+	
+	if(empty($cc_create_count)) { $cc_create_count = 1; } else { $cc_create_count++; }
 	
 	// If there is already the object, leave it alone
 	if(!$force_new && is_object($cc)) { return $cc; }
@@ -207,22 +228,22 @@ function constant_contact_create_object($force_new = false)
 	//
 
 	// Get the username and password
-	$username = get_option('cc_username');
-	$password =  get_option('cc_password');
+	$username = trim(rtrim(get_option('cc_username')));
+	$password =  trim(rtrim(get_option('cc_password')));
 
 	// If either are missing always return false, they are mandatory
 	if(!$username || !$password):
 		// issues an error using wp system
 		return false;
 	endif;
-
+	
 	// Include the class definition file
 	require_once CC_FILE_PATH . 'class.cc.php';
 
 	// Create a new instance
 	$new_cc = new cc($username, $password);
-
-
+	
+	
 	/**
 	 * Test the instance to make sure it is valid
 	 */
@@ -292,7 +313,7 @@ function constant_contact_urlencode_array($args) {
 
 add_shortcode('constantcontactapi', 'constant_contact_signup_form_shortcode');
 function constant_contact_signup_form_shortcode($atts, $content=null) {
-	shortcode_atts( array(
+	$atts = shortcode_atts( array(
 		'before' => null,
 		'after' => null,
 		'formid' => 0,
@@ -309,6 +330,14 @@ function constant_contact_signup_form_shortcode($atts, $content=null) {
 	return constant_contact_public_signup_form($atts, false);
 };
 
+
+// Added for people experiencing Array at the top of their forms
+add_filter('constant_contact_form', 'constant_contact_form_remove_array_text');
+
+function constant_contact_form_remove_array_text($form = null) {
+	return str_replace('Array()','', str_replace('Array ()','', str_replace('Array','', str_replace('array()','', str_replace('array','', $form))))); 
+}
+
 /**
  * HTML Signup form to be used in widget and shortcode
  *
@@ -318,6 +347,7 @@ function constant_contact_signup_form_shortcode($atts, $content=null) {
  * @param <type> $args
  */
 function constant_contact_public_signup_form($args, $echo = true) {
+
 	$output = $error_output = $success = $haserror = $listoutput = $hiddenlistoutput = '';
 	$defaultArgs = array(
 		'before' => null,
@@ -334,6 +364,8 @@ function constant_contact_public_signup_form($args, $echo = true) {
 	);
 	$args = wp_parse_args($args, $defaultArgs);
 	
+	$unique_id = sha1(implode('||', $args));
+
 	extract($args, EXTR_SKIP);
 
 	/**
@@ -374,16 +406,16 @@ function constant_contact_public_signup_form($args, $echo = true) {
 		$lists_to_show[$details['id']] = $details;
 	endforeach;
 
-
 	if($formid !== '' && function_exists('constant_contact_retrieve_form')) {
-		
-		$force = isset($_REQUEST['cache']) ? true : false;
-		$form = constant_contact_retrieve_form($formid, $force);
-		
+		$force = (isset($_REQUEST['cache']) || (isset($_REQUEST['uniqueformid']) && $_REQUEST['uniqueformid'] === $unique_id)) ? true : false;
+		$form = constant_contact_retrieve_form($formid, $force, $unique_id);
 	}
 	
 	// If the form returns an error, we want to get out of here!
 	if(empty($form) || is_wp_error($form)) { return false; }
+	
+	// Modify lists with this filter
+	$lists_to_show = apply_filters('constant_contact_form_designer_lists', apply_filters('constant_contact_form_designer_lists_'.$formid, $lists_to_show));
 	
 	/**
 	 * Display errors or Success message if the form was submitted.
@@ -394,14 +426,18 @@ function constant_contact_public_signup_form($args, $echo = true) {
 	if(isset($_GET['cc_success'])) {
 		$success = '<p class="success cc_success">Success, you have been subscribed.</p>';
 		$success = apply_filters('constant_contact_form_success', $success);
-		return str_replace('<!-- %%SUCCESS%% -->', $success, $form);
+		
+		$form = str_replace('<!-- %%SUCCESS%% -->', $success, $form);
+		$form = preg_replace('/\%\%(.*?)\%\%/ism', '', $form);
+		
+		return $form;
 	} 
 	 // Display errors if they exist in the cc_errors global
-	else if(isset($GLOBALS['cc_errors'])) {
+	else if(isset($GLOBALS['cc_errors_'.$unique_id])) {
 		$errors = false; $haserror = ' has_errors';
-		$errors = $GLOBALS['cc_errors'];
+		$errors = $GLOBALS['cc_errors_'.$unique_id];
 		// Remove errors from the global so we dont' show them twice by accident
-		unset($GLOBALS['cc_errors']);
+		unset($GLOBALS['cc_errors_'.$unique_id]);
 
 		// Set up error display
 		$error_output .= '<div id="constant-contact-signup-errors" class="error">';
@@ -415,8 +451,9 @@ function constant_contact_public_signup_form($args, $echo = true) {
 
 		// Filter output so text can be modified by plugins/themes
 		$error_output = apply_filters('constant_contact_form_errors', $error_output);
-	} // end if(isset($GLOBALS['cc_errors']))
+	} // end if(isset($GLOBALS['cc_errors_'.$unique_id]))
 	
+	$form = str_replace('<!-- %%SUCCESS%% -->', '', $form);
 	$form = str_replace('<!-- %%ERRORS%% -->', $error_output, $form);
 	$form = str_replace('%%HASERROR%%', $haserror, $form);
 
@@ -511,6 +548,7 @@ function constant_contact_public_signup_form($args, $echo = true) {
 		<div>
 			<input type="hidden" id="cc_redirect_url" name="cc_redirect_url" value="'. urlencode( $redirect_url ) .'" />
 			<input type="hidden" id="cc_referral_url" name="cc_referral_url" value="'. urlencode( $current_page_url ) .'" />'.$hiddenlistoutput.'
+				<input type="hidden" name="uniqueformid" value="'.$unique_id.'" />
 		</div>';
 #			$submit_button = '<input type="submit" name="constant-contact-signup-submit" value="Signup" class="button submit" />';
 			// Filter output of submit button so it can be modified by themes/plugins
@@ -518,7 +556,7 @@ function constant_contact_public_signup_form($args, $echo = true) {
 #			$hiddenoutput .= '
 #		</div>';
 	$form = str_replace('<!-- %%HIDDEN%% -->', $hiddenoutput, $form);
-
+	
 	// Modify the output by calling add_filter('constant_contact_form', 'your_function');
 	$output = apply_filters('constant_contact_form', $form);
 
@@ -551,22 +589,6 @@ function constant_contact_signup_form_field_mapping() {
 function constant_contact_handle_public_signup_form() {
 	global $cc;
 
-/*
-
-		$fields = get_option('cc_extra_fields');
-		$field_mappings = constant_contact_build_field_mappings();
-		// parse custom fields
-		$extra_fields = array();
-		if(is_array($fields)):
-		foreach($fields as $field):
-			$fieldname = str_replace(' ','', $field);
-			if(isset($field_mappings[$fieldname]) && isset($_POST[$field_mappings[$fieldname]])):
-				$extra_fields[$fieldname] = $_POST[$field_mappings[$fieldname]];
-			endif;
-		endforeach;
-		endif;
-
-*/
 	/**
 	 * Check that the form was submitted and we have an email value, otherwise return false
 	 */
@@ -575,6 +597,8 @@ function constant_contact_handle_public_signup_form() {
 		return false;
 	}
 	
+	$form_id = isset($_POST['uniqueformid']) ? esc_html($_POST['uniqueformid']) : 0;
+
 	// Create the cc object if necessary
 	if(!constant_contact_create_object()) { return false;}
 
@@ -596,8 +620,6 @@ function constant_contact_handle_public_signup_form() {
 		
 		// If the field is required...
 		if(isset($field['req']) && $field['req'] == 1) {
-			
-			
 			if(tempty($value)) {
 				if(isset($field['label']) && !empty($field['label'])) {
 					$errors[] = array('Please enter your '.$field['label'], $key);
@@ -605,11 +627,12 @@ function constant_contact_handle_public_signup_form() {
 					$errors[] = array('Please enter all required fields', $key);
 				}
 			}
-			
-			if($key == 'email_address' && !is_email($field['value'])) {
-				$errors[] = array('Please enter a valid email address', 'cc_email_address');
-			}
 		}
+		
+		if($key == 'email_address' && (!is_email($field['value']) || !constant_contact_domain_exists($field['value']))) {
+			$errors[] = array('Please enter a valid email address', 'constant-contact-api');
+		}
+		
 		if(isset($signup_form_field_mapping[$key])) { $fields[$signup_form_field_mapping[$key]] = $value; }
 		
 	}
@@ -625,7 +648,7 @@ function constant_contact_handle_public_signup_form() {
 	 * If we have registered errors then return them now and exit
 	 */
 	if($errors):
-		$GLOBALS['cc_errors'] = $errors;
+		$GLOBALS['cc_errors_'.$form_id] = $errors;
 		return;
 	endif;
 
@@ -662,7 +685,7 @@ function constant_contact_handle_public_signup_form() {
 	 * If we have nothing in $list_id's return an error and exit
 	 */
 	if(empty($subscribe_lists)):
-		$GLOBALS['cc_errors'][] = 'Please select at least 1 list.';
+		$GLOBALS['cc_errors_'.$form_id][] = 'Please select at least 1 list.';
 		return;
 	endif;
 
@@ -683,14 +706,15 @@ function constant_contact_handle_public_signup_form() {
 	 * If the call was unsuccessful show a generic error. 
 	 */
 	if(!$status):
-		$GLOBALS['cc_errors'][] = 'Sorry there was a problem, please try again later';
+		$GLOBALS['cc_errors_'.$form_id][] = 'Sorry there was a problem, please try again later';
 		return;
 	elseif($redirect_to):
-		header("Location: $redirect_to");
+		$redirect_to = apply_filters('constant_contact_add_success_param', true) ? add_query_arg('cc_success', true, $redirect_to) : $redirect_to;
+		header("Location: {$redirect_to}");
 		exit;
 	else:
 		$url = add_query_arg('cc_success', true, urldecode($_POST['cc_referral_url']));
-		header("Location: " . $url );
+		header("Location: {$url}");
 		exit;
 	endif;
 
@@ -699,6 +723,14 @@ function constant_contact_handle_public_signup_form() {
 	return false;
 }
 
+
+function constant_contact_domain_exists($email,$record = 'MX') {
+	if(apply_filters('constant_contact_validate_email_domain', 1)) {
+		list($user,$domain) = split('@',$email);
+		return checkdnsrr($domain,$record);
+	}
+	return true;
+}
 
 /*
 * From http://www.webcheatsheet.com/PHP/get_current_page_url.php
@@ -839,10 +871,10 @@ function constant_contact_get_active_events() {
 	
 	$_events = $cc->get_events();
 
-	if(!empty($_events)) {
+	if(!empty($_events) && is_array($_events)) {
 		$draft = $active = array();
 		foreach($_events as $k => $v) {
-			if($v['Status'] == 'ACTIVE') {
+			if(isset($v['Status']) && $v['Status'] == 'ACTIVE') {
 				$active[$v['id']] = $v;
 			}
 		}

@@ -71,15 +71,17 @@ class constant_contact_api_widget extends WP_Widget {
    /** @see WP_Widget::widget */
     function widget($args = array(), $instance = array())
 	{
+		$currentform = (isset($_POST['uniqueformid']) && $this->id === $_POST['uniqueformid']) ? true : false;
+		
 		$instance = $this->parse_args($instance);
 		
 		extract($instance);
 		
 		$output = '';
 		$errors = false;
-		if(isset($GLOBALS['cc_errors'])):
-			$errors = $GLOBALS['cc_errors'];
-			unset($GLOBALS['cc_errors']);
+		if(isset($GLOBALS['cc_errors_'.$this->id])):
+			$errors = $GLOBALS['cc_errors_'.$this->id];
+			unset($GLOBALS['cc_errors_'.$this->id]);
 		endif;
 				
 		$cc = constant_contact_create_object();
@@ -128,7 +130,7 @@ class constant_contact_api_widget extends WP_Widget {
 					<label for="cc_firstname">'.__('First Name:','constant-contact-api').'</label>
 					<div class="input-text-wrap">
 						<input type="text" name="fields[first_name][value]" id="cc_firstname" value="'; 
-						$output .= (isset($_POST['fields']['first_name']['value'])) ? htmlentities($_POST['fields']['first_name']['value']) : '';
+						$output .= ($currentform && isset($_POST['fields']['first_name']['value'])) ? htmlentities($_POST['fields']['first_name']['value']) : '';
 						$output .= '" />
 					</div>';
 				endif;
@@ -138,7 +140,7 @@ class constant_contact_api_widget extends WP_Widget {
 					<label for="cc_lastname">'.__('Last Name:','constant-contact-api').'</label>
 					<div class="input-text-wrap">
 						<input type="text" name="fields[last_name][value]" id="cc_lastname" value="';
-						$output .= (isset($_POST['fields']['last_name']['value'])) ? htmlentities($_POST['fields']['last_name']['value']) : '';
+						$output .= ($currentform && isset($_POST['fields']['last_name']['value'])) ? htmlentities($_POST['fields']['last_name']['value']) : '';
 						$output .= '" />
 					</div>';
 				endif;
@@ -147,7 +149,7 @@ class constant_contact_api_widget extends WP_Widget {
 				<label for="cc_email">'.__('Email:','constant-contact-api').'</label>
 				<div class="input-text-wrap">
 					<input type="text" name="fields[email_address][value]" id="cc_email" value="';
-					$output .= (isset($_POST['fields']['email_address']['value'])) ? htmlentities($_POST['fields']['email_address']['value']) : '';
+					$output .= ($currentform && isset($_POST['fields']['email_address']['value'])) ? htmlentities($_POST['fields']['email_address']['value']) : '';
 				$output .= '" />
 				</div>';
 				
@@ -164,7 +166,7 @@ class constant_contact_api_widget extends WP_Widget {
 						}
 						if(!empty($showlists)) {
 							foreach($showlists as $k => $v) {
-								if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])) {
+								if($currentform && isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])) {
 									$output .=  '<option selected value="'.$v['id'].'">'.$v['ShortName'].'</option>';
 								} else {
 									$output .=  '<option value="'.$v['id'].'">'.$v['ShortName'].'</option>';
@@ -180,7 +182,7 @@ class constant_contact_api_widget extends WP_Widget {
 						$output .=  '<ul>'."\n";
 						if(!empty($showlists)) {
 							foreach($showlists as $k => $v) {
-								if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])) {
+								if($currentform && isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])) {
 									$output .=  '<li><label for="cc_newsletter-'.$v['id'].'"><input checked="checked" type="checkbox" name="cc_newsletter[]" id="cc_newsletter-'.$v['id'].'" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '</label></li>'."\n"; // ZK added label, ID, converted to <LI>
 								} else {
 									$output .=  '<li><label for="cc_newsletter-'.$v['id'].'"><input type="checkbox" name="cc_newsletter[]" id="cc_newsletter-'.$v['id'].'" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '</label></li>'."\n"; // ZK added label, ID
@@ -215,6 +217,7 @@ class constant_contact_api_widget extends WP_Widget {
 					$submit_button = '<input type="submit" name="constant-contact-signup-submit" value="Signup" class="button submit" />';
 					$output .= apply_filters('constant_contact_form_submit', $submit_button);
 					$output .= '
+					<input type="hidden" name="uniqueformid" value="'.$this->id.'" />
 				</div>
 			</form>';
 			$output .= (isset($after_widget)) ? $after_widget : ''; 

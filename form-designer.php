@@ -4,12 +4,13 @@ Plugin Name: Constant Contact API: Form Designer (Alpha)
 Plugin URI: http://integrationservic.es/constant-contact/wordpress-plugin.php
 Description: Create fancy-lookin' forms for the Constant Contact API plugin that have tons of neat configuration options.
 Author: Katz Web Services, Inc.
-Version: 2.3
+Version: 2.3.2
 Author URI: http://www.katzwebservices.com
 */
 
+
 // register admin menu action
-add_action('admin_menu', 'constant_contact_form_designer_admin_menu');
+add_action('admin_menu', 'constant_contact_form_designer_admin_menu', 30);
 function constant_contact_form_designer_admin_menu() {
 	add_submenu_page( 'constant-contact-api', 'Constant Contact Form Designer', 'Form Designer', 'administrator', 'constant-contact-forms', 'constant_contact_design_forms');
 }
@@ -111,11 +112,11 @@ function constant_contact_widget_scripts() {
 	}
 }
 
-function constant_contact_retrieve_form($formid, $force_update=false) {
+function constant_contact_retrieve_form($formid, $force_update=false, $unique_id = '') {
 	$formid = (int)$formid;
 	
 	// If it is an array and we are not forcing an update, return the data
-	if (!$force_update && $form = get_transient("cc_form_$formid")) {
+	if(empty($_GET) && empty($_POST) && !$force_update && $form = get_transient("cc_form_$formid")) {
 		return $form;
 	}
 	
@@ -133,41 +134,64 @@ function constant_contact_retrieve_form($formid, $force_update=false) {
 	$list['echo'] = true;
 	$list['path'] = CC_FORM_GEN_PATH;
 	$list['cc_success'] = (isset($_REQUEST['cc_success']));
-	$form_string = CC_FORM_GEN_PATH.'form.php?'.http_build_query($list);
-	$response = wp_remote_get($form_string);
+	$list['cc_request'] = empty($_REQUEST['uniqueformid']) ? array() : $_REQUEST;
+	$list['uniqueformid'] = $unique_id;
+	$form_string = CC_FORM_GEN_PATH.'form.php';
+	$response = wp_remote_post($form_string, array('body' => $list));
 	
 	if( is_wp_error( $response ) ) {
 		return false;
 	} else {
 		$form = $response['body'];
-		// Save the array into the cc_form_id transient with a 30 day expiration
-		set_transient("cc_form_$formid", $form, 60*60*24*30);
+		if(empty($_GET) && empty($_POST)) {
+			// Save the array into the cc_form_id transient with a 30 day expiration
+			set_transient("cc_form_$formid", $form, 60*60*24*30);
+		} else {
+			delete_transient("cc_form_$formid");
+		}
 		return $form;
 	}
 }
 
-function cc_form_get_selected_id() {
+function cc_form_get_selected_id($allForms = array()) {
 	if(isset( $_REQUEST['form'] )) {
 		$cc_form_selected_id = (int) $_REQUEST['form'];
 	} else {
 		if(isset( $_REQUEST['cc-form-id'] )) { 
 			$cc_form_selected_id = (int) $_REQUEST['cc-form-id'];
 		} else {
-			$cc_form_selected_id = -1;
+			if(empty($allForms)) {
+				$cc_form_selected_id = -1;
+			} else {
+				$cc_form_selected_id = sizeof($allForms) - 1;
+				if(isset($_REQUEST['deleted'])) {
+					$cc_form_selected_id--;
+				}
+				// Intstead of always showing new form, show last form possible.
+				$_REQUEST['form'] = $cc_form_selected_id;
+				$_REQUEST['action'] = 'edit';
+			}
 		}
 	}
+	
 	return $cc_form_selected_id;
 }
 
 function cc_form_process() {
+	global $cc_form_selected_id;
+	
 	require_once( 'form-designer-functions.php' );
 	
+	// Allowed actions: add, update, delete
 	$action = isset( $_REQUEST['action'] ) ? $_REQUEST['action'] : 'edit';
 
 	$cc_form_selected_id = cc_form_get_selected_id();
 		
 	switch ( $action ) {
 		case 'delete':
+			
+			$cc_form_selected_id = isset($_REQUEST['form']) ? (int)$_REQUEST['form'] : $cc_form_selected_id;
+			
 			if ( $deleted_form = wp_get_cc_form( $cc_form_selected_id ) ) {
 				
 				$delete_cc_form = wp_delete_cc_form( $cc_form_selected_id );
@@ -186,11 +210,13 @@ function cc_form_process() {
 						}
 					}
 				}
+				$_REQUEST['deleted'] = 1;
 			} else {
-				die();
+				$_REQUEST['deleted'] = 0;
 				// Reset the selected menu
 				$cc_form_selected_id = -1;
 				unset( $_REQUEST['form'] );
+				$messages[] = '<div id="message" class="error"><p>The form could not be deleted. The form may have already been deleted.</p></div>';
 			}
 			break;
 	
@@ -225,7 +251,8 @@ function cc_form_process() {
 			}
 			break;
 	}
-	if(isset($messages) && is_array($messages)) { foreach($messages as $message) { echo $message; } }
+	return $messages;
+
 }
 
 
@@ -284,8 +311,8 @@ function cc_form_scripts() {
 	
 	// Otto is the man.
 	// http://ottopress.com/2010/passing-parameters-from-php-to-javascripts-in-plugins/
-	wp_enqueue_script( 'cc-code', plugin_dir_url(__FILE__).'js/cc-code.js');
-	$params = array('path' => plugin_dir_url(__FILE__), 'rand' => mt_rand(0, 10000000), 'adminajax' => admin_url('admin-ajax.php'));
+	wp_enqueue_script( 'cc-code', plugin_dir_url(__FILE__).'js/cc-code-dev.js');
+	$params = array('path' => plugin_dir_url(__FILE__), 'rand' => mt_rand(0, 10000000));
 	wp_localize_script('cc-code', 'ScriptParams', $params);
 	
 	// Metaboxes
@@ -327,68 +354,27 @@ function constant_contact_design_forms() {
 	global $cc_form_selected_id;
 	$cc_forms = array();
 
-//	$cc_form_selected_id = '';
 
-
-// Container for any messages displayed to the user
-$messages = array();
-
-// Container that stores the name of the active menu
-$cc_form_selected_title = '';
-
-// The menu id of the current menu being edited
-$cc_form_selected_id = cc_form_get_selected_id();
-
-// Allowed actions: add, update, delete
-$action = isset( $_REQUEST['action'] ) ? $_REQUEST['action'] : 'edit';
-
-	// Work with the actions
-	cc_form_process();
+	// Container for any messages displayed to the user
+	$messages = array();
 	
-	// Get all forms
+	// Container that stores the name of the active menu
+	$cc_form_selected_title = '';
+	
+	// The menu id of the current menu being edited
+	$cc_form_selected_id = cc_form_get_selected_id($cc_forms);
+
+	// Work with the actions and echo a message if there is one.
+	$messages = cc_form_process();
+	
+	// Get all forms	
 	$cc_forms = wp_get_cc_forms();
-	#r($cc_forms);
-
-	// Get recently edited nav menu
-	$recently_edited = (int) get_user_option( 'cc_form_recently_edited' );
-	
-	// If there was no recently edited menu, and $cc_form_selected_id is a nav menu, update recently edited menu.
-	if ( !$recently_edited && is_cc_form( $cc_form_selected_id ) ) {
-		$recently_edited = $cc_form_selected_id;
-			
-	// Else if $cc_form_selected_id is not a menu and not requesting that we create a new menu, but $recently_edited is a menu, grab that one.
-	} elseif ( -1 == $cc_form_selected_id && ! isset( $_REQUEST['form'] ) && is_cc_form( $recently_edited ) ) {
-		$cc_form_selected_id = $recently_edited;
-	}
-	
-	// Update the user's setting
-	if ( $cc_form_selected_id != $recently_edited && is_cc_form( $cc_form_selected_id ) )
-		update_user_meta( $current_user->ID, 'cc_form_recently_edited', $cc_form_selected_id );
 	
 	// If there's a menu, get its name.
 	if ( ! $cc_form_selected_title && $_form = wp_get_cc_form( $cc_form_selected_id ) ) {
 		$cc_form_selected_title = $_form['form-name'];
 	}
 	
-	// Generate truncated menu names
-	$previous_names = array();
-	foreach( (array) $cc_forms as $key => $_cc_form ) {
-		$name = isset($_cc_form['form-name']) ? $_cc_form['form-name'] : 'Form '+$key;
-		
-		$_cc_form['truncated_name'] = trim( wp_html_excerpt( $name, 30 ) );
-		if ( isset($_cc_form['form-name']) && $_cc_form['truncated_name'] != $_cc_form['form-name'])
-			$_cc_form['truncated_name'] .= '&hellip;';
-		
-		if(!in_array(sanitize_user( $name ), $previous_names)) { 
-			$previous_names[] = sanitize_user( $name );
-		} else {
-			$namekey = sanitize_user( $name );
-			$previous_names[$namekey] = isset($previous_names[$namekey]) ? ($previous_names[$namekey] + 1) : 1;
-			$_cc_form['truncated_name'] .= ' ('.$previous_names[$namekey].')';
-		}
-		
-		$cc_forms[$key]['truncated_name'] = $_cc_form['truncated_name'];
-	}
 
 ?>
 <?php 
@@ -401,9 +387,9 @@ wp_cc_form_setup();
 	<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> Form Designer</h2>
 	<?php
 	if(isset($messages) && is_array($messages)) {
-	foreach( $messages as $message ) :
-		echo $message . "\n";
-	endforeach;
+		foreach( $messages as $message ) :
+			echo $message . "\n";
+		endforeach;
 	}
 	$formURL = '';
 	if($cc_form_selected_id != -1) {
@@ -448,10 +434,11 @@ wp_cc_form_setup();
 			<div class="nav-tabs-wrapper">
 			<div class="nav-tabs">
 				<?php
+				
 				foreach( (array) $cc_forms as $_cc_form ) :
 					if(!isset($_cc_form['cc-form-id'])) { continue; }
 					if ($cc_form_selected_id == $_cc_form['cc-form-id'] ) : ?><span class="nav-tab nav-tab-active">
-							<?php echo esc_html( $_cc_form['truncated_name'] ); ?>
+							<?php echo !empty($_cc_form['truncated_name']) ? esc_html( $_cc_form['truncated_name'] ) : sprintf(__('Form %d', 'constant-contact-api'), ($_cc_form['cc-form-id'] + 1)); ?>
 						</span><?php else : ?><a href="<?php
 							echo esc_url(add_query_arg(
 								array(
@@ -461,7 +448,7 @@ wp_cc_form_setup();
 								admin_url( 'admin.php?page=constant-contact-forms' )
 							));
 						?>" class="nav-tab hide-if-no-js">
-							<?php echo esc_html( $_cc_form['truncated_name'] ); ?>
+							<?php echo !empty($_cc_form['truncated_name']) ? esc_html( $_cc_form['truncated_name'] ) : sprintf(__('Form %d', 'constant-contact-api'), ($_cc_form['cc-form-id'] + 1)); ?>
 						</a><?php endif;
 				endforeach;
 				if ( -1 == $cc_form_selected_id ) : ?><span class="nav-tab menu-add-new nav-tab-active">
@@ -495,6 +482,7 @@ wp_cc_form_setup();
 								<?php if ( $cc_form_selected_id != -1 ) :  ?>
 								<div class="delete-action">
 									<a class="submitdelete deletion menu-delete" href="<?php echo esc_url( wp_nonce_url( admin_url('admin.php?page=constant-contact-forms&action=delete&amp;form=' . $cc_form_selected_id), 'delete-cc_form-' . $cc_form_selected_id ) ); ?>"><?php _e('Delete Form'); ?></a>
+									<span>In a post or page, use <code>[constantcontactapi formid="<?php echo $cc_form_selected_id; ?>"]</code> <a href="http://wordpress.org/extend/plugins/constant-contact-api/faq/" target="_blank">Learn More.</a></span>
 								</div><!-- END .delete-action -->
 								<?php  endif; ?>
 							</div><!-- END .major-publishing-actions -->
@@ -513,6 +501,23 @@ wp_cc_form_setup();
 							<?php
 								
 								$form = wp_get_cc_form($cc_form_selected_id);
+
+								cc_form_meta_box_formfields($form);
+							?>
+						</div><!-- /#post-body-content -->
+					</div><!-- /#post-body -->
+				</div><!-- /#update-nav-menu -->
+			</div><!-- /.menu-edit -->
+		</div><!-- /#menu-management -->
+	</div><!-- /#menu-management-liquid -->
+	</div><!-- /#nav-menus-frame -->
+	</form><!-- /#tha-form -->
+</div><!-- /.wrap-->
+<?php
+
+} // End design forms
+
+?>wp_get_cc_form($cc_form_selected_id);
 
 								cc_form_meta_box_formfields($form);
 							?>

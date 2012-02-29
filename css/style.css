@@ -25,11 +25,30 @@ textarea#defaultformtext {
 	overflow: hidden;
 	/* background: url(images/icons.gif) no-repeat 20px 20px; */
 }
+
+.item-controls .move a { 
+	cursor: pointer;
+	padding: 4px 5px;
+	float: right;
+	font-size: 1.2em;
+}
+.item-controls .move a:hover {
+	color: black; font-weight: bold; 
+	background: #F0F0EE;
+	padding: 3px 4px;
+	border:1px solid #B2BBD0;
+	border-top: 0;
+	border-bottom: 0;
+}
+/* li.menu-item .item-edit, */
 li.menu-item .hide { display: none!important; }
 .menu-item-settings .mce_bold .mceIcon {background-position:0 0; }
 .menu-item-settings .mce_italic .mceIcon {background-position:-60px 0}
 
-.menu-item-settings .labelStyle a {display:block; border:1px solid #F0F0EE; width:20px; height:20px}
+.menu-item-settings .labelStyle a {display:block; border:1px solid #F0F0EE; }
+
+.menu-item-settings .labelStyle a { width:20px; height:20px }
+
 .menu-item-settings label.checked a:hover,
 .labelStyle a:hover { border:1px solid #0A246A; background-color:#B2BBD0!important; }
 .menu-item-settings label.checked a {border:1px solid #0A246A; background-color:#C2CBE0!important}
@@ -83,8 +102,24 @@ div.input {
 	padding: 10px;
 	position: relative;
 	z-index: 10000;
+	background: rgb(253,253,253);
+	background: rgba(253,253,253,.2);
+	border-bottom: 2px solid rgb(230,230,230);
 }
 #stopFollowingMe { text-align: right; position: absolute; bottom: -1.5em; font-size: .85em; right: 0; display: block;}
+
+.major-publishing-actions .delete-action {
+	clear: left;
+}
+
+.delete-action span {
+	float: left;
+	display: block;
+	float: left;
+	font-size: 11px;
+	margin: 4px 0 4px 10px;
+	line-height: 15px;
+}
 
 #color4text {
 	padding: 5px;

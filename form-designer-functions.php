@@ -129,9 +129,32 @@ function wp_set_cc_forms($forms) {
 
 
 function wp_get_cc_forms() {
-	$forms = get_option('cc_form_design');
-	if(!$forms) { $forms = array(); }
-	return $forms;
+	
+	$cc_forms = get_option('cc_form_design');
+	
+	if(!$cc_forms) { $cc_forms = array(); }
+	
+	// Generate truncated menu names
+	$previous_names = array();
+	foreach( (array) $cc_forms as $key => $_cc_form ) {
+		$name = isset($_cc_form['form-name']) ? $_cc_form['form-name'] : 'Form '+$key;
+		
+		$_cc_form['truncated_name'] = trim( wp_html_excerpt( $name, 30 ) );
+		if ( isset($_cc_form['form-name']) && $_cc_form['truncated_name'] != $_cc_form['form-name'])
+			$_cc_form['truncated_name'] .= '&hellip;';
+		
+		if(!in_array(sanitize_user( $name ), $previous_names)) { 
+			$previous_names[] = sanitize_user( $name );
+		} else {
+			$namekey = sanitize_user( $name );
+			$previous_names[$namekey] = isset($previous_names[$namekey]) ? ($previous_names[$namekey] + 1) : 1;
+			$_cc_form['truncated_name'] .= ' ('.$previous_names[$namekey].')';
+		}
+		
+		$cc_forms[$key]['truncated_name'] = $_cc_form['truncated_name'];
+	}
+	
+	return $cc_forms;
 }
 
 
@@ -184,12 +207,12 @@ $formfield_num = 0;
 function make_formfield_list_items($array, $checkedArray) {
 	$out = '';
 	foreach($array as $a) {
-		$out .= make_formfield_list_item($a[0], $a[1], $a[2], isset($checkedArray[$a[0]]));
+		$out .= make_formfield_list_item($a[0], $a[1], !empty($checkedArray) ? in_array($a[0], $checkedArray) : $a[2]);
 	}
 	return $out;
 }
 
-function make_formfield_list_item($id, $title, $checked) {
+function make_formfield_list_item($id, $title, $checked = false) {
 	if($checked) { $checked = ' checked="checked"';}
 	if($id == 'email_address') { $checked = ' checked="checked" disabled="disabled"'; }
 	return '<li>

@@ -46,6 +46,7 @@ class constant_contact_form_widget extends WP_Widget {
    /** @see WP_Widget::widget */
     function widget($args = array(), $instance = array(), $echo = true)
 	{
+
 		$form = constant_contact_public_signup_form($instance, false);
 		
 		if(!$form) {

@@ -36,15 +36,10 @@ function cc_form_meta_box_presetoptions($post, $metabox=array()) {
 }
 
 function cc_form_meta_box_formfields_select($post, $metabox=array()) {
-	$checkedArray = array();
+	
 	$form = $metabox['args'][0];
-	if(is_array($form['f']) && !empty($form)) {
-		foreach($form['f'] as $field) {
-			if(isset($field['id'])) { 
-				$checkedArray["{$field['id']}"] = true;
-			}	
-		}
-	}
+	$checkedArray = !empty($form['formfields']) ? $form['formfields'] : array();
+	$checkedArray['email_address'] = 'email_address';
 ?>
 <div class="posttypediv">
 	<ul id="formfields-select-tabs" class="formfields-select-tabs add-menu-item-tabs">
@@ -759,6 +754,13 @@ function cc_form_meta_box_fontstyles($post, $metabox=array()) {
 					<div class="input"><ul>
 					  	<li><label for="labelweightboldno"><input type="radio" name="labelweight" id="labelweightboldno" <?php check_radio($form,'labelweight', 'normal', true); ?> /> Normal</label></li>
 						<li><label for="labelweightboldyes"><input type="radio" name="labelweight" id="labelweightboldyes" <?php check_radio($form,'labelweight', 'bold'); ?> /> Bold</label></li>
+					</ul></div>
+				 </li>
+-->
+<?php 
+} 
+
+?>ld</label></li>
 					</ul></div>
 				 </li>
 -->

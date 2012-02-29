@@ -4,20 +4,28 @@ Plugin Name: Constant Contact API
 Plugin URI: http://integrationservic.es/constant-contact/wordpress-plugin.php
 Description: Powerfully integrates <a href="http://conta.cc/bRojlN" target="_blank">Constant Contact</a> into your WordPress website.
 Author: Katz Web Services, Inc. & James Benson
-Version: 2.3
+Version: 2.3.2
 Author URI: http://www.katzwebservices.com
 */
+
+add_action('plugins_loaded', 'constant_contact_setup_plugin', 1);
+
+function constant_contact_setup_plugin() {
 	
 	// For language internationalization
 	load_plugin_textdomain( 'constant-contact-api', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 
-	// load our config file, this sets the default path and default PHP constants
-	require_once dirname(__FILE__) . '/config.php';
+	define('CC_FILE_PATH', dirname(__FILE__) . '/'); // The full path to this file
+	define('CC_FILE_URL', plugin_dir_url(__FILE__)); // @ Added 2.0 The full URL to this file
+	
+	// To store the object in a session, start a session if not initiated already.
+	if(!session_id()) { session_start(); }
+
 	require_once CC_FILE_PATH . 'functions.php';
 	require_once CC_FILE_PATH . 'user.php';
 	require_once CC_FILE_PATH . 'widget-legacy.php';
 	require_once CC_FILE_PATH . 'widget-events.php'; // Added 2.2
-
+	
 	// load admin only files
 	if(is_admin()) {
 		require_once CC_FILE_PATH . 'admin/install.php';
@@ -52,20 +60,6 @@ Author URI: http://www.katzwebservices.com
 		add_action('admin_print_styles', 'constant_contact_enquque_core_styles');
 	}
 	
-	function constant_contact_enquque_core_styles() {
-		if(constant_contact_is_plugin_page()) {
-			wp_enqueue_style('constant-contact-api-admin', plugins_url('constant-contact-api/admin/constant-contact-admin-css.css'), false, false, 'all');
-			wp_enqueue_style('constant-contact-api-admin-qtip', plugins_url('constant-contact-api/css/jquery.qtip.min.css'), false, false, 'all');
-		}
-	}
-	
-	function constant_contact_enquque_core_scripts() {
-		if(constant_contact_is_plugin_page()) {
-			wp_enqueue_script('constant-contact-api-admin-page', plugins_url('constant-contact-api/js/admin-cc-page.js'), array('jquery'));
-			wp_enqueue_script('constant-contact-api-admin-qtip', plugins_url('constant-contact-api/js/jquery.qtip.pack.js'), array('jquery', 'constant-contact-api-admin-page'));
-		}
-	}
-	
 	// register legacy widget
 	add_action('widgets_init', 'constant_contact_load_legacy_widget');
 	add_action('widgets_init', 'constant_contact_load_events_widget'); // Added 2.2
@@ -77,6 +71,18 @@ Author URI: http://www.katzwebservices.com
 	add_action('profile_update', 'constant_contact_profile_update');
 
 	// register show user update form action
+	add_action('show_user_profile', 'constant_contact_show_user_profile');
+
+	// register user registration action
+	add_action('register_post', 'constant_contact_register_post', 10, 3);
+	add_filter('wpmu_signup_user_notification', 'constant_contact_register_post_multisite'); // For multisite
+
+	// register show user register form action
+	add_action('signup_extra_fields', 'constant_contact_register_form'); // For multisite
+	add_action('register_form', 'constant_contact_register_form');
+}
+	
+?>pdate form action
 	add_action('show_user_profile', 'constant_contact_show_user_profile');
 
 	// register user registration action

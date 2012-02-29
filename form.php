@@ -1,4 +1,8 @@
 <?php
+@define('DOING_AJAX', true);
+@header('Content-Type: application/json;');
+@header('Status Code: 200 OK;');
+
 	# header('HTTP/1.1 403 Forbidden'); // For testing ModSecurity issues
 	function findFont($id = '') {
 			switch($id) {
@@ -63,11 +67,22 @@
 			}
 		}
 	
-	function makeFormField($field, $html = false) {
+	function makeFormField($field, $cc_request = array(), $currentform = false) {
 		$asterisk = $bold = $italic = $required = $val = $size = '';
 		$fields = '';
 		if(is_array($field)) { extract($field); }
-		$val = stripslashes(stripslashes($val));
+		
+		#print_r($cc_request);
+		
+		if(isset($cc_request['fields'][$field['id']]['value']) && $currentform) {
+			$placeholder = '';
+			$val = stripslashes(stripslashes($cc_request['fields'][$field['id']]['value']));
+		} else {
+			$placeholder = ' placeholder=\''.htmlentities(stripslashes(stripslashes($val))).'\'';
+			$val = '';
+		}
+		
+		
 		if(isset($label)) { $label = stripslashes(stripslashes($label)); }
 		if($t == 'b' || $t == 's') { $fields .= "<!-- %%LISTSELECTION%% -->"; }
 		$fields .= "<div class='cc_$id kws_input_container'>";
@@ -93,7 +108,7 @@
 		} else {
 			if(!empty($label)) { $fields .= "<label for='cc_$id' class='$class'>$label{$asterisk}</label>"; }
 			if(!empty($size) && $t == 't') { $size = " size=\"$size\"";}
-			$fields .= "<input type='text' value='$val'$size name='".$name."[value]' class='{$t} $class{$required}' id='cc_$id' >"; 
+			$fields .= "<input type='text' value='$val'$size $placeholder name='".$name."[value]' class='{$t} $class{$required}' id='cc_$id' >"; 
 		}
 		if(!empty($label)) { $fields .= '<input type="hidden" name="'.$name.'[label]" value="'.htmlentities($label).'" />'; }
 		$fields .= $requiredFields;
@@ -102,11 +117,14 @@
 	}
 	
 	function processForm() {
-		$f = $uid = $required = $t = $label = $givethanks = $safesubscribe = $size = $name = $id = $fields = $labelsusesamecolor = $labelsusesamealign = $labelsusesamefont = $labelsusesamepadding = $bgrepeat = $lfont = $tfont = $widthtype = $backgroundtype = $blockalign = $intro = $size = '';
+		$f = $uid = $required = $t = $label = $givethanks = $safesubscribe = $size = $name = $id = $fields = $labelsusesamecolor = $labelsusesamealign = $labelsusesamefont = $labelsusesamepadding = $bgrepeat = $lfont = $tfont = $widthtype = $backgroundtype = $blockalign = $intro = $size = $uniqueformid = '';
+		$cc_request = array();
 	
 		if(isset($_REQUEST['f'])) {
 			extract($_REQUEST);
 		}
+		
+		$currentform = (isset($cc_request['uniqueformid']) && $cc_request['uniqueformid'] == $uniqueformid);
 		
 		if(isset($form)) { $selector = ' id="cc_form_'.$form.'"'; } else { $selector = ''; }
 
@@ -115,19 +133,19 @@
 			foreach($f as $field) {
 				$field['size'] = $size;
 				if($field['id'] == str_replace('_default', '', $changed) || $field['id'] == str_replace('_label', '', $changed)) {
-					return makeFormField($field);
+					return makeFormField($field, $cc_request);
 				};
 			};
 		}
 		if(is_array($f)) {
 			foreach($f as $field) {
 				$field['size'] = $size;
-				$fields .= makeFormField($field);
+				$fields .= makeFormField($field, $cc_request, $currentform);
 			}
 			$fields = '<div class="kws_input_fields">'.$fields.'</div>';
 		}
 		if($safesubscribe != 'no') {
-			$safesubscribelink = '<a href="http://snurl.com/as4c4" target="_blank" class="cc_safesubscribe" rel="nofollow">Privacy by SafeSubscribe</a>';
+			$safesubscribelink = '<a href="http://katz.si/safesubscribe" target="_blank" class="cc_safesubscribe" rel="nofollow">Privacy by SafeSubscribe</a>';
 		} else {
 			$safesubscribelink = '';
 		}
@@ -235,6 +253,7 @@ $css = <<<EOD
 	$selector .cc_success {
 		margin:0!important;
 		padding:10px;
+		color: $textcolor!important;
 	}
 	
 	$selector {
@@ -288,10 +307,10 @@ $css = <<<EOD
 		-webkit-border-radius: {$borderradius}px {$borderradius}px;
 		border-radius: {$borderradius}px {$borderradius}px {$borderradius}px {$borderradius}px;
 		width: {$width}{$widthtype};
-		color: $textcolor;
-		font-family: $tfont;
+		color: $textcolor!important;
+		font-family: $tfont!important;
 		font-size: $tsize!important;
-		text-align: $talign;
+		text-align: $talign!important;
 	}
 	#content $selector { margin-bottom: 1em; margin-top: 1em; } 
 	.kws_input_fields {
@@ -311,6 +330,7 @@ $css = <<<EOD
 		margin:0;
 		padding:0;
 		line-height:1;
+		color: $textcolor;
 	}
 	$selector .cc_intro * { 
 		padding: .5em 0;
@@ -342,21 +362,23 @@ EOD;
 	}
 
 function printForm() {
+
 	if(isset($_REQUEST['f']) && is_array($_REQUEST['f'])) {
 		foreach($_REQUEST['f'] as $key => $field) {
 			if(!isset($field['n'])) { unset($_REQUEST['f'][$key]); }
 		}
 	}
 	if(isset($_REQUEST['output']) && $_REQUEST['output'] == 'html') {
-		if(!isset($_REQUEST['form'])  && !isset($_REQUEST['cc-form-id'])) { $output = '<!-- Constant Contact: The form you requested does not exist -->'; } else {	
-		
-		if(isset($_REQUEST['formOnly']) && !empty($_REQUEST['formOnly'])) {
-			$output = processForm(); 
-		} else if(isset($_REQUEST['styleOnly']) && !empty($_REQUEST['styleOnly'])) { 
-			$output = processStyle(); 
-		} else { 
-			$output = processStyle().processForm(); 
-		}
+		if(!isset($_REQUEST['form'])  && !isset($_REQUEST['cc-form-id'])) { 
+			$output = '<!-- Constant Contact: The form you requested does not exist -->'; 
+		} else {		
+			if(isset($_REQUEST['formOnly']) && !empty($_REQUEST['formOnly'])) {
+				$output = processForm(); 
+			} else if(isset($_REQUEST['styleOnly']) && !empty($_REQUEST['styleOnly'])) { 
+				$output = processStyle(); 
+			} else { 
+				$output = processStyle().processForm(); 
+			}
 		}
 		if(isset($_REQUEST['echo']) && !empty($_REQUEST['echo'])) {
 			echo $output;
@@ -377,6 +399,7 @@ function printForm() {
 		return;
 	}
 }
+
 printForm();
 
 exit();

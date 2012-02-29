@@ -2,8 +2,8 @@ jQuery.noConflict();
 
 jQuery(document).ready(function($) {
 	$('#examplewrapper').scrollFollow({
-		speed: 1000,
-		offset: 0,
+		speed: 10,
+		offset: 30,
 		container: 'nav-menus-frame',
 		killSwitch: 'stopFollowingMe'
 	});
@@ -46,8 +46,11 @@ jQuery(document).ready(function($) {
 		});
 	});
 
-
-$('textarea.tinymce').tinymce({
+$('textarea.tinymce').live('keyup change', function() {
+	if($('.mceEditor').length > 0) { return; }
+//	triggerTextUpdate();
+	tinyMCE.execCommand('mceAddControl', false,'intro_default');
+}).tinymce({
 	// Location of TinyMCE script
 	script_url : ScriptParams.path + 'tiny_mce/tiny_mce.js',
 	theme : "advanced",
@@ -67,6 +70,7 @@ $('textarea.tinymce').tinymce({
 		ed.onChange.add(triggerTextUpdate);
 	}
 });
+
 
 function triggerTextUpdate(inst) {
 	if($('.kws_form .cc_intro').length > 0) {
@@ -130,19 +134,11 @@ $('#bgpos,#bgrepeat').change(function() { updateBackgroundURL(); });
 
 // Radio Buttons & Checkboxes
 // Doing this prevents us from having to do bind('click change'), which runs twice and slows things down.
-if(jQuery.browser.msie6 || jQuery.browser.msie7) {
-	$('input:checkbox[name^="formfields"]').bind('click', function() { showHideFormFields($(this)); });
-	$('input[name=safesubscribe]').bind('click', function() { updateSafeSubscribe(); });
-	$('input[name="backgroundtype"]').bind('click', function() { updateBackgroundStyle(); updateBackgroundType(); });
-	$('input:checkbox[name^="f"]').bind('click', function() { updateFormFields(); });
-	$('input[id^=lus]').bind('click', function() { updateLabelSame(); });
-} else {
-	$('input:checkbox[name^="formfields"]').bind('change', function() { showHideFormFields($(this)); });
-	$('input[name=safesubscribe]').bind('change', function() { updateSafeSubscribe(); });
-	$('input[name="backgroundtype"]').bind('change', function() { updateBackgroundStyle(); updateBackgroundType(); });
-	$('input:checkbox[name^="f"]').bind('change', function() { updateFormFields(false, false, 'input:checkbox[f] bind'); });
-	$('input[id^=lus]').bind('change', function() { updateLabelSame(); });
-}
+$('input:checkbox[name^="formfields"]').bind('change', function() { showHideFormFields($(this)); });
+$('input[name=safesubscribe]').bind('change', function() { updateSafeSubscribe(); });
+$('input[name="backgroundtype"]').bind('change', function() { updateBackgroundStyle(); updateBackgroundType(); });
+$('input:checkbox[name^="f"]').bind('change', function() { updateFormFields(false, false, 'input:checkbox[f] bind'); });
+$('input[id^=lus]').bind('change', function() { updateLabelSame(); });
 
 $('label.labelStyle').bind('click', function() {
 	if($('input[type=checkbox]:checked', $(this)).length > 0) { $(this).addClass('checked'); } else { $(this).removeClass('checked'); }
@@ -177,6 +173,16 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 });
 //$('input[name=widthtype]').click(function() { /* updateBoxWidthandPadding(); */ updateWidthCalculator(); /* updateCode('style'); */  });
 
+	
+	$('input.menu-save').live('click submit', function() {
+		$('#examplewrapper').hide();
+	});
+	
+	$('li.menu-item .item-edit').live('click', function(e) {
+		e.preventDefault();
+		$('.menu-item-settings', $(this).parents('li.formfield')).toggle()
+		return false;
+	});
 	
 	function updatePattern($clickedLI) {
 		var val = '';
@@ -221,10 +227,11 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		}
 		var fullFormFields = $('form#cc-form-settings').serialize();
 		
-		var dataString = formFields+'&'+styleFields+textOnlyLink+changedLink+'&path='+ScriptParams.path; //+'&action=cc_get_form
+		var dataString = 'rand='+ScriptParams.rand+'&'+formFields+'&'+styleFields+textOnlyLink+changedLink+'&path='+ScriptParams.path; //+'&action=cc_get_form
+		
 		$.ajax({
-			type: 'GET',
-			url: ScriptParams.path + 'form.php?rand='+ScriptParams.rand+'&path='+ScriptParams.path, // ScriptParams.adminajax was too slow!
+			type: 'POST',
+			url: ScriptParams.path + 'form.php', // ScriptParams.adminajax was too slow!
 			processData: false,
 			data:  dataString,
 			success: function(data, textStatus, XMLHttpRequest){
@@ -242,8 +249,14 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 					}
 					
 					if(!empty(data.input)) {
-						input = data.input; 
-						var replaceClass = $(input).attr('class').replace(' kws_input_container', '');
+						input = $(data.input);
+						
+						if(input[0].length) {
+							inputclass = input[1];	
+						} else {
+							inputclass = input;
+						}
+						var replaceClass = $(inputclass).attr('class').replace(' kws_input_container', '');
 						$('.grabber .kws_form div.'+replaceClass).replaceWith($(input));
 						return;
 					}
@@ -493,9 +506,11 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		$('#form-fields ul.menu li.menu-item').sort(mySorter).appendTo('#form-fields ul.menu');
 	}
 	function showHideFormFields($clicked) {
+		
 		if(!$clicked) {
 			$clicked = $('#formfields_select input:checkbox');
 		}
+		
 		$clicked.each(function() {
 				//$('#form-fields .menu li').has('#'+$(this).val()).find('input.checkbox').attr('checked', $(this).attr('checked'));
 				var targetLI = $('#form-fields .menu li').has('#'+$(this).val());
@@ -503,16 +518,17 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 				if(checked === true) {
 					targetLI.remove().appendTo($('#form-fields .menu')).show()
 					.find('input.checkbox').attr('checked', checked)
-					.find('input').each(function() { $(this).attr('disabled', false); });
+					.find('input').each(function() { $(this).attr('disabled', false); })
 				} else {
 					targetLI.hide()
 					.find('input.checkbox').attr('checked', checked)
 					.find('input').each(function() { $(this).attr('disabled', true); });
 				}
 		});
-		 
 
-		$('#formfields_select').trigger('change');
+		// console.log($clicked);
+
+		//$('#formfields_select').trigger('change');
 	}
 	
 	function updateFormFields(textOnly, $changed, from) {
@@ -614,8 +630,10 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		});
 	}		
 	
+		
 	$('#form-fields ul.menu').sortable({
 		handle: '.menu-item-handle',
+		forceHelperSize: true,
 		placeholder: 'sortable-placeholder',
 		start: function(e, ui) {
 			var taHeight = $('textarea', $(this)).outerHeight();
@@ -623,6 +641,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 			$('textarea', $(this)).css('display','block').height(taHeight+'px').width('90%').attr('disabled', true);
 			updateSharedVars( ui );
 			$(this).disableSelection();
+			$('body,#menu-to-edit').disableSelection();
 		},
 		change: function(e, ui) {
 			if( ! ui.placeholder.parent().hasClass('menu') ) {
@@ -639,6 +658,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 			updateSharedVars( ui );
 		},
 		stop: function(e, ui) {
+			$('body,#menu-to-edit').enableSelection();
 			$(this).enableSelection();
 			generateForm(true, false, '.sortable');
 			$('textarea', $(this)).attr('disabled', false);
@@ -954,7 +974,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		
 		
 		$.ajax({
-		  type: "GET",
+		  type: "POST",
 		  url: ScriptParams.path + 'ozhgradient.php',
 		  dataType: "text",
 		  data: 'start='+bordercolor+'&end='+color2+'&height='+$('#gradheight').val(),

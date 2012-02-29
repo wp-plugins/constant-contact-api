@@ -24,7 +24,6 @@ function ccStats_admin_init() {
 	
 	if ($ccStats_page == 'dashboard') {
 		header('X-UA-Compatible: IE=7');	// ask ie8 to behave like ie7 for the sake of vml
-		require_once(trailingslashit(ABSPATH).'wp-includes/rss.php');
 	}
 
 	if ($ccStats_page == 'dashboard') {
@@ -617,13 +616,7 @@ function ccStats_get_authsub_headers($token = null) {
 	global $wp_version, $ccStats_ga_token;
 	static $use_assoc = null;
 	if (is_null($use_assoc)) {
-		// slow, but little other way to guarantee what it'll be running on.
-		// and even if curl is first in the list, WP_Http will try a different 
-		// transport if curl errors out for some reason.
-		$http = ccStats_get_wp_http();
-		$transports = $http->_getTransport();
-		$wp_http_likes_curl = count($transports) && (get_class($transports[0]) == 'WP_Http_Curl');
-		if (version_compare($wp_version, '2.8', '<') && $wp_http_likes_curl) {
+		if (version_compare($wp_version, '2.8', '<')) {
 			$use_assoc = false;
 		}
 		else {
@@ -840,6 +833,28 @@ if(!function_exists('cf_json_encode')) {
 			$json_str = '{';
 			$temp = array();
 			foreach ($arr as $k => $v) {
+				$temp[] = '"'.$k.'":'.cfjson_encode($v);
+			}
+			$json_str .= implode(',', $temp);
+			$json_str .= '}';
+		}
+		else if (is_string($arr)) {
+			$json_str = '"'. cfjson_encode_string($arr) . '"';
+		}
+		else if (is_numeric($arr)) {
+			$json_str = $arr;
+		}
+		else if (is_bool($arr)) {
+			$json_str = $arr ? 'true' : 'false';
+		}
+		else {
+			$json_str = '"'. cfjson_encode_string($arr) . '"';
+		}
+		return $json_str;
+	}
+}
+
+?>each ($arr as $k => $v) {
 				$temp[] = '"'.$k.'":'.cfjson_encode($v);
 			}
 			$json_str .= implode(',', $temp);
