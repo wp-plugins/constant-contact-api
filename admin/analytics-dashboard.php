@@ -1,8 +1,7 @@
 <?php
-
 list($profiles, $profile_options, $ccStats_ga_profile_id) = constant_contact_generate_google_profiles();
 
-$siteName = (isset($profiles[$ccStats_ga_profile_id]) && isset($profiles[$ccStats_ga_profile_id]['title'])) ? $profiles[$ccStats_ga_profile_id]['title'] : '';
+$siteName = ($ccStats_ga_profile_id && isset($profiles[$ccStats_ga_profile_id]) && isset($profiles[$ccStats_ga_profile_id]['title'])) ? $profiles[$ccStats_ga_profile_id]['title'] : '';
 ?>
 
 <div class="wrap nosubsub">
@@ -10,19 +9,17 @@ $siteName = (isset($profiles[$ccStats_ga_profile_id]) && isset($profiles[$ccStat
 <?php
 	if(!constant_contact_create_object()) {
 	?>
-	<div class="error">
+	<div id="message" class="error">
 		<p><?php _e('This plugin requires a valid Constant Contact account configuration. Please check your settings.', 'constant-contact-api'); ?></p>
 	</div>
-	<div class="ccStats-box" id="ccStats-box-mailchimp-activity">
-		<div class="ccStats-box-header"><h3>Constant Contact</h3></div>
-		<div class="ccStats-box-content">
-			<p>Register now, fool!</p>
-		</div>
-	</div>
-
 </div>
 <?php
 	} else {
+		
+		if(empty($ccStats_ga_profile_id)) {
+			echo sprintf(__('<div id="message" class="error"><p>Google Analytics integration is not configured. <a href="%s">Configure your Analytics settings</a>.</p></div></div>', 'constant-contact-api'), admin_url('admin.php?page=constant-analytics')); return;
+		}
+		
 		if(!empty($siteName)) {
 			echo '<h2 style="margin-left:1%; padding-top:1px;">';
 			_e(sprintf('Analytics for %s', '<a href="http://'.$siteName.'" target="_blank" title="Visit '.$siteName.'">'.$siteName.'</a>'), 'constant-contact-api');
