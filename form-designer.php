@@ -517,21 +517,4 @@ wp_cc_form_setup();
 
 } // End design forms
 
-?>wp_get_cc_form($cc_form_selected_id);
-
-								cc_form_meta_box_formfields($form);
-							?>
-						</div><!-- /#post-body-content -->
-					</div><!-- /#post-body -->
-				</div><!-- /#update-nav-menu -->
-			</div><!-- /.menu-edit -->
-		</div><!-- /#menu-management -->
-	</div><!-- /#menu-management-liquid -->
-	</div><!-- /#nav-menus-frame -->
-	</form><!-- /#tha-form -->
-</div><!-- /.wrap-->
-<?php
-
-} // End design forms
-
 ?>
