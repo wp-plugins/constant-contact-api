@@ -1,5 +1,13 @@
 <?php
 
+add_action('plugins_loaded', 'ccStats_set_globals');
+
+function ccStats_set_globals() {
+	global $ccStats_ga_profile_id, $ccStats_ga_token;
+	$ccStats_ga_token = get_option('ccStats_ga_token');
+	$ccStats_ga_profile_id = get_option('ccStats_ga_profile_id');
+}
+
 function ccStats_admin_init() {
 
 	if(!constant_contact_create_object()) { return; }

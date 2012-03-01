@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackk
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 2.9
 Tested up to: 3.3.1
-Stable tag: 2.3.5.1
+Stable tag: 2.3.6
 
 Integrate Constant Contact into your website with this full-featured plugin.
 
@@ -70,7 +70,15 @@ To install the plugin follow the steps below:
 
 == Changelog ==
 
-= 2.3.5 = 
+= 2.3.6 =
+* Resolved issue with Constant Analytics data not pulling
+* Fixed issue with empty Form Designer submit button values
+* Fixed fatal error for Form Designer `syntax error, unexpected '}' in /constant-contact-api/form-designer-meta-boxes.php on line 768
+
+= 2.3.5.1 =
+* Fixed one more fatal error
+
+= 2.3.5 =
 * Fixed one more fatal error
 * WordPress download doesn't include some files. Returning back to `tag` instead of `trunk` to see if that works.
 
@@ -230,6 +238,18 @@ To install the plugin follow the steps below:
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
+
+= 2.3.6 =
+* Resolved issue with Constant Analytics data not pulling
+* Fixed issue with empty Form Designer submit button values
+* Fixed fatal error for Form Designer `syntax error, unexpected '}' in /constant-contact-api/form-designer-meta-boxes.php on line 768
+
+= 2.3.5.1 =
+* Fixed one more fatal error
+
+= 2.3.5 =
+* Fixed one more fatal error
+* WordPress download doesn't include some files. Returning back to `tag` instead of `trunk` to see if that works.
 
 = 2.3.4 =
 * Fixed issue with `constant-analytics.php` causing PHP warning

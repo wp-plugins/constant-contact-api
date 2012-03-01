@@ -760,11 +760,4 @@ function cc_form_meta_box_fontstyles($post, $metabox=array()) {
 <?php 
 } 
 
-?>ld</label></li>
-					</ul></div>
-				 </li>
--->
-<?php 
-} 
-
 ?>

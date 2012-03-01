@@ -72,14 +72,14 @@
 		$fields = '';
 		if(is_array($field)) { extract($field); }
 		
-		#print_r($cc_request);
-		
 		if(isset($cc_request['fields'][$field['id']]['value']) && $currentform) {
 			$placeholder = '';
 			$val = stripslashes(stripslashes($cc_request['fields'][$field['id']]['value']));
 		} else {
 			$placeholder = ' placeholder=\''.htmlentities(stripslashes(stripslashes($val))).'\'';
-			$val = '';
+			if(!($t == 'b' || $t == 's')) {
+				$val = '';
+			}
 		}
 		
 		
