@@ -4,7 +4,7 @@ Plugin Name: Constant Contact API
 Plugin URI: http://integrationservic.es/constant-contact/wordpress-plugin.php
 Description: Powerfully integrates <a href="http://conta.cc/bRojlN" target="_blank">Constant Contact</a> into your WordPress website.
 Author: Katz Web Services, Inc. & James Benson
-Version: 2.3.2
+Version: 2.3.3
 Author URI: http://www.katzwebservices.com
 */
 
@@ -81,16 +81,5 @@ function constant_contact_setup_plugin() {
 	add_action('signup_extra_fields', 'constant_contact_register_form'); // For multisite
 	add_action('register_form', 'constant_contact_register_form');
 }
-	
-?>pdate form action
-	add_action('show_user_profile', 'constant_contact_show_user_profile');
-
-	// register user registration action
-	add_action('register_post', 'constant_contact_register_post', 10, 3);
-	add_filter('wpmu_signup_user_notification', 'constant_contact_register_post_multisite'); // For multisite
-
-	// register show user register form action
-	add_action('signup_extra_fields', 'constant_contact_register_form'); // For multisite
-	add_action('register_form', 'constant_contact_register_form');
 	
 ?>
