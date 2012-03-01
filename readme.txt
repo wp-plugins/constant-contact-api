@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackk
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 2.9
 Tested up to: 3.3.1
-Stable tag: trunk
+Stable tag: 2.3.5
 
 Integrate Constant Contact into your website with this full-featured plugin.
 
@@ -69,6 +69,10 @@ To install the plugin follow the steps below:
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
 == Changelog ==
+
+= 2.3.5 = 
+* Fixed one more fatal error
+* WordPress download doesn't include some files. Returning back to `tag` instead of `trunk` to see if that works.
 
 = 2.3.4 =
 * Fixed issue with `constant-analytics.php` causing PHP warning
