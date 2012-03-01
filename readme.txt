@@ -3,8 +3,8 @@ Contributors: katzwebdesign, jamesbenson
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackkatz%40gmail%2ecom&item_name=Constant%20Contact%20API%20Plugin&no_shipping=0&no_note=1&tax=0&currency_code=USD&lc=US&bn=PP%2dDonationsBF&charset=UTF%2d8
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 2.9
-Tested up to: 3.2
-Stable tag: 2.3.1
+Tested up to: 3.3.1
+Stable tag: 2.3.3
 
 Integrate Constant Contact into your website with this full-featured plugin.
 
@@ -70,6 +70,9 @@ To install the plugin follow the steps below:
 
 == Changelog ==
 
+= 2.3.3 =
+* Fixed fatal error with plugin. Sorry, folks!
+
 = 2.3.2 =
 * Fixed major issues with `[constantcontactapi]` shortcode not parsing passed attributes.
 * Fixed bug where submitting a form with empty email field showed success
@@ -83,6 +86,7 @@ To install the plugin follow the steps below:
 	- Submit button text now updates in the form preview.
 	- Added a background & border to the Form Slide so that it's obvious why clicking doesn't work when Slide is turned on.
 	- If a form exists, it is selected to edit by default (instead of Create New Form). This should help prevent confusion and duplicate forms.
+* Added check for configuration to Constant Analytics dashboard
 * Technical
 	- Wrapped the plugin startup actions & hooks in a `plugins_loaded` hook
 	- Removed config.php file; wasn't necessary
@@ -219,6 +223,9 @@ To install the plugin follow the steps below:
 
 == Upgrade Notice ==
 
+= 2.3.3 =
+* Fixed fatal error with plugin. Sorry, folks!
+
 = 2.3.2 =
 * Fixed major issues with `[constantcontactapi]` shortcode not parsing passed attributes.
 * Fixed bug where submitting a form with empty email field showed success
@@ -232,6 +239,7 @@ To install the plugin follow the steps below:
 	- Submit button text now updates in the form preview.
 	- Added a background & border to the Form Slide so that it's obvious why clicking doesn't work when Slide is turned on.
 	- If a form exists, it is selected to edit by default (instead of Create New Form). This should help prevent confusion and duplicate forms.
+* Added check for configuration to Constant Analytics dashboard
 * Technical
 	- Wrapped the plugin startup actions & hooks in a `plugins_loaded` hook
 	- Removed config.php file; wasn't necessary
