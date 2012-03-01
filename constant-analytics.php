@@ -854,26 +854,4 @@ if(!function_exists('cf_json_encode')) {
 	}
 }
 
-?>each ($arr as $k => $v) {
-				$temp[] = '"'.$k.'":'.cfjson_encode($v);
-			}
-			$json_str .= implode(',', $temp);
-			$json_str .= '}';
-		}
-		else if (is_string($arr)) {
-			$json_str = '"'. cfjson_encode_string($arr) . '"';
-		}
-		else if (is_numeric($arr)) {
-			$json_str = $arr;
-		}
-		else if (is_bool($arr)) {
-			$json_str = $arr ? 'true' : 'false';
-		}
-		else {
-			$json_str = '"'. cfjson_encode_string($arr) . '"';
-		}
-		return $json_str;
-	}
-}
-
 ?>
