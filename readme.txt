@@ -3,14 +3,14 @@ Contributors: katzwebdesign, jamesbenson
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackkatz%40gmail%2ecom&item_name=Constant%20Contact%20API%20Plugin&no_shipping=0&no_note=1&tax=0&currency_code=USD&lc=US&bn=PP%2dDonationsBF&charset=UTF%2d8
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 2.9
-Tested up to: 3.3.1
+Tested up to: 3.3.2
 Stable tag: 2.3.6
 
 Integrate Constant Contact into your website with this full-featured plugin.
 
 == Description ==
 
-> __This plugin requires a <a href="http://www.constantcontact.com/index.jsp?pn=katzwebservices&cc=api" title="Sign up for a free Constant Contact trial" rel="nofollow">Constant Contact account</a>.__ <br />*Don't have an account?* Constant Contact offers a <a href="http://www.constantcontact.com/email-marketing/index.jsp?pn=katzwebservices&cc=api" rel="nofollow">free 60 day trial</a>, so sign up and give this plugin a whirl!<br /><em>The link above is an affiliate link that supports development of this plugin.</em>
+> __This plugin requires a <a href="http://www.constantcontact.com/index.jsp" title="Sign up for a free Constant Contact trial" rel="nofollow">Constant Contact account</a>.__ <br />*Don't have an account?* Constant Contact offers a <a href="http://www.constantcontact.com/email-marketing/index.jsp" rel="nofollow">free 60 day trial</a>, so sign up and give this plugin a whirl!<br /><em>The link above is an affiliate link that supports development of this plugin.</em>
 
 <h4>Fully integrate Constant Contact with your WordPress website.</h4>
 
@@ -406,9 +406,9 @@ This version fixes a major bug and all users should upgrade immediately.
 == Frequently Asked Questions ==
 
 = Do I need a Constant Contact account for this plugin? =
-This plugin requires a <a href="http://www.constantcontact.com/index.jsp?pn=katzwebservices&cc=api" rel="nofollow" title="Sign up for Constant Contact">Constant Contact account</a>  (affiliate link).
+This plugin requires a <a href="http://www.constantcontact.com/index.jsp" rel="nofollow" title="Sign up for Constant Contact">Constant Contact account</a>  (affiliate link).
 
-Constant Contact is a great email marketing company -- their rates are determined by the number of contacts in your list, not how many emails you send. This means you can send unlimited emails per month for one fixed rate! <a href="http://www.constantcontact.com/features/signup.jsp?pn=katzwebservices&cc=api" title="Try out Constant Contact today" rel="nofollow">Give it a test run</a>  (affiliate link). 
+Constant Contact is a great email marketing company -- their rates are determined by the number of contacts in your list, not how many emails you send. This means you can send unlimited emails per month for one fixed rate! <a href="http://www.constantcontact.com/features/signup.jsp" title="Try out Constant Contact today" rel="nofollow">Give it a test run</a>  (affiliate link). 
 
 = Is there shortcode support? =
 
