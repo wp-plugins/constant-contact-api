@@ -725,7 +725,7 @@ function constant_contact_handle_public_signup_form() {
 
 
 function constant_contact_domain_exists($email,$record = 'MX') {
-	if(apply_filters('constant_contact_validate_email_domain', 1)) {
+	if(apply_filters('constant_contact_validate_email_domain', 1) && function_exists('checkdnsrr')) {
 		list($user,$domain) = split('@',$email);
 		return checkdnsrr($domain,$record);
 	}

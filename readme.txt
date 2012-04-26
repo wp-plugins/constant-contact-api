@@ -70,6 +70,9 @@ To install the plugin follow the steps below:
 
 == Changelog ==
 
+= 2.3.7 =
+* Fixed fatal error for users with PHP versions not supporting `checkdnsrr` function for email domain validation.
+
 = 2.3.6 =
 * Resolved issue with Constant Analytics data not pulling
 * Fixed issue with empty Form Designer submit button values
