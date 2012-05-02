@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackk
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 2.9
 Tested up to: 3.3.2
-Stable tag: 2.3.6
+Stable tag: trunk
 
 Integrate Constant Contact into your website with this full-featured plugin.
 
@@ -19,7 +19,7 @@ The Constant Contact for Wordpress plugin is the best email marketing plugin for
 You can place a signup checkbox or list selection on your register page or use the signup widget anywhere in your website sidebar or PHP templates.
 
 <h3>Now featuring Event Marketing!</h3>
-Version 2.1 of the plugin introduces <a href="http://conta.cc/hB5lnC" title="Learn more about Constant Contact Event Marketing" rel="nofollow">Constant Contact Event Marketing</a> functionality by allowing you to track events, registration, and registrants using the plugin. Simply navigate to Constant Contact > Events. Manage your events from inside WordPress!
+Version 2.1 of the plugin introduces <a href="http://www.constantcontact.com" title="Learn more about Constant Contact Event Marketing" rel="nofollow">Constant Contact Event Marketing</a> functionality by allowing you to track events, registration, and registrants using the plugin. Simply navigate to Constant Contact > Events. Manage your events from inside WordPress!
 
 <h3>Built-in Form Designer</h3>
 <strong>The Constant Contact Form Designer (CCFD)</strong> gives the Constant Contact API a form generation tool. The Form Designer allows users to generate unlimited number of unique forms and gives a wide variety of options that can be configured, including what fields to show in the signup form. There and tons of design options, including custom background images, border width, colors, fonts and much more.
@@ -524,7 +524,7 @@ The problem is that your web server may think that Form Designer is an unwelcome
 <a href="http://www.hostgator.com" rel="nofollow">HostGator</a> reps said whitelisting your own domain is <strong>not an issue that affects website security</strong>.
 
 = My gradients aren't working on the Form Designer! =
-This plugin uses <a href="http://ozh.in/kw">Ozh's gradient script</a>. Please refer to that page.
+This plugin uses <a href="http://planetozh.com/blog/my-projects/images-php-gd-gradient-fill/">Ozh's gradient script</a>. Please refer to that page.
 
 = What is the plugin license? =
 Good news, this plugin is free for everyone! The plugin is [licensed under the GPL](http://www.gnu.org/licenses/gpl-3.0.txt "View the GPL License").
