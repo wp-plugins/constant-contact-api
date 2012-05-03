@@ -19,7 +19,7 @@ The Constant Contact for Wordpress plugin is the best email marketing plugin for
 You can place a signup checkbox or list selection on your register page or use the signup widget anywhere in your website sidebar or PHP templates.
 
 <h3>Now featuring Event Marketing!</h3>
-Version 2.1 of the plugin introduces <a href="http://www.constantcontact.com" title="Learn more about Constant Contact Event Marketing" rel="nofollow">Constant Contact Event Marketing</a> functionality by allowing you to track events, registration, and registrants using the plugin. Simply navigate to Constant Contact > Events. Manage your events from inside WordPress!
+Version 2.1 of the plugin introduces <a href="http://www.constantcontact.com/event-marketing/index.jsp" title="Learn more about Constant Contact Event Marketing" rel="nofollow">Constant Contact Event Marketing</a> functionality by allowing you to track events, registration, and registrants using the plugin. Simply navigate to Constant Contact > Events. Manage your events from inside WordPress!
 
 <h3>Built-in Form Designer</h3>
 <strong>The Constant Contact Form Designer (CCFD)</strong> gives the Constant Contact API a form generation tool. The Form Designer allows users to generate unlimited number of unique forms and gives a wide variety of options that can be configured, including what fields to show in the signup form. There and tons of design options, including custom background images, border width, colors, fonts and much more.
