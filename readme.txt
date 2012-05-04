@@ -521,7 +521,7 @@ The problem is that your web server may think that Form Designer is an unwelcome
 <a href="http://www.hostgator.com" rel="nofollow">HostGator</a> reps said whitelisting your own domain is <strong>not an issue that affects website security</strong>.
 
 = My gradients aren't working on the Form Designer! =
-This plugin uses <a href="http://ozh.in/kw">Ozh's gradient script</a>. Please refer to that page.
+This plugin uses Ozh's gradient script. Please refer to that page.
 
 = What is the plugin license? =
 Good news, this plugin is free for everyone! The plugin is [licensed under the GPL](http://www.gnu.org/licenses/gpl-3.0.txt "View the GPL License").
