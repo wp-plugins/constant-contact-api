@@ -19,7 +19,7 @@ add_action('plugins_loaded', 'ccfg_init');
 
 function ccfg_init() {
 	global $pagenow;
-
+	
 	define('CC_FORM_GEN_PATH', plugin_dir_url(__FILE__));
 	add_action('init', 'check_ccfg_compatibility');
 	add_action('widgets_init', 'constant_contact_form_load_widget');
@@ -39,11 +39,13 @@ function ccfg_init() {
 function check_ccfg_compatibility() {
 	global $cc;
 	
+	if(!defined('CC_FILE_PATH') || !function_exists('constant_contact_create_object')) {
+		return false;
+	}
+	
 	$cc = constant_contact_create_object();
 	
-	if(!defined('CC_FILE_PATH')) {
-		return false;
-	} elseif(empty($cc)) {
+	if(empty($cc)) {
 		return 0;
 	} else {
 		return true; 
