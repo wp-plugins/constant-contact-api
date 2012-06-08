@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackk
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 2.9
 Tested up to: 3.3.2
-Stable tag: trunk
+Stable tag: 2.3.8
 
 Integrate Constant Contact into your website with this full-featured plugin.
 
@@ -71,6 +71,7 @@ To install the plugin follow the steps below:
 == Changelog ==
 
 = 2.3.8 =
+* Reduced number of API calls in Admin if the settings are not correct.
 * Added Akismet spam filtering
 * Fixed many issues with the Form Designer
 	- Selected a form by default
@@ -257,6 +258,7 @@ To install the plugin follow the steps below:
 == Upgrade Notice ==
 
 = 2.3.8 =
+* Reduced number of API calls in Admin if the settings are not correct.
 * Added Akismet spam filtering
 * Fixed many issues with the Form Designer
 	- Selected a form by default
