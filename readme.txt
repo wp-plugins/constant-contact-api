@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackk
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 2.9
 Tested up to: 3.3.2
-Stable tag: 2.3.7
+Stable tag: 2.3.8
 
 Integrate Constant Contact into your website with this full-featured plugin.
 
@@ -18,11 +18,11 @@ The Constant Contact for Wordpress plugin is the best email marketing plugin for
 
 You can place a signup checkbox or list selection on your register page or use the signup widget anywhere in your website sidebar or PHP templates.
 
-<h3>Now featuring Event Marketing!</h3>
-Version 2.1 of the plugin introduces <a href="http://www.constantcontact.com" title="Learn more about Constant Contact Event Marketing" rel="nofollow">Constant Contact Event Marketing</a> functionality by allowing you to track events, registration, and registrants using the plugin. Simply navigate to Constant Contact > Events. Manage your events from inside WordPress!
+<h3>Event Marketing</h3>
+The plugin features <a href="http://www.constantcontact.com/event-marketing/index.jsp" title="Learn more about Constant Contact Event Marketing" rel="nofollow">Constant Contact Event Marketing</a> functionality by allowing you to track events, registration, and registrants using the plugin. Simply navigate to Constant Contact > Events. Manage your events from inside WordPress!
 
 <h3>Built-in Form Designer</h3>
-<strong>The Constant Contact Form Designer (CCFD)</strong> gives the Constant Contact API a form generation tool. The Form Designer allows users to generate unlimited number of unique forms and gives a wide variety of options that can be configured, including what fields to show in the signup form. There and tons of design options, including custom background images, border width, colors, fonts and much more.
+<strong>The Constant Contact Form Designer</strong> is a form generation and design tool. The Form Designer allows users to generate unlimited number of unique forms and gives a wide variety of options that can be configured, including what fields to show in the signup form. There and tons of design options, including custom background images, border width, colors, fonts and much more.
 
 <h3>Constant Analytics: In-Depth Google Analytics</h3>
 View your Google Analytics data in your dashboard with Constant Analytics. View traffic by source, geography, and popularity. See the impact of blog posts and email campaigns with the great graphing tools.
@@ -69,6 +69,21 @@ To install the plugin follow the steps below:
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
 == Changelog ==
+
+= 2.3.8 =
+* Reduced number of API calls in Admin if the settings are not correct.
+* Added Akismet spam filtering
+* Fixed many issues with the Form Designer
+	- Selected a form by default
+	- Fixed broken Form Text field updating process
+	- Fixed live updating for Form Alignment settings
+	- Fixed issue with required fields not working
+	- Added support for text color in the Form Text box
+	- Added confirmation before deleting a form
+* Added an unique `id` to each form for valid HTML on pages with multiple forms
+* Made General Interest list not editable, since editing doesn't work anyway
+* CC password now a text field to help password entry
+* Changed how `session_start()` is called; should fix a potential bug
 
 = 2.3.7 =
 * Fixed fatal error for users with PHP versions not supporting `checkdnsrr` function for email domain validation.
@@ -241,6 +256,21 @@ To install the plugin follow the steps below:
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
+
+= 2.3.8 =
+* Reduced number of API calls in Admin if the settings are not correct.
+* Added Akismet spam filtering
+* Fixed many issues with the Form Designer
+	- Selected a form by default
+	- Fixed broken Form Text field updating process
+	- Fixed live updating for Form Alignment settings
+	- Fixed issue with required fields not working
+	- Added support for text color in the Form Text box
+	- Added confirmation before deleting a form
+* Added an unique `id` to each form for valid HTML on pages with multiple forms
+* Made General Interest list not editable, since editing doesn't work anyway
+* CC password now a text field to help password entry
+* Changed how `session_start()` is called; should fix a potential bug
 
 = 2.3.6 =
 * Resolved issue with Constant Analytics data not pulling
