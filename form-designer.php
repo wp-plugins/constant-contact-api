@@ -4,7 +4,7 @@ Plugin Name: Constant Contact API: Form Designer (Alpha)
 Plugin URI: http://integrationservic.es/constant-contact/wordpress-plugin.php
 Description: Create fancy-lookin' forms for the Constant Contact API plugin that have tons of neat configuration options.
 Author: Katz Web Services, Inc.
-Version: 2.3.8
+Version: 2.3.9
 Author URI: http://www.katzwebservices.com
 */
 
@@ -19,7 +19,7 @@ add_action('plugins_loaded', 'ccfg_init');
 
 function ccfg_init() {
 	global $pagenow;
-
+	
 	define('CC_FORM_GEN_PATH', plugin_dir_url(__FILE__));
 	add_action('init', 'check_ccfg_compatibility');
 	add_action('widgets_init', 'constant_contact_form_load_widget');
@@ -39,11 +39,13 @@ function ccfg_init() {
 function check_ccfg_compatibility() {
 	global $cc;
 	
+	if(!defined('CC_FILE_PATH') || !function_exists('constant_contact_create_object')) {
+		return false;
+	}
+	
 	$cc = constant_contact_create_object();
 	
-	if(!defined('CC_FILE_PATH')) {
-		return false;
-	} elseif(empty($cc)) {
+	if(empty($cc)) {
 		return 0;
 	} else {
 		return true; 
@@ -180,7 +182,7 @@ function constant_contact_retrieve_form($formid, $force_update=false, $unique_id
 function cc_form_get_selected_id($allForms = array()) {
 	
 	if(isset($_REQUEST['form']) && (empty($_REQUEST['action']) || @$_REQUEST['action'] === 'edit')) {
-		return (int)$_REQUEST['form'];
+		return $_REQUEST['form'];
 	}
 	
 	if(empty($allForms)) {
@@ -210,6 +212,9 @@ function cc_form_process() {
 	$cc_form_selected_id = cc_form_get_selected_id();
 		
 	switch ( $action ) {
+		case 'delete_all':
+			delete_option('cc_form_design');
+			break;
 		case 'delete':
 			
 			$cc_form_selected_id = isset($_REQUEST['form']) ? (int)$_REQUEST['form'] : $cc_form_selected_id;
@@ -413,8 +418,16 @@ function constant_contact_design_forms() {
 wp_cc_form_setup(); 
 
 ?>
+<script>
+jQuery(document).ready(function($) {
+	$('#delete_all_forms').click(function() {
+		return confirm('<?php _e('Delete all form Data? This cannot be undone.', 'constant-contact-api'); ?>');
+	});
+});
+</script>
 <div class="wrap">
 <div>
+	<a class="alignright" href="<?php echo wp_nonce_url( admin_url('admin.php?page=constant-contact-forms&action=delete_all&amp;form=all'), 'delete-all' ); ?>" id="delete_all_forms"><?php _e('Clear All Forms', 'constant-contact-api'); ?></a>
 	<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> Form Designer</h2>
 	<?php
 	

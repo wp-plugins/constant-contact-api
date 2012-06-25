@@ -1170,18 +1170,20 @@ function constant_contact_get_events_output($args = array(), $sidebar = false) {
 					}
 					if(!empty($location)) {
 						$locationText = constant_contact_create_location($EventLocation);
-						if($map) {
-							if(isset($EventLocation['Location'])) { $EventLocation['NewLocation'] = '('.$EventLocation['Location'].')'; unset($EventLocation['Location']); }
-							#if(isset($EventLocation['Address3'])) { unset($EventLocation['Address3']); }
-							$locationformap = trim(constant_contact_create_location($EventLocation));
-							$address_qs = str_replace("<br />", ", ", $locationformap.'<br />'.$EventLocation['NewLocation']); //replacing <br/> with spaces
-							$address_qs = urlencode($address_qs);
-							$locationText .= "<br/>".apply_filters('cc_event_map_link', "<a href='http://maps.google.com/maps?q=$address_qs'".$target." class='cc_event_map_link'>".__('Map Location','constant-contact-api')."</a>", $EventLocation, $address_qs);
+						if(!empty($locationText)) {
+							if($map) {
+								if(isset($EventLocation['Location'])) { $EventLocation['NewLocation'] = '('.$EventLocation['Location'].')'; unset($EventLocation['Location']); }
+								#if(isset($EventLocation['Address3'])) { unset($EventLocation['Address3']); }
+								$locationformap = trim(constant_contact_create_location($EventLocation));
+								$address_qs = str_replace("<br />", ", ", $locationformap.'<br />'.$EventLocation['NewLocation']); //replacing <br/> with spaces
+								$address_qs = urlencode($address_qs);
+								$locationText .= "<br/>".apply_filters('cc_event_map_link', "<a href='http://maps.google.com/maps?q=$address_qs'".$target." class='cc_event_map_link'>".__('Map Location','constant-contact-api')."</a>", $EventLocation, $address_qs);
+							}
+							
+							$locationOut = '
+						<dt class="cc_event_location cc_event_location_dt">'.apply_filters('cc_event_location_dt', __('Location: ','constant-contact-api')).'</dt>
+							<dd class="cc_event_location_dd cc_event_location">'.apply_filters('cc_event_location', $locationText).'</dd>';
 						}
-						
-						$locationOut = '
-					<dt class="cc_event_location cc_event_location_dt">'.apply_filters('cc_event_location_dt', __('Location: ','constant-contact-api')).'</dt>
-						<dd class="cc_event_location_dd cc_event_location">'.apply_filters('cc_event_location', $locationText).'</dd>';
 					}
 					
 				$endOut = '

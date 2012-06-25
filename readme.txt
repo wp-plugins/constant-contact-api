@@ -3,8 +3,8 @@ Contributors: katzwebdesign, jamesbenson
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackkatz%40gmail%2ecom&item_name=Constant%20Contact%20API%20Plugin&no_shipping=0&no_note=1&tax=0&currency_code=USD&lc=US&bn=PP%2dDonationsBF&charset=UTF%2d8
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 2.9
-Tested up to: 3.3.2
-Stable tag: trunk
+Tested up to: 3.4
+Stable tag: 2.3.9
 
 Integrate Constant Contact into your website with this full-featured plugin.
 
@@ -69,6 +69,11 @@ To install the plugin follow the steps below:
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
 == Changelog ==
+
+= 2.3.9 = 
+* Fixed Form Designer issue affecting being able to select active form
+	* Added "Clear All Forms link" in top-right of Form Designer page to delete all forms
+* If Event Location is empty, widget will not show "Location:" text
 
 = 2.3.8 =
 * Added Akismet spam filtering
@@ -255,6 +260,11 @@ To install the plugin follow the steps below:
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
+
+= 2.3.9 = 
+* Fixed Form Designer issue affecting being able to select active form
+	* Added "Clear All Forms link" in top-right of Form Designer page to delete all forms
+* If Event Location is empty, widget will not show "Location:" text
 
 = 2.3.8 =
 * Added Akismet spam filtering
