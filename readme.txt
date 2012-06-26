@@ -3,8 +3,8 @@ Contributors: katzwebdesign, jamesbenson
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackkatz%40gmail%2ecom&item_name=Constant%20Contact%20API%20Plugin&no_shipping=0&no_note=1&tax=0&currency_code=USD&lc=US&bn=PP%2dDonationsBF&charset=UTF%2d8
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 2.9
-Tested up to: 3.3.2
-Stable tag: 2.3.8
+Tested up to: 3.4
+Stable tag: 2.3.9
 
 Integrate Constant Contact into your website with this full-featured plugin.
 
@@ -70,8 +70,12 @@ To install the plugin follow the steps below:
 
 == Changelog ==
 
+= 2.3.9 = 
+* Fixed Form Designer issue affecting being able to select active form
+	* Added "Clear All Forms link" in top-right of Form Designer page to delete all forms
+* If Event Location is empty, widget will not show "Location:" text
+
 = 2.3.8 =
-* Reduced number of API calls in Admin if the settings are not correct.
 * Added Akismet spam filtering
 * Fixed many issues with the Form Designer
 	- Selected a form by default
@@ -257,8 +261,12 @@ To install the plugin follow the steps below:
 
 == Upgrade Notice ==
 
+= 2.3.9 = 
+* Fixed Form Designer issue affecting being able to select active form
+	* Added "Clear All Forms link" in top-right of Form Designer page to delete all forms
+* If Event Location is empty, widget will not show "Location:" text
+
 = 2.3.8 =
-* Reduced number of API calls in Admin if the settings are not correct.
 * Added Akismet spam filtering
 * Fixed many issues with the Form Designer
 	- Selected a form by default
