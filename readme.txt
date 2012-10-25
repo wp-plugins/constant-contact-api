@@ -1,10 +1,10 @@
 === Constant Contact for Wordpress ===
-Contributors: katzwebdesign, jamesbenson
+Contributors: katzwebdesign, katzwebservices, jamesbenson
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackkatz%40gmail%2ecom&item_name=Constant%20Contact%20API%20Plugin&no_shipping=0&no_note=1&tax=0&currency_code=USD&lc=US&bn=PP%2dDonationsBF&charset=UTF%2d8
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 2.9
-Tested up to: 3.4
-Stable tag: 2.3.9
+Tested up to: 3.5 beta2
+Stable tag: 2.3.10
 
 Integrate Constant Contact into your website with this full-featured plugin.
 
@@ -14,7 +14,7 @@ Integrate Constant Contact into your website with this full-featured plugin.
 
 <h4>Fully integrate Constant Contact with your WordPress website.</h4>
 
-The Constant Contact for Wordpress plugin is the best email marketing plugin for WordPress: integrate your website seamlessly with your Constant Contact account. 
+The Constant Contact for Wordpress plugin is the best email marketing plugin for WordPress: integrate your website seamlessly with your Constant Contact account.
 
 You can place a signup checkbox or list selection on your register page or use the signup widget anywhere in your website sidebar or PHP templates.
 
@@ -59,18 +59,31 @@ To install the plugin follow the steps below:
 ### Using the Form Designer
 1. Install this plugin.
 2. Activate the Constant Contact API: Form Designer plugin
-3. Configure the settings on the form designer by updating the settings in the boxes on the left. 
+3. Configure the settings on the form designer by updating the settings in the boxes on the left.
 4. Next to "Form Name" where it says "Enter form name here," enter your form name.
 5. Once you have configured and named your form, click Save Form.
 6. In the Appearance menu of the administration, click the Widgets link.
-7. Drag the widget named "Constant Contact Form Designer" into the sidebar. 
+7. Drag the widget named "Constant Contact Form Designer" into the sidebar.
 8. Configure the settings shown, then click the "Save" button at the bottom of the widget form.
 9. You will see the signup widget you created on your website!
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
 == Changelog ==
 
-= 2.3.9 = 
+= 2.3.10 =
+* Form Designer Updates:
+	* Added: Set the lists a form subscribes to in the Form Designer
+	* Fixed: Ability to edit existing forms
+	* Fixed: Issue where saving an existing form will jump to a different form
+	* Added: A new form ID generator will prevent overlapping IDs when deleting forms
+* Fixed: Constant Analytics once again allows you to pick from your Google Analytics profiles
+* Modified: Removed "Add Campaign" button: the feature wasn't ready, and was included by mistake
+* Improved Events list to include shortcode instead of unclear `id`
+* Added `[eventspot]` shortcode. Previous `[ccevents]` shortcode still works.
+* Added internationalization (translation support) to the Legacy Form widget.
+* Added field for submit button text to the Legacy Form widget.
+
+= 2.3.9 =
 * Fixed Form Designer issue affecting being able to select active form
 	* Added "Clear All Forms link" in top-right of Form Designer page to delete all forms
 * If Event Location is empty, widget will not show "Location:" text
@@ -130,7 +143,7 @@ To install the plugin follow the steps below:
 	- Removed config.php file; wasn't necessary
 	- Removed redundant & unused code from Form Designer
 
-= 2.3.1 = 
+= 2.3.1 =
 * Updated Constant Analytics Javascript for WordPress 3.2 compatibility
 * Fixed some not-so-minor issues
 	* Fixed issue with legacy widget where hidden lists were not being added to the form properly
@@ -156,11 +169,11 @@ To install the plugin follow the steps below:
 * Added a hook for internationalization of plugin (multiple language support)
 * Fixed issue where updating username & password settings may not change account except when closing browser window. This bug also affected if users de-activated plugin with the `Remove all data stored in database` selected. If users re-activated the plugin, the plugin would still seem to be configured properly because this information was stored in the browser session.
 
-= 2.2 = 
+= 2.2 =
 * Added an Events widget and shortcode
 * Updated the readme to have Form Designer shortcode instructions (see FAQ)
 
-= 2.1.4 = 
+= 2.1.4 =
 * Converted the plugin to using the <a href="http://codex.wordpress.org/HTTP_API" rel="nofollow">WordPress HTTP API</a> and `wp_remote_request()`. This should fix issues some users have been having with setting up the plugin (such as <a href="http://wordpress.org/support/topic/565047" rel="nofollow">issue #565047</a>)
 * Fixed issue where if the Constant Contact username & password settings were incorrect, then saved again (and still incorrect), there would be an error `Warning: Cannot modify header information - headers already sent by...`
 * Improved error messages so you'll know whether Constant Contact is having an issue of if it's a settings configuration issue.
@@ -171,7 +184,7 @@ To install the plugin follow the steps below:
 * Fixed "Invalid Argument" Line 183 error (<a href="http://wordpress.org/support/topic/547609" rel="nofollow">issue #547609</a>)
 * Fixed issue with forms not redirecting upon success (<a href="http://wordpress.org/support/topic/547609" rel="nofollow">issue #547609</a>)
 
-= 2.1.2 = 
+= 2.1.2 =
 
 * Form Designer
 	* Determined that issues with Form Designer not displaying are caused by hosting configuration issues. <strong>Contact your web host and request that they "whitelist your domain for ModSecurity."</strong> View the FAQ section for more information.
@@ -205,7 +218,7 @@ To install the plugin follow the steps below:
 * Improved blog registration form HTML
 * Improved Admin Profile lists HTML
 
-= 2.0 = 
+= 2.0 =
 * <strong>Major upgrade</strong> - make sure to back up your database. If you already have installed the plugin, this upgrade may not transfer your current settings.
 * Went through each page of the admin and made the layout and code better, and reworded the administration to <strong>make more sense</strong>
 * Fixed Import, Export, Activity
@@ -228,7 +241,7 @@ To install the plugin follow the steps below:
 * <em>Short story:</em> __Improved speed.__ <br /><em>Long story:</em> Fixes major potential bug - if you have noticed your site takes a long time to start loading, it may be because the plugin had been trying to access the Constant Contact API for the list values twice per page load. This structure has been totally revamped, and now the Constant Contact API is only accessed once upon changing settings. This release improves load time considerably by storing that information in the WordPress database. Added `cc_widget_lists_array` option to store Constant Contact lists, so that the API doesn't need to be called every page load. Now, API is only called when the plugin settings are saved.
 * Wrapped the List Selection Title for the multi-select form element in a `label` tag, and removed line break.
 
-= 1.1.0.1 = 
+= 1.1.0.1 =
 * Removed line break (`<br />`) before widget form to improve display of widget signup form
 * Fixed widget description and title display issues by renaming variables from `$title` to `$widget_title` and `$description` to `$widget_description`.
 * Converted some settings fields to `<textarea>` to make editing easier.
@@ -261,7 +274,20 @@ To install the plugin follow the steps below:
 
 == Upgrade Notice ==
 
-= 2.3.9 = 
+= 2.3.10 =
+* Form Designer Updates:
+	* Added: Set the lists a form subscribes to in the Form Designer
+	* Fixed: Ability to edit existing forms
+	* Fixed: Issue where saving an existing form will jump to a different form
+	* Added: A new form ID generator will prevent overlapping IDs when deleting forms
+* Fixed: Constant Analytics once again allows you to pick from your Google Analytics profiles
+* Modified: Removed "Add Campaign" button: the feature wasn't ready, and was included by mistake
+* Improved Events list to include shortcode instead of unclear `id`
+* Added `[eventspot]` shortcode. Previous `[ccevents]` shortcode still works.
+* Added internationalization (translation support) to the Legacy Form widget.
+* Added field for submit button text to the Legacy Form widget.
+
+= 2.3.9 =
 * Fixed Form Designer issue affecting being able to select active form
 	* Added "Clear All Forms link" in top-right of Form Designer page to delete all forms
 * If Event Location is empty, widget will not show "Location:" text
@@ -318,7 +344,7 @@ To install the plugin follow the steps below:
 	- Removed config.php file; wasn't necessary
 	- Removed redundant & unused code from Form Designer
 
-= 2.3.1 = 
+= 2.3.1 =
 * Updated Constant Analytics Javascript for WordPress 3.2 compatibility
 * Fixed some not-so-minor issues
 	* Fixed issue with legacy widget where hidden lists were not being added to the form properly
@@ -344,11 +370,11 @@ To install the plugin follow the steps below:
 * Added a hook for internationalization of plugin (multiple language support)
 * Fixed issue where updating username & password settings may not change account except when closing browser window. This bug also affected if users de-activated plugin with the `Remove all data stored in database` selected. If users re-activated the plugin, the plugin would still seem to be configured properly because this information was stored in the browser session.
 
-= 2.2 = 
+= 2.2 =
 * Added an Events widget and shortcode
 * Updated the readme to have Form Designer shortcode instructions (see FAQ)
 
-= 2.1.4 = 
+= 2.1.4 =
 * Converted the plugin to using the <a href="http://codex.wordpress.org/HTTP_API" rel="nofollow">WordPress HTTP API</a>. This should fix issues some users have been having with setting up the plugin (such as <a href="http://wordpress.org/support/topic/565047" rel="nofollow">issue #565047</a>)
 * Fixed issue where if the Constant Contact username & password settings were incorrect, then saved again (and still incorrect), there would be an error `Warning: Cannot modify header information - headers already sent by...`
 
@@ -358,7 +384,7 @@ To install the plugin follow the steps below:
 * Fixed "Invalid Argument" Line 183 error (<a href="http://wordpress.org/support/topic/547609" rel="nofollow">issue #547609</a>)
 * Fixed issue with forms not redirecting upon success (<a href="http://wordpress.org/support/topic/547609" rel="nofollow">issue #547609</a>)
 
-= 2.1.2 = 
+= 2.1.2 =
 
 * Form Designer
 	* Determined that issues with Form Designer not displaying are caused by hosting configuration issues. <strong>Contact your web host and request that they "whitelist your domain for ModSecurity."</strong> View the FAQ section for more information.
@@ -392,7 +418,7 @@ To install the plugin follow the steps below:
 * Improved blog registration form HTML
 * Improved Admin Profile lists HTML
 
-= 2.0 = 
+= 2.0 =
 * <strong>Major upgrade</strong> - make sure to back up your database. If you already have installed the plugin, this upgrade may not transfer your current settings.
 * Went through each page of the admin and made the layout and code better, and reworded the administration to <strong>make more sense</strong>
 * Fixed Import, Export, Activity
@@ -410,17 +436,17 @@ To install the plugin follow the steps below:
 * Minor bug fix, fixes `in_array(): Wrong datatype for second argument` error <a href="http://wordpress.org/support/topic/393359" rel="nofollow">reported here</a>.
 
 = 1.1.1 =
-* Fixes major potential bug - if you have noticed your site takes a long time to start loading, it may be because the plugin had been trying to access the Constant Contact API for the list values twice per page load. This structure has been totally revamped, and now the Constant Contact API is only accessed once upon changing settings. This release improves load time considerably by storing that information in the WordPress database. 
+* Fixes major potential bug - if you have noticed your site takes a long time to start loading, it may be because the plugin had been trying to access the Constant Contact API for the list values twice per page load. This structure has been totally revamped, and now the Constant Contact API is only accessed once upon changing settings. This release improves load time considerably by storing that information in the WordPress database.
 * Added `cc_widget_lists_array` option to store Constant Contact lists, so that the API doesn't need to be called every page load. Now, API is only called when the plugin settings are saved.
 
 = 1.1.0.1 =
 * If your widget description and titles were not displaying in the signup form, that is now fixed.
 
-= 1.1 = 
+= 1.1 =
 * Fixes a potential `register_globals` issue
 * Adds helpful filters for developers
 * Improves widget error handling & error messages
-* Improves 
+* Improves
 
 = 1.0.10 =
 This release fixes a problem with 1and1 servers
@@ -449,7 +475,7 @@ This version fixes a major bug and all users should upgrade immediately.
 = Do I need a Constant Contact account for this plugin? =
 This plugin requires a <a href="http://www.constantcontact.com/index.jsp" rel="nofollow" title="Sign up for Constant Contact">Constant Contact account</a>  (affiliate link).
 
-Constant Contact is a great email marketing company -- their rates are determined by the number of contacts in your list, not how many emails you send. This means you can send unlimited emails per month for one fixed rate! <a href="http://www.constantcontact.com/features/signup.jsp" title="Try out Constant Contact today" rel="nofollow">Give it a test run</a>  (affiliate link). 
+Constant Contact is a great email marketing company -- their rates are determined by the number of contacts in your list, not how many emails you send. This means you can send unlimited emails per month for one fixed rate! <a href="http://www.constantcontact.com/features/signup.jsp" title="Try out Constant Contact today" rel="nofollow">Give it a test run</a>  (affiliate link).
 
 = Is there shortcode support? =
 
@@ -475,7 +501,7 @@ So to add a form, you would add the following in your content: `[constantcontact
 
 ### Event Shortcode ###
 
-To show event details, you can use the `[ccevents]` shortcode with the following options:
+To show event details, you can use the `[eventspot]` shortcode with the following options:
 
 <pre>
 'id' => null, // Show a specific event; enter Event ID (found on the Events page) to use
@@ -492,9 +518,9 @@ To show event details, you can use the `[ccevents]` shortcode with the following
 
 <strong>Sample Event Shortcodes</strong>
 
-* To show event details for 5 events using the default settings, you would use `[ccevents limit=3]`
-* To show event details for a single event with the id of `abc123` and also show the location details and map link, you would use: `[ccevents id="abc123" location=true map=true]`
-* To use your own CSS file, you would use `[ccevents style=false]`
+* To show event details for 5 events using the default settings, you would use `[eventspot limit=3]`
+* To show event details for a single event with the id of `abc123` and also show the location details and map link, you would use: `[eventspot id="abc123" location=true map=true]`
+* To use your own CSS file, you would use `[eventspot style=false]`
 
 
 = How do I use the new `apply_filters()` functionality? (Added 1.1) =
@@ -502,7 +528,7 @@ If you want to change some code in the widget, you can use the WordPress `add_fi
 
 You can add code to your theme's `functions.php` file that will modify the widget output. Here's an example:
 <pre>
-function my_example_function($widget) { 
+function my_example_function($widget) {
 	// The $widget variable is the output of the widget
 	// This will replace 'this word' with 'that word' in the widget output.
 	$widget = str_replace('this word', 'that word', $widget);
@@ -523,7 +549,7 @@ function cc_event_output_single($output, $pieces = array('start'=> '','title'=>'
 	// The pieces of each event are stored in the $pieces array
 	// So you can modify them and cut and paste in what order you
 	// want the pieces to display
-	return $pieces['start'].'<dt>Description</dt>'.$pieces['description'].$pieces['date'].$pieces['end'];	
+	return $pieces['start'].'<dt>Description</dt>'.$pieces['description'].$pieces['date'].$pieces['end'];
 }
 </pre>
 
@@ -545,19 +571,19 @@ When you do that, email click stats will be segmented for you in the Site Traffi
 ### Using the new Form Designer
 1. Install this plugin.
 2. Activate the Constant Contact API: Form Designer plugin
-3. Configure the settings on the form designer by updating the settings in the boxes on the left. 
+3. Configure the settings on the form designer by updating the settings in the boxes on the left.
 4. Next to "Form Name" where it says "Enter form name here," enter your form name.
 5. Once you have configured and named your form, click Save Form.
 6. In the Appearance menu of the administration, click the Widgets link.
-7. Drag the widget named "Constant Contact Form Designer" into the sidebar. 
+7. Drag the widget named "Constant Contact Form Designer" into the sidebar.
 8. Configure the settings shown, then click the "Save" button at the bottom of the widget form.
 9. You will see the signup widget you created on your website!
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
-= Form Designer isn't showing up or working = 
-Form Designer needs to be activated separately from the main plugin (see "How do I use the Form Designer?" above). Once you activate it, if it's still not working, it's likely a server issue. 
+= Form Designer isn't showing up or working =
+Form Designer needs to be activated separately from the main plugin (see "How do I use the Form Designer?" above). Once you activate it, if it's still not working, it's likely a server issue.
 
-The problem is that your web server may think that Form Designer is an unwelcome script. In order to fix this, you should <strong>contact your web host and request that they "whitelist your domain for ModSecurity."</strong>. 
+The problem is that your web server may think that Form Designer is an unwelcome script. In order to fix this, you should <strong>contact your web host and request that they "whitelist your domain for ModSecurity."</strong>.
 
 <a href="http://www.hostgator.com" rel="nofollow">HostGator</a> reps said whitelisting your own domain is <strong>not an issue that affects website security</strong>.
 
