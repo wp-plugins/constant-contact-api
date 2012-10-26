@@ -279,6 +279,7 @@ class constant_contact_api_widget extends WP_Widget {
   /** @see WP_Widget::form */
     function form($instance)
 	{
+		self::r($instance);
 		$instance = $this->parse_args($instance);
 
 		extract($instance);
@@ -302,13 +303,13 @@ class constant_contact_api_widget extends WP_Widget {
 		<tr valign="top">
 			<th scope="row"><p><label><span><?php _e('Show First Name?', 'constant-contact-api'); ?></span></label></p></th>
 			<td>
-				<p><label class="howto" for="<?php echo $this->get_field_id('show_firstname');?>"><input <?php checked($show_firstname, 1); ?> type="checkbox" class="checkbox" name="<?php echo $this->get_field_name('show_firstname');?>" value="1" id="<?php echo $this->get_field_id('show_firstname');?>" /> <span><?php _e('Show first name input field', 'constant-contact-api'); ?></span></label></p>
+				<p><label class="howto" for="<?php echo $this->get_field_id('show_firstname');?>"><input name="<?php echo $this->get_field_name('show_firstname');?>" value="0" type="hidden" /><input <?php checked($show_firstname, 1); ?> type="checkbox" class="checkbox" name="<?php echo $this->get_field_name('show_firstname');?>" value="1" id="<?php echo $this->get_field_id('show_firstname');?>" /> <span><?php _e('Show first name input field', 'constant-contact-api'); ?></span></label></p>
 			</td>
 		</tr>
 		<tr valign="top">
 			<th scope="row"><p><label><span><?php _e('Show Last Name?', 'constant-contact-api'); ?></span></label></p></th>
 			<td>
-				<p><label class="howto" for="<?php echo $this->get_field_id('show_lastname');?>"><input <?php checked($show_lastname, 1); ?> type="checkbox" class="checkbox" name="<?php echo $this->get_field_name('show_lastname');?>" value="1" id="<?php echo $this->get_field_id('show_lastname');?>" /> <span><?php _e('Show last name input field', 'constant-contact-api'); ?></span></label></p>
+				<p><label class="howto" for="<?php echo $this->get_field_id('show_lastname');?>"><input name="<?php echo $this->get_field_name('show_lastname');?>" value="0" type="hidden" /><input <?php checked($show_lastname, 1); ?> type="checkbox" class="checkbox" name="<?php echo $this->get_field_name('show_lastname');?>" value="1" id="<?php echo $this->get_field_id('show_lastname');?>" /> <span><?php _e('Show last name input field', 'constant-contact-api'); ?></span></label></p>
 			</td>
 		</tr>
 		<tr valign="top">

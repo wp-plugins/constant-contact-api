@@ -70,6 +70,9 @@ To install the plugin follow the steps below:
 
 == Changelog ==
 
+= 2.3.11 =
+* Fixed issue introduced in 2.3.10 where First Name and Last Name checkboxes don't stay checked in the Legacy Form Widget
+
 = 2.3.10 =
 * Form Designer Updates:
 	* Added: Set the lists a form subscribes to in the Form Designer
@@ -273,6 +276,9 @@ To install the plugin follow the steps below:
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
+
+= 2.3.11 =
+* Fixed issue introduced in 2.3.10 where First Name and Last Name checkboxes don't stay checked in the Legacy Form Widget
 
 = 2.3.10 =
 * Form Designer Updates:
