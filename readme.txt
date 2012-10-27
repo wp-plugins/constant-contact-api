@@ -14,7 +14,7 @@ Integrate Constant Contact into your website with this full-featured plugin.
 
 <h4>Fully integrate Constant Contact with your WordPress website.</h4>
 
-The Constant Contact for Wordpress plugin is the best email marketing plugin for WordPress: integrate your website seamlessly with your Constant Contact account.
+The Constant Contact for Wordpress plugin is the best email marketing plugin for WordPress: integrate your website seamlessly with Constant Contact.
 
 You can place a signup checkbox or list selection on your register page or use the signup widget anywhere in your website sidebar or PHP templates.
 
