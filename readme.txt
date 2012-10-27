@@ -14,7 +14,7 @@ Integrate Constant Contact into your website with this full-featured plugin.
 
 <h4>Fully integrate Constant Contact with your WordPress website.</h4>
 
-The Constant Contact for Wordpress plugin is the best email marketing plugin for WordPress: integrate your website seamlessly with your Constant Contact account.
+The Constant Contact for Wordpress plugin is the best email marketing plugin for WordPress: integrate your website seamlessly with Constant Contact.
 
 You can place a signup checkbox or list selection on your register page or use the signup widget anywhere in your website sidebar or PHP templates.
 
@@ -69,9 +69,6 @@ To install the plugin follow the steps below:
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
 == Changelog ==
-
-= 2.3.11 =
-* Fixed issue introduced in 2.3.10 where First Name and Last Name checkboxes don't stay checked in the Legacy Form Widget
 
 = 2.3.10 =
 * Form Designer Updates:
@@ -276,9 +273,6 @@ To install the plugin follow the steps below:
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
-
-= 2.3.11 =
-* Fixed issue introduced in 2.3.10 where First Name and Last Name checkboxes don't stay checked in the Legacy Form Widget
 
 = 2.3.10 =
 * Form Designer Updates:
