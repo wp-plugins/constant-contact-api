@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackk
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 2.9
 Tested up to: 3.5 beta2
-Stable tag: 2.3.10
+Stable tag: 2.3.12
 
 Integrate Constant Contact into your website with this full-featured plugin.
 
@@ -69,6 +69,9 @@ To install the plugin follow the steps below:
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
 == Changelog ==
+
+= 2.3.12 =
+* Fixed issue introduced in 2.3.11 where settings were printed in the legacy widget.
 
 = 2.3.11 =
 * Fixed issue introduced in 2.3.10 where First Name and Last Name checkboxes don't stay checked in the Legacy Form Widget

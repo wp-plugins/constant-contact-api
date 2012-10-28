@@ -279,7 +279,6 @@ class constant_contact_api_widget extends WP_Widget {
   /** @see WP_Widget::form */
     function form($instance)
 	{
-		self::r($instance);
 		$instance = $this->parse_args($instance);
 
 		extract($instance);
