@@ -3,8 +3,13 @@ Contributors: katzwebdesign, katzwebservices, jamesbenson
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackkatz%40gmail%2ecom&item_name=Constant%20Contact%20API%20Plugin&no_shipping=0&no_note=1&tax=0&currency_code=USD&lc=US&bn=PP%2dDonationsBF&charset=UTF%2d8
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 2.9
+<<<<<<< .mine
+Tested up to: 3.5.1
+Stable tag: 2.4.0
+=======
 Tested up to: 3.5.1
 Stable tag: 2.4
+>>>>>>> .r658891
 
 Integrate Constant Contact into your website with this full-featured plugin.
 
@@ -70,6 +75,29 @@ To install the plugin follow the steps below:
 
 == Changelog ==
 
+<<<<<<< .mine
+= 2.4.0 =
+* Fixed some potential XSS vulnerabilities. Thanks to <a href="http://ultimorender.com.ar/funkascript">Manuel</a> for making them known.
+* Form Designer
+	* Updated to the latest TinyMCE codebase for the Form Editor. Unfortunately, the plugin still can't use the WP editor due to technical limitations.
+	* Switched to using built-in jQuery and jQuery UI scripts for better speed and support going forward
+	* Fixed lots of bugs
+	* Fixed scrollFollow
+	* Added some authentication to prevent hacking
+* Fixed link to import FAQ
+* Improved internationalization support plugin-wide
+* Fixed: "View Activity" link now works to view individual activity items.
+* Fixed Form Designer Widget extra options visibiltiy bug
+* Improved admin styling for WordPress 3.5
+* Removed Export page. Didn't make sense to have in there.
+
+= 2.3.12 =
+* Fixed issue introduced in 2.3.11 where settings were printed in the legacy widget.
+
+= 2.3.11 =
+* Fixed issue introduced in 2.3.10 where First Name and Last Name checkboxes don't stay checked in the Legacy Form Widget
+
+=======
 = 2.4 =
 * Fixed some potential XSS vulnerabilities. Thanks to <a href="http://ultimorender.com.ar/funkascript">Manuel</a> for making them known.
 * Form Designer
@@ -91,6 +119,7 @@ To install the plugin follow the steps below:
 = 2.3.11 =
 * Fixed issue introduced in 2.3.10 where First Name and Last Name checkboxes don't stay checked in the Legacy Form Widget
 
+>>>>>>> .r658891
 = 2.3.10 =
 * Form Designer Updates:
 	* Added: Set the lists a form subscribes to in the Form Designer
@@ -295,6 +324,26 @@ To install the plugin follow the steps below:
 
 == Upgrade Notice ==
 
+<<<<<<< .mine
+= 2.4.0 =
+* Fixed some potential XSS vulnerabilities. Thanks to <a href="http://ultimorender.com.ar/funkascript">Manuel</a> for making them known.
+* Form Designer
+	* Updated to the latest TinyMCE codebase for the Form Editor. Unfortunately, the plugin still can't use the WP editor due to technical limitations.
+	* Switched to using built-in jQuery and jQuery UI scripts for better speed and support going forward
+	* Fixed lots of bugs
+	* Fixed scrollFollow
+	* Added some authentication to prevent hacking
+* Fixed link to import FAQ
+* Improved internationalization support plugin-wide
+* Fixed: "View Activity" link now works to view individual activity items.
+* Fixed Form Designer Widget extra options visibiltiy bug
+* Improved admin styling for WordPress 3.5
+* Removed Export page. Didn't make sense to have in there.
+
+= 2.3.11 =
+* Fixed issue introduced in 2.3.10 where First Name and Last Name checkboxes don't stay checked in the Legacy Form Widget
+
+=======
 = 2.4 =
 * Fixed some potential XSS vulnerabilities. Thanks to <a href="http://ultimorender.com.ar/funkascript">Manuel</a> for making them known.
 * Form Designer
@@ -313,6 +362,7 @@ To install the plugin follow the steps below:
 = 2.3.11 =
 * Fixed issue introduced in 2.3.10 where First Name and Last Name checkboxes don't stay checked in the Legacy Form Widget
 
+>>>>>>> .r658891
 = 2.3.10 =
 * Form Designer Updates:
 	* Added: Set the lists a form subscribes to in the Form Designer
@@ -512,9 +562,9 @@ This version fixes a major bug and all users should upgrade immediately.
 == Frequently Asked Questions ==
 
 = Do I need a Constant Contact account for this plugin? =
-This plugin requires a <a href="http://www.constantcontact.com/index.jsp" rel="nofollow" title="Sign up for Constant Contact">Constant Contact account</a>  (affiliate link).
+This plugin requires a <a href="http://www.constantcontact.com/index.jsp" rel="nofollow" title="Sign up for Constant Contact">Constant Contact account</a>.
 
-Constant Contact is a great email marketing company -- their rates are determined by the number of contacts in your list, not how many emails you send. This means you can send unlimited emails per month for one fixed rate! <a href="http://www.constantcontact.com/features/signup.jsp" title="Try out Constant Contact today" rel="nofollow">Give it a test run</a>  (affiliate link).
+Constant Contact is a great email marketing company -- their rates are determined by the number of contacts in your list, not how many emails you send. This means you can send unlimited emails per month for one fixed rate! <a href="http://www.constantcontact.com/features/signup.jsp" title="Try out Constant Contact today" rel="nofollow">Give it a test run</a>.
 
 = Is there shortcode support? =
 
