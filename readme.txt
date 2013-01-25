@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackk
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 2.9
 Tested up to: 3.5.1
-Stable tag: 2.4.0
+Stable tag: 2.4.0.1
 
 Integrate Constant Contact into your website with this full-featured plugin.
 
@@ -70,7 +70,10 @@ To install the plugin follow the steps below:
 
 == Changelog ==
 
-= 2.4 =
+= 2.4.0.1 =
+* Possibly fixed issue with login not working on IIS sites
+
+= 2.4.0 =
 * Fixed some potential XSS vulnerabilities. Thanks to <a href="http://ultimorender.com.ar/funkascript">Manuel</a> for making them known.
 * Form Designer
 	* Updated to the latest TinyMCE codebase for the Form Editor. Unfortunately, the plugin still can't use the WP editor due to technical limitations.
@@ -295,7 +298,10 @@ To install the plugin follow the steps below:
 
 == Upgrade Notice ==
 
-= 2.4 =
+= 2.4.0.1 =
+* Possibly fixed issue with login not working on IIS sites
+
+= 2.4.0 =
 * Fixed some potential XSS vulnerabilities. Thanks to <a href="http://ultimorender.com.ar/funkascript">Manuel</a> for making them known.
 * Form Designer
 	* Updated to the latest TinyMCE codebase for the Form Editor. Unfortunately, the plugin still can't use the WP editor due to technical limitations.

@@ -4,7 +4,7 @@ Plugin Name: Constant Contact API: Form Designer (Alpha)
 Plugin URI: http://integrationservic.es/constant-contact/wordpress-plugin.php
 Description: Create fancy-lookin' forms for the Constant Contact API plugin that have tons of neat configuration options.
 Author: Katz Web Services, Inc.
-Version: 2.4.0
+Version: 2.4.0.1
 Author URI: http://www.katzwebservices.com
 */
 

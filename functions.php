@@ -379,36 +379,31 @@ function constant_contact_create_object($force_new = false)
 	// Create a new instance
 	$new_cc = new cc($username, $password);
 
+	// Run a generic check to see if we can connect
+	$new_cc->get_service_description();
+
 	/**
 	 * Test the instance to make sure it is valid
 	 */
-	// Run a generic check to see if we can connect
-	if(is_object($new_cc) && $new_cc->get_service_description()) {
+	if(is_object($new_cc) && (empty($new_cc->last_error) || (isset($new_cc->http_response_code) && $new_cc->http_response_code === 200))) {
 		// If we have connected copy the object into the global
 		$cc = &$new_cc;
 
 		$_SESSION['ccObject'] = maybe_serialize($new_cc);
 
+		$cc_create_failed = false;
+
 		// Save some processing time!
 		constant_contact_set_transient('cc_object', maybe_serialize($new_cc), 60*60*12);
 
-		// If there is a problem with $cc show an error
-		if(!is_object($new_cc)) {
-
-			$cc_create_failed = true;
-			update_option('cc_configured', 0);
-			return false;
-		} else {
-			update_option('cc_configured', 1);
-			return $new_cc;
-		}
+		update_option('cc_configured', 1);
+		return $new_cc;
 
 	// Otherwise, if there is a response code, deal with the connection error
-	} elseif(is_object($new_cc) AND isset($new_cc->http_response_code)) {
+	} elseif(is_object($new_cc) && isset($new_cc->http_response_code)) {
 		// if we get an unauthorized 401 error code reset the username and password
 		// if we don't do this the CC account will be temporarily blocked eventually
 		$cc_create_failed = $new_cc->http_get_response_code_error($new_cc->http_response_code);
-		return false;
 	} // if http_response_code
 
 	update_option('cc_configured', 0);
@@ -1410,4 +1405,3 @@ function echo_if_not_empty($check = null, $empty = '', $echo = false) {
 	echo get_if_not_empty($check, $empty, $echo);
 }
 
-?>

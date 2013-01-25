@@ -227,7 +227,7 @@ class cc {
      */
     function cc($api_username, $api_password)
     {
-    	$this->api_username = $api_username;
+        $this->api_username = $api_username;
         $this->api_password = $api_password;
 
         $this->api_url .= '/ws/customers/' . rawurlencode($api_username) . '/';
@@ -670,29 +670,29 @@ class cc {
     }
 
 
-	function get_all_list_members($listid) {
-		$contacts = constant_contact_get_transient('listmembers'.$listid);
-		if($contacts && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'list')) { return maybe_unserialize($contacts); }
+    function get_all_list_members($listid) {
+        $contacts = constant_contact_get_transient('listmembers'.$listid);
+        if($contacts && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'list')) { return maybe_unserialize($contacts); }
 
-		$contacts = array();
-		$_contacts = array($this->get_list_members($listid));
-		if(!empty($_contacts)) {
+        $contacts = array();
+        $_contacts = array($this->get_list_members($listid));
+        if(!empty($_contacts)) {
 
-			while(!empty($this->member_meta_data->next_page)) {
-				$_contacts[] = $this->get_list_members($listid, $this->member_meta_data->next_page);
-			}
-			foreach($_contacts as $contactList) {
-				foreach($contactList as $k => $v) {
-					$contacts[$v['id']] = $v;
-				}
-			}
-			#r($contacts);
+            while(!empty($this->member_meta_data->next_page)) {
+                $_contacts[] = $this->get_list_members($listid, $this->member_meta_data->next_page);
+            }
+            foreach($_contacts as $contactList) {
+                foreach($contactList as $k => $v) {
+                    $contacts[$v['id']] = $v;
+                }
+            }
+            #r($contacts);
 
-		}
+        }
 
-		constant_contact_set_transient('listmembers'.$listid, maybe_serialize($contacts));
-		return $contacts;
-	}
+        constant_contact_set_transient('listmembers'.$listid, maybe_serialize($contacts));
+        return $contacts;
+    }
 
 
     /**
@@ -824,29 +824,29 @@ $xml_data .= '
     }
 
 
-	function get_all_contacts($timeout = 21600) {
-		$contacts = constant_contact_get_transient('cc_contacts');
-		if($contacts && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'contacts')) { return maybe_unserialize($contacts); }
+    function get_all_contacts($timeout = 21600) {
+        $contacts = constant_contact_get_transient('cc_contacts');
+        if($contacts && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'contacts')) { return maybe_unserialize($contacts); }
 
-		$contacts = array();
-		$_contacts = array($this->get_contacts());
-		if(!empty($_contacts)) {
+        $contacts = array();
+        $_contacts = array($this->get_contacts());
+        if(!empty($_contacts)) {
 
-			while(!empty($this->contact_meta_data->next_page)) {
-				$_contacts[] = $this->get_contacts($this->contact_meta_data->next_page);
-			}
-			foreach($_contacts as $contactList) {
-				foreach($contactList as $k => $v) {
-					$contacts[$v['id']] = $v;
-				}
-			}
-			#r($contacts);
+            while(!empty($this->contact_meta_data->next_page)) {
+                $_contacts[] = $this->get_contacts($this->contact_meta_data->next_page);
+            }
+            foreach($_contacts as $contactList) {
+                foreach($contactList as $k => $v) {
+                    $contacts[$v['id']] = $v;
+                }
+            }
+            #r($contacts);
 
-		}
+        }
 
-		constant_contact_set_transient('cc_contacts', maybe_serialize($contacts), $timeout);
-		return $contacts;
-	}
+        constant_contact_set_transient('cc_contacts', maybe_serialize($contacts), $timeout);
+        return $contacts;
+    }
 
 
     /**
@@ -856,7 +856,7 @@ $xml_data .= '
      */
     function get_contacts($action = 'contacts', $timeout = 3600)
     {
-    	$xml = $this->load_url($action);
+        $xml = $this->load_url($action);
 
         if(!$xml):
             return false;
@@ -897,7 +897,7 @@ $xml_data .= '
             endif;
         endif;
 
-		return $contacts;
+        return $contacts;
     }
 
 
@@ -908,9 +908,9 @@ $xml_data .= '
      */
     function get_contact($id = null, $timeout = 3600)
     {
-    	$transient_title = 'cccon'.sha1($id);
-		$contact = constant_contact_get_transient($transient_title);
-		if(!empty($timeout) && $contact && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'contact')) { return maybe_unserialize($contact); }
+        $transient_title = 'cccon'.sha1($id);
+        $contact = constant_contact_get_transient($transient_title);
+        if(!empty($timeout) && $contact && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'contact')) { return maybe_unserialize($contact); }
 
         $xml = $this->load_url("contacts/$id");
 
@@ -959,7 +959,7 @@ $xml_data .= '
             $contact['id'] = $id;
         endif;
 
-		constant_contact_set_transient($transient_title, maybe_serialize($contact), $timeout);
+        constant_contact_set_transient($transient_title, maybe_serialize($contact), $timeout);
 
         return $contact;
     }
@@ -1091,15 +1091,15 @@ $xml_data .= '
     }
 
 
-	/**
+    /**
      * Gets all activities
      *
      * @access     public
      */
     function get_events($action = 'events', $timeout = 3600)
     {
-    	$events = constant_contact_get_transient('cc_events');
-		if($events && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'events')) { return maybe_unserialize($events); }
+        $events = constant_contact_get_transient('cc_events');
+        if($events && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'events')) { return maybe_unserialize($events); }
 
         $xml = $this->load_url($action);
 
@@ -1111,7 +1111,7 @@ $xml_data .= '
         $events = array();
         $_events = (isset($xml['atom:feed']['atom:entry'])) ? $xml['atom:feed']['atom:entry'] : false;
         if(is_array($_events)):
-        	if(isset($_events[0]['atom:link_attr']['href'])):
+            if(isset($_events[0]['atom:link_attr']['href'])):
                 foreach($_events as $k => $v):
                     $id = $this->get_id_from_link($v['atom:link_attr']['href']);
                     $event = $v['atom:content']['Event'];
@@ -1127,8 +1127,8 @@ $xml_data .= '
         endif;
 
         if(!empty($events)) {
-	        constant_contact_set_transient('cc_events', maybe_serialize($events), $timeout);
-	    }
+            constant_contact_set_transient('cc_events', maybe_serialize($events), $timeout);
+        }
 
         return $events;
     }
@@ -1140,9 +1140,9 @@ $xml_data .= '
      */
     function get_event($id = null, $timeout = 3600)
     {
-    	$transient_title = 'ccev_'.sha1($id);
-		$events = constant_contact_get_transient($transient_title);
-		if($events && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'event')) { return maybe_unserialize($events); }
+        $transient_title = 'ccev_'.sha1($id);
+        $events = constant_contact_get_transient($transient_title);
+        if($events && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'event')) { return maybe_unserialize($events); }
 
         $xml = $this->load_url("events/$id");
 
@@ -1159,20 +1159,20 @@ $xml_data .= '
             $events['FileName'] = $this->get_id_from_link($events['FileName']);
         endif;
 
-		if(!empty($events)) {
-			constant_contact_set_transient($transient_title, maybe_serialize($events), $timeout);
-		}
+        if(!empty($events)) {
+            constant_contact_set_transient($transient_title, maybe_serialize($events), $timeout);
+        }
 
         return $events;
     }
 
     function get_event_registrants($id) {
 
-    	$transient_title = 'ccers'.sha1($id);
-		$registrants = constant_contact_get_transient($transient_title);
-		if($registrants && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'registrants')) { return maybe_unserialize($registrants); }
+        $transient_title = 'ccers'.sha1($id);
+        $registrants = constant_contact_get_transient($transient_title);
+        if($registrants && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'registrants')) { return maybe_unserialize($registrants); }
 
-    	 $xml = $this->load_url("events/$id/registrants");
+         $xml = $this->load_url("events/$id/registrants");
 
         if(!$xml):
             return false;
@@ -1200,17 +1200,17 @@ $xml_data .= '
         endif;
 
         if(!empty($registrants)) {
-	        constant_contact_set_transient($transient_title, maybe_serialize($registrants), 60*60);
-	    }
+            constant_contact_set_transient($transient_title, maybe_serialize($registrants), 60*60);
+        }
 
         return $registrants;
     }
 
     function get_event_registrant($eventid = '',$registrantid = '')
     {
-    	$transient_title = 'ccer'.sha1($eventid.$registrantid);
-		$registrant = constant_contact_get_transient($transient_title);
-		if($registrant && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'registrant')) { return maybe_unserialize($registrant); }
+        $transient_title = 'ccer'.sha1($eventid.$registrantid);
+        $registrant = constant_contact_get_transient($transient_title);
+        if($registrant && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'registrant')) { return maybe_unserialize($registrant); }
 
         $xml = $this->load_url("events/$eventid/registrants/$registrantid");
 
@@ -1230,9 +1230,9 @@ $xml_data .= '
             $registrant['id'] = $id;
         endif;
 
-		if(!empty($registrant)) {
-			constant_contact_set_transient($transient_title, maybe_serialize($registrant), 60*60);
-		}
+        if(!empty($registrant)) {
+            constant_contact_set_transient($transient_title, maybe_serialize($registrant), 60*60);
+        }
 
         return $registrant;
     }
@@ -1336,11 +1336,11 @@ $xml_data .= '
         $this->load_url("activities", 'post', $params, 201);
 
         if((isset($this->http_response_headers['Location']) && trim($this->http_response_headers['Location']) != '') || isset($this->http_response_headers['location']) && trim($this->http_response_headers['location']) != '') {
-        	if(isset($this->http_response_headers['Location']) && trim($this->http_response_headers['Location']) != '') {
-        		return $this->get_id_from_link($this->http_response_headers['Location']);
-        	} else {
-	        	return $this->get_id_from_link($this->http_response_headers['location']);
-        	}
+            if(isset($this->http_response_headers['Location']) && trim($this->http_response_headers['Location']) != '') {
+                return $this->get_id_from_link($this->http_response_headers['Location']);
+            } else {
+                return $this->get_id_from_link($this->http_response_headers['location']);
+            }
         }
 
         return false;
@@ -1401,10 +1401,10 @@ $xml_data .= '
         $this->load_url("activities", 'post', $params, 201);
 
         if((isset($this->http_response_headers['Location']) && trim($this->http_response_headers['Location']) != '') || (isset($this->http_response_headers['location']) && trim($this->http_response_headers['location']) != '')) {
-          	if(isset($this->http_response_headers['Location']) && trim($this->http_response_headers['Location']) != '') {
-            	return $this->get_id_from_link($this->http_response_headers['Location']);
+            if(isset($this->http_response_headers['Location']) && trim($this->http_response_headers['Location']) != '') {
+                return $this->get_id_from_link($this->http_response_headers['Location']);
             } else {
-            	return $this->get_id_from_link($this->http_response_headers['location']);
+                return $this->get_id_from_link($this->http_response_headers['location']);
             }
         }
 
@@ -1420,11 +1420,11 @@ $xml_data .= '
      */
     function get_campaigns($action = 'campaigns')
     {
-    	$transient_title = 'cc_campaigns';
-		$campaigns = constant_contact_get_transient($transient_title);
-		if($campaigns && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'campaigns')) { return maybe_unserialize($campaigns); }
+        $transient_title = 'cc_campaigns';
+        $campaigns = constant_contact_get_transient($transient_title);
+        if($campaigns && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'campaigns')) { return maybe_unserialize($campaigns); }
 
-		$xml = $this->load_url($action);
+        $xml = $this->load_url($action);
 
         if(!$xml):
             return false;
@@ -1452,7 +1452,7 @@ $xml_data .= '
 
         endif;
 
-		constant_contact_set_transient($transient_title, maybe_serialize($campaigns), 60*60);
+        constant_contact_set_transient($transient_title, maybe_serialize($campaigns), 60*60);
 
         return $campaigns;
     }
@@ -1604,52 +1604,52 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
 */
 
 
-    	/**
-	 * Creates a new campaign
-	 *
-	 * @access 	public
-	 */
-	function create_campaign($title = '', $email_subject = '', $email_head = '', $email_html = '', $email_text = '', $contact_lists = array(),$options = array(), $content_type = 'HTML')
-	{
-		$defaults = array(
-			'FromName' => get_option('blogname'),
-			'EmailAddress' => get_option('admin_email'),
-			'ViewAsWebpage' => 'NO',
-			'ViewAsWebpageText' => '',
-			'ViewAsWebpageLinkText' => '',
-			'IncludeForwardEmail' => 'NO',
-			'IncludeSubscribeLink' => 'NO',
-			'GreetingSalutation' => 'Dear',
-			'GreetingName' => 'FirstName',
-			'GreetingString' => 'Greetings!',
-			'OrganizationName' => '',
-			'OrganizationAddress1' => 'Account.AddressLine1',
-			'OrganizationAddress2' => 'Account.AddressLine2',
-			'OrganizationAddress3' => 'Account.AddressLine3',
-			'OrganizationCity' => 'Account.City',
-			'OrganizationState' => 'Account.USState',
-			'OrganizationInternationalState' => 'Account.State',
-			'OrganizationCountry' => 'Account.CountryCode',
-			'OrganizationPostalCode' => 'Account.PostalCode',
-			'StyleSheet' => '',
-			'Status' => 'Draft',
-			'ForwardEmailLinkText' => '',
-			'PermissionReminderText' => '',
-			'SubscribeLinkText' => '',
-			'EmailContentFormat' => 'XHTML',
-			'PermissionReminder' => 'YES',
-		);
+        /**
+     * Creates a new campaign
+     *
+     * @access  public
+     */
+    function create_campaign($title = '', $email_subject = '', $email_head = '', $email_html = '', $email_text = '', $contact_lists = array(),$options = array(), $content_type = 'HTML')
+    {
+        $defaults = array(
+            'FromName' => get_option('blogname'),
+            'EmailAddress' => get_option('admin_email'),
+            'ViewAsWebpage' => 'NO',
+            'ViewAsWebpageText' => '',
+            'ViewAsWebpageLinkText' => '',
+            'IncludeForwardEmail' => 'NO',
+            'IncludeSubscribeLink' => 'NO',
+            'GreetingSalutation' => 'Dear',
+            'GreetingName' => 'FirstName',
+            'GreetingString' => 'Greetings!',
+            'OrganizationName' => '',
+            'OrganizationAddress1' => 'Account.AddressLine1',
+            'OrganizationAddress2' => 'Account.AddressLine2',
+            'OrganizationAddress3' => 'Account.AddressLine3',
+            'OrganizationCity' => 'Account.City',
+            'OrganizationState' => 'Account.USState',
+            'OrganizationInternationalState' => 'Account.State',
+            'OrganizationCountry' => 'Account.CountryCode',
+            'OrganizationPostalCode' => 'Account.PostalCode',
+            'StyleSheet' => '',
+            'Status' => 'Draft',
+            'ForwardEmailLinkText' => '',
+            'PermissionReminderText' => '',
+            'SubscribeLinkText' => '',
+            'EmailContentFormat' => 'XHTML',
+            'PermissionReminder' => 'YES',
+        );
 
-		$options = wp_parse_args($options, $defaults);
+        $options = wp_parse_args($options, $defaults);
 
-	  if(get_option('gmt_offset')) {
-	  	$offset = get_option('gmt_offset') * 60;
-	  } else {
-	  	$offset = (60 * -5);
-	  }
+      if(get_option('gmt_offset')) {
+        $offset = get_option('gmt_offset') * 60;
+      } else {
+        $offset = (60 * -5);
+      }
 
-		// build the XML post data
-		$xml_post = '
+        // build the XML post data
+        $xml_post = '
 <?xml version="1.0" encoding="UTF-8"?>
 <entry xmlns="http://www.w3.org/2005/Atom">
   <link href="/ws/customers/'.$this->api_username.'/campaigns" rel="edit" />
@@ -1657,57 +1657,57 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
   <title type="text">'.esc_html($title).'</title>
   <updated>'.date('Y').'-'.date('m').'-'.date('d').'T'.date('G').':'.date('i').':'.date('s').'.'.$offset.'Z</updated>
   <author>
-  	<name>Constant Contact for WordPress</name>
+    <name>Constant Contact for WordPress</name>
   </author>
   <content type="application/vnd.ctct+xml">
     <Campaign xmlns="http://ws.constantcontact.com/ns/1.0/" id="'.$this->get_http_api_url().'campaigns">
       <Name>'.esc_html($title).'</Name>
       <Date>'.date('Y').'-'.date('m').'-'.date('d').'T'.date('G').':'.date('i').':'.date('s').'.'.$offset.'Z</Date>
       <Subject>'.esc_html($email_subject).'</Subject>
-	  ';
+      ';
 
 
-	$xml_post .= '
-		<ViewAsWebpage>'.$options['ViewAsWebpage'].'</ViewAsWebpage>
-		<ViewAsWebpageLinkText>'.esc_html($options['ViewAsWebpageLinkText']).'</ViewAsWebpageLinkText>
-		<ViewAsWebpageText>'.esc_html($options['ViewAsWebpageText']).'</ViewAsWebpageText>
-		';
-	unset($options['ViewAsWebpage'], $options['ViewAsWebpageLinkText'], $options['ViewAsWebpageText']);
+    $xml_post .= '
+        <ViewAsWebpage>'.$options['ViewAsWebpage'].'</ViewAsWebpage>
+        <ViewAsWebpageLinkText>'.esc_html($options['ViewAsWebpageLinkText']).'</ViewAsWebpageLinkText>
+        <ViewAsWebpageText>'.esc_html($options['ViewAsWebpageText']).'</ViewAsWebpageText>
+        ';
+    unset($options['ViewAsWebpage'], $options['ViewAsWebpageLinkText'], $options['ViewAsWebpageText']);
 
-	if(isset($options['PermissionReminder']) && $options['PermissionReminder'] == 'YES') {
-		$xml_post .= '
-		<PermissionReminder>YES</PermissionReminder>
-		<PermissionReminderText>'.esc_html($options['PermissionReminderText']).'</PermissionReminderText>';
-	}
-	unset($options['PermissionReminder'], $options['PermissionReminderText']);
+    if(isset($options['PermissionReminder']) && $options['PermissionReminder'] == 'YES') {
+        $xml_post .= '
+        <PermissionReminder>YES</PermissionReminder>
+        <PermissionReminderText>'.esc_html($options['PermissionReminderText']).'</PermissionReminderText>';
+    }
+    unset($options['PermissionReminder'], $options['PermissionReminderText']);
 
-	if($options['IncludeForwardEmail'] == 'YES') {
-		$xml_post .= '
-		<IncludeForwardEmail>YES</IncludeForwardEmail>
-		<ForwardEmailLinkText>'.esc_html($options['ForwardEmailLinkText']).'</ForwardEmailLinkText>
-		';
-	} else {
-		$xml_post .= '
-		<IncludeForwardEmail>NO</IncludeForwardEmail>
-		<ForwardEmailLinkText></ForwardEmailLinkText>
-		';
-	}
-	unset($options['IncludeForwardEmail'], $options['ForwardEmailLinkText']);
+    if($options['IncludeForwardEmail'] == 'YES') {
+        $xml_post .= '
+        <IncludeForwardEmail>YES</IncludeForwardEmail>
+        <ForwardEmailLinkText>'.esc_html($options['ForwardEmailLinkText']).'</ForwardEmailLinkText>
+        ';
+    } else {
+        $xml_post .= '
+        <IncludeForwardEmail>NO</IncludeForwardEmail>
+        <ForwardEmailLinkText></ForwardEmailLinkText>
+        ';
+    }
+    unset($options['IncludeForwardEmail'], $options['ForwardEmailLinkText']);
 
-	if($options['IncludeSubscribeLink'] == 'YES') {
-		$xml_post .= '
-		<IncludeSubscribeLink>YES</IncludeSubscribeLink>
-		<SubscribeLinkText>'.esc_html($options['SubscribeLinkText']).'</SubscribeLinkText>
-		';
-	} else {
-		$xml_post .= '
-		<IncludeSubscribeLink>NO</IncludeSubscribeLink>
-		<SubscribeLinkText></SubscribeLinkText>
-		';
-	}
-	unset($options['IncludeSubscribeLink'], $options['SubscribeLinkText']);
+    if($options['IncludeSubscribeLink'] == 'YES') {
+        $xml_post .= '
+        <IncludeSubscribeLink>YES</IncludeSubscribeLink>
+        <SubscribeLinkText>'.esc_html($options['SubscribeLinkText']).'</SubscribeLinkText>
+        ';
+    } else {
+        $xml_post .= '
+        <IncludeSubscribeLink>NO</IncludeSubscribeLink>
+        <SubscribeLinkText></SubscribeLinkText>
+        ';
+    }
+    unset($options['IncludeSubscribeLink'], $options['SubscribeLinkText']);
 
-		if(!empty($options['EmailAddress'])) {
+        if(!empty($options['EmailAddress'])) {
             $email = $this->get_emails($options['EmailAddress']);
 
             if(!isset($email['id'])) {
@@ -1715,85 +1715,85 @@ id="'.$this->get_http_api_url().'campaigns/1100546096289">
                 return false;
             }
 
-       		unset($options['EmailAddress']);
+            unset($options['EmailAddress']);
 
 
-		$xml_post .= '
-		<FromEmail>
-			<Email id="'.$this->get_http_api_url().'settings/emailaddresses/'.$email['id'].'">
-				<link xmlns="http://www.w3.org/2005/Atom" href="'.$this->api_uri.'settings/emailaddresses/'.$email['id'].'" rel="self" />
-			</Email>
-			<EmailAddress>'.$email['EmailAddress'].'</EmailAddress>
-		</FromEmail>
-		<ReplyToEmail>
-			<Email id="'.$this->get_http_api_url().'settings/emailaddresses/'.$email['id'].'">
-				<link xmlns="http://www.w3.org/2005/Atom" href="'.$this->api_uri.'settings/emailaddresses/'.$email['id'].'" rel="self" />
-			</Email>
-			<EmailAddress>'.$email['EmailAddress'].'</EmailAddress>
-		</ReplyToEmail>
-		';
-		foreach($options as $field => $value) {
-			$xml_post .= '<'.$field.'>'.esc_html($value).'</'.$field.'>'."\n\t\t";
-			unset($options[$field]);
-		}
+        $xml_post .= '
+        <FromEmail>
+            <Email id="'.$this->get_http_api_url().'settings/emailaddresses/'.$email['id'].'">
+                <link xmlns="http://www.w3.org/2005/Atom" href="'.$this->api_uri.'settings/emailaddresses/'.$email['id'].'" rel="self" />
+            </Email>
+            <EmailAddress>'.$email['EmailAddress'].'</EmailAddress>
+        </FromEmail>
+        <ReplyToEmail>
+            <Email id="'.$this->get_http_api_url().'settings/emailaddresses/'.$email['id'].'">
+                <link xmlns="http://www.w3.org/2005/Atom" href="'.$this->api_uri.'settings/emailaddresses/'.$email['id'].'" rel="self" />
+            </Email>
+            <EmailAddress>'.$email['EmailAddress'].'</EmailAddress>
+        </ReplyToEmail>
+        ';
+        foreach($options as $field => $value) {
+            $xml_post .= '<'.$field.'>'.esc_html($value).'</'.$field.'>'."\n\t\t";
+            unset($options[$field]);
+        }
 
-			$xml_post .= '
-		<EmailContent>'.esc_html('<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"
+            $xml_post .= '
+        <EmailContent>'.esc_html('<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"
 xmlns:cctd="http://www.constantcontact.com/cctd">
-			'.$email_head.'
-			<body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0">
-				<CopyRight>Copyright (c) 1996-2009 Constant Contact. All rights reserved.  Except as permitted under a separate written agreement with Constant Contact, neither the Constant Contact software, nor any content that appears on any Constant Contact site, including but not limited to, web pages, newsletters, or templates may be reproduced, republished, repurposed, or distributed without the prior written permission of Constant Contact.  For inquiries regarding reproduction or distribution of any Constant Contact material, please contact '.$email['EmailAddress'].'</CopyRight>
-				<OpenTracking/>
-				<CustomBlock name="letter.intro" title="Personalization">
-				    <Greeting/>
-				</CustomBlock>'.
-		htmlentities2('<table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="backgroundTable">
-            	<tr>
-                	<td align="center" valign="top">
+            '.$email_head.'
+            <body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0">
+                <CopyRight>Copyright (c) 1996-2009 Constant Contact. All rights reserved.  Except as permitted under a separate written agreement with Constant Contact, neither the Constant Contact software, nor any content that appears on any Constant Contact site, including but not limited to, web pages, newsletters, or templates may be reproduced, republished, repurposed, or distributed without the prior written permission of Constant Contact.  For inquiries regarding reproduction or distribution of any Constant Contact material, please contact '.$email['EmailAddress'].'</CopyRight>
+                <OpenTracking/>
+                <CustomBlock name="letter.intro" title="Personalization">
+                    <Greeting/>
+                </CustomBlock>'.
+        htmlentities2('<table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="backgroundTable">
+                <tr>
+                    <td align="center" valign="top">
                         <table border="0" cellpadding="10" cellspacing="0" width="600" id="templatePreheader">
                             <tr>
                                 <td valign="top" class="preheaderContent">
                                     <table border="0" cellpadding="10" cellspacing="0" width="100%">
-                                    	<tr>
-                                        	<td valign="top">
-                                            	<div>
-                                                	 Use this area to offer a short teaser of your email content. Text here will show in the preview area of some email clients.
-                                                </div>
-                                            </td>
-                                			<td valign="top" width="190">
-                                            	<div>
-                                                	Is this email not displaying correctly?<br /><a href="*|ARCHIVE|*" target="_blank">View it in your browser</a>.
-                                                </div>
-                                            </td>
-								        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
-                    	<table border="0" cellpadding="0" cellspacing="0" width="600" id="templateContainer">
-                        	<tr>
-                            	<td align="center" valign="top">
-                                	<table border="0" cellpadding="0" cellspacing="0" width="600" id="templateHeader">
                                         <tr>
-                                            <td class="headerContent">
-                                            	<img src="http://gallery.mailchimp.com/653153ae841fd11de66ad181a/images/placeholder_600.gif" style="max-width:600px;" id="headerImage campaign-icon" mc:label="header_image" mc:allowdesigner mc:allowtext />
+                                            <td valign="top">
+                                                <div>
+                                                     Use this area to offer a short teaser of your email content. Text here will show in the preview area of some email clients.
+                                                </div>
+                                            </td>
+                                            <td valign="top" width="190">
+                                                <div>
+                                                    Is this email not displaying correctly?<br /><a href="*|ARCHIVE|*" target="_blank">View it in your browser</a>.
+                                                </div>
                                             </td>
                                         </tr>
                                     </table>
                                 </td>
                             </tr>
-                        	<tr>
-                            	<td align="center" valign="top">
-                                	<table border="0" cellpadding="0" cellspacing="0" width="600" id="templateBody">
-                                    	<tr>
+                        </table>
+                        <table border="0" cellpadding="0" cellspacing="0" width="600" id="templateContainer">
+                            <tr>
+                                <td align="center" valign="top">
+                                    <table border="0" cellpadding="0" cellspacing="0" width="600" id="templateHeader">
+                                        <tr>
+                                            <td class="headerContent">
+                                                <img src="http://gallery.mailchimp.com/653153ae841fd11de66ad181a/images/placeholder_600.gif" style="max-width:600px;" id="headerImage campaign-icon" mc:label="header_image" mc:allowdesigner mc:allowtext />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center" valign="top">
+                                    <table border="0" cellpadding="0" cellspacing="0" width="600" id="templateBody">
+                                        <tr>
                                             <td valign="top" class="bodyContent">
-                                				<table border="0" cellpadding="20" cellspacing="0" width="100%">
+                                                <table border="0" cellpadding="20" cellspacing="0" width="100%">
                                                     <tr>
                                                         <td valign="top">
                                                             <div>
                                                                '.$email_html.'
                                                             </div>
-														</td>
+                                                        </td>
                                                     </tr>
                                                 </table>
                                             </td>
@@ -1801,11 +1801,11 @@ xmlns:cctd="http://www.constantcontact.com/cctd">
                                     </table>
                                 </td>
                             </tr>
-                        	<tr>
-                            	<td align="center" valign="top">
-                                	<table border="0" cellpadding="10" cellspacing="0" width="600" id="templateFooter">
-                                    	<tr>
-                                        	<td valign="top" class="footerContent">
+                            <tr>
+                                <td align="center" valign="top">
+                                    <table border="0" cellpadding="10" cellspacing="0" width="600" id="templateFooter">
+                                        <tr>
+                                            <td valign="top" class="footerContent">
                                                 <table border="0" cellpadding="10" cellspacing="0" width="100%">
                                                     <tr>
                                                         <td colspan="2" valign="middle" id="social">
@@ -1817,13 +1817,13 @@ xmlns:cctd="http://www.constantcontact.com/cctd">
                                                     <tr>
                                                         <td valign="top" width="350">
                                                             <div>
-																<em>Copyright &copy; *|CURRENT_YEAR|* *|LIST:COMPANY|*, All rights reserved.</em>
-																<br />
-																*|IFNOT:ARCHIVE_PAGE|* *|LIST:DESCRIPTION|*
-																<br />
-																<strong>Our mailing address is:</strong>
-																<br />
-																*|HTML:LIST_ADDRESS_HTML|**|END:IF|*
+                                                                <em>Copyright &copy; *|CURRENT_YEAR|* *|LIST:COMPANY|*, All rights reserved.</em>
+                                                                <br />
+                                                                *|IFNOT:ARCHIVE_PAGE|* *|LIST:DESCRIPTION|*
+                                                                <br />
+                                                                <strong>Our mailing address is:</strong>
+                                                                <br />
+                                                                *|HTML:LIST_ADDRESS_HTML|**|END:IF|*
                                                             </div>
                                                         </td>
                                                         <td valign="top" width="190" id="monkeyRewards">
@@ -1850,62 +1850,62 @@ xmlns:cctd="http://www.constantcontact.com/cctd">
                     </td>
                 </tr>
             </table>').'
-			</body>
-			</html>').'
-		</EmailContent>
-		<EmailTextContent>&lt;Text>'.esc_html($email_text).'&lt;/Text></EmailTextContent>
-	';
-		if(is_array($contact_lists)):
-			$xml_post  .= '<ContactLists>';
-			foreach($contact_lists as $id):
-				$xml_post  .= '
-				<ContactList id="'.$this->get_list_url($id).'">
-					<link xmlns="http://www.w3.org/2005/Atom" href="'.$this->get_list_url($id,0).'" rel="self" />
-				</ContactList>
-			  ';
-			endforeach;
-			$xml_post .= '</ContactLists>';
-		endif;
+            </body>
+            </html>').'
+        </EmailContent>
+        <EmailTextContent>&lt;Text>'.esc_html($email_text).'&lt;/Text></EmailTextContent>
+    ';
+        if(is_array($contact_lists)):
+            $xml_post  .= '<ContactLists>';
+            foreach($contact_lists as $id):
+                $xml_post  .= '
+                <ContactList id="'.$this->get_list_url($id).'">
+                    <link xmlns="http://www.w3.org/2005/Atom" href="'.$this->get_list_url($id,0).'" rel="self" />
+                </ContactList>
+              ';
+            endforeach;
+            $xml_post .= '</ContactLists>';
+        endif;
 
         } else {
-        	return false;
+            return false;
         }
 
-		$xml_post .= '
-		</Campaign>
-	</content>
-	<source>
-	    <id>'.$this->get_http_api_url().'campaigns</id>
-	    <title type="text">Campaigns for customer: '.$this->api_username.'</title>
-	    <link href="campaigns" />
-	    <link href="campaigns" rel="self" />
-	    <author>
-	      <name>'.$this->api_username.'</name>
-	    </author>
-	    <updated>'.date('Y').'-'.date('m').'-'.date('d').'T'.date('G').':'.date('i').':'.date('s').'.'.$offset.'Z</updated>
-	</source>
+        $xml_post .= '
+        </Campaign>
+    </content>
+    <source>
+        <id>'.$this->get_http_api_url().'campaigns</id>
+        <title type="text">Campaigns for customer: '.$this->api_username.'</title>
+        <link href="campaigns" />
+        <link href="campaigns" rel="self" />
+        <author>
+          <name>'.$this->api_username.'</name>
+        </author>
+        <updated>'.date('Y').'-'.date('m').'-'.date('d').'T'.date('G').':'.date('i').':'.date('s').'.'.$offset.'Z</updated>
+    </source>
 </entry>';
 
-		$this->http_set_content_type('application/atom+xml');
+        $this->http_set_content_type('application/atom+xml');
 
-	#	die(htmlentities(print_r($xml_post, true)));
+    #   die(htmlentities(print_r($xml_post, true)));
 
-		$xml = $this->load_url("campaigns", 'post', trim(rtrim($xml_post)), 201);
+        $xml = $this->load_url("campaigns", 'post', trim(rtrim($xml_post)), 201);
 
-	#	if(!is_admin()) {
-			echo '<pre>';
-			print_r($xml_post);
-			print_r($xml);
-			print_r($this);
-			echo '</pre>';
-	#	}
+    #   if(!is_admin()) {
+            echo '<pre>';
+            print_r($xml_post);
+            print_r($xml);
+            print_r($this);
+            echo '</pre>';
+    #   }
 
-		if(isset($this->http_response_headers['Location']) && trim($this->http_response_headers['Location']) != ''):
-			return $this->get_id_from_link($this->http_response_headers['Location']);
-		endif;
+        if(isset($this->http_response_headers['Location']) && trim($this->http_response_headers['Location']) != ''):
+            return $this->get_id_from_link($this->http_response_headers['Location']);
+        endif;
 
-		return false;
-	}
+        return false;
+    }
 
 
 
@@ -1921,9 +1921,9 @@ xmlns:cctd="http://www.constantcontact.com/cctd">
      */
     function query_campaigns($status = 'SENT')
     {
-    	$transient_title = 'cccam'.$status;
-		$campaigns = constant_contact_get_transient($transient_title);
-		if($campaigns && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'campaigns')) { return maybe_unserialize($campaigns); }
+        $transient_title = 'cccam'.$status;
+        $campaigns = constant_contact_get_transient($transient_title);
+        if($campaigns && (!isset($_GET['refresh']) || $_GET['refresh'] !== 'campaigns')) { return maybe_unserialize($campaigns); }
 
         $xml = $this->load_url('campaigns?status=' . urlencode($status));
 
@@ -1951,7 +1951,7 @@ xmlns:cctd="http://www.constantcontact.com/cctd">
             endif;
         endif;
 
-		constant_contact_set_transient($transient_title, maybe_serialize($campaigns), 60*60*6);
+        constant_contact_set_transient($transient_title, maybe_serialize($campaigns), 60*60*6);
 
         return $campaigns;
     }
@@ -2029,7 +2029,7 @@ xmlns:cctd="http://www.constantcontact.com/cctd">
             $minute = (int) $time_bits[1];
             $second = (int) $time_bits[2];
 
-		  return mktime($hour, $minute, $second, $month, $day, $year);
+          return mktime($hour, $minute, $second, $month, $day, $year);
         endif;
 
         return false;
@@ -2122,7 +2122,7 @@ xmlns:cctd="http://www.constantcontact.com/cctd">
             if($type == "open") {//The starting of the tag '<tag>'
                 $parent[$level-1] = &$current;
                 if(!is_array($current) or (!in_array($tag, array_keys($current)))) { //Insert New tag
-                	if(!is_array($current)) { $current = array(); } // Added in 2.3
+                    if(!is_array($current)) { $current = array(); } // Added in 2.3
                     $current[$tag] = $result;
                     if($attributes_data) $current[$tag. '_attr'] = $attributes_data;
                     $repeated_tag_index[$tag.'_'.$level] = 1;
@@ -2319,26 +2319,22 @@ xmlns:cctd="http://www.constantcontact.com/cctd">
      */
     function load_url($action = '', $method = 'get', $params = array(), $expected_http_code = 200)
     {
-//	echor("cc:load_url($action)");
 
-//	echor(debug_backtrace());
-
-
-	$this->http_send($this->api_url . $action, $method, $params);
+        $this->http_send($this->api_url . $action, $method, $params);
 
         // handle status codes
-        if(intval($expected_http_code) === $this->http_response_code):
-            if($this->http_content_type):
+        if(floatval($expected_http_code) === floatval($this->http_response_code)) {
+            if($this->http_content_type) {
                 return $this->xml_to_array($this->http_response_body);
-            else:
+            } else {
                 return $this->http_response_body; /* downloads the file */
-            endif;
-        else:
+            }
+        } else {
             $this->last_error  = "Invalid status code {$this->http_response_code}";
 
             // if their was an error sometimes the body contains useful info
             return false;
-        endif;
+        }
     }
 
 
@@ -2452,7 +2448,7 @@ xmlns:cctd="http://www.constantcontact.com/cctd">
 
         $request = $this->http_build_request_headers();
 
-		$body = '';
+        $body = '';
         if(trim($params) != ''):
             $body = "$params{$this->http_linebreak}";
         endif;
@@ -2460,37 +2456,37 @@ xmlns:cctd="http://www.constantcontact.com/cctd">
         $this->http_request = $request;
 
     /*
-		if($this->http_url_bits['scheme']=='https'):
+        if($this->http_url_bits['scheme']=='https'):
             $url = "https://$the_host";
         else:
             $url = "http://$the_host";
         endif;
-	*/
+    */
 
         $url = "https://$the_host";
 
         $args = array(
-        	'body' => $body,
-        	'headers'=> $request,
-        	'method' => strtoupper($method), // GET, POST, PUT, DELETE, etc.
-        	'sslverify' => false,
-        	'timeout' => $this->http_request_timeout,
-        	'httpversion' => '1.1'
+            'body' => $body,
+            'headers'=> $request,
+            'method' => strtoupper($method), // GET, POST, PUT, DELETE, etc.
+            'sslverify' => false,
+            'timeout' => $this->http_request_timeout,
+            'httpversion' => '1.1'
         );
 
         $response = wp_remote_request($url.$the_path, $args);
 
-		global $cc_responses;
-		$cc_responses[] = array('url' => $url.$the_path, 'args' => $args, 'response' => $response);
+        global $cc_responses;
+        $cc_responses[] = array('url' => $url.$the_path, 'args' => $args, 'response' => $response);
 
- 		if($response && !is_wp_error($response)) {
-			$this->http_response = $response;
-			$this->http_parse_response();
-			return true;
-		} elseif(is_wp_error($response)) {
-			$this->last_error = $response->get_error_message();
-		}
-		return false;
+        if($response && !is_wp_error($response)) {
+            $this->http_response = $response;
+            $this->http_parse_response();
+            return true;
+        } elseif(is_wp_error($response)) {
+            $this->last_error = $response->get_error_message();
+        }
+        return false;
     }
 
 
@@ -2534,12 +2530,12 @@ xmlns:cctd="http://www.constantcontact.com/cctd">
      */
     function http_parse_response()
     {
-    	if(empty($this->http_response)) { return false; }
+        if(empty($this->http_response)) { return false; }
         $headers = wp_remote_retrieve_headers($this->http_response);
 
         foreach($headers as $header => $value) {
-        	if(is_string($value)) { $value = trim($value); }
-        	$this->http_response_headers[$header] = $value;
+            if(is_string($value)) { $value = trim($value); }
+            $this->http_response_headers[$header] = $value;
         }
 
         $this->http_response_body = $body = wp_remote_retrieve_body($this->http_response);
@@ -2661,13 +2657,13 @@ xmlns:cctd="http://www.constantcontact.com/cctd">
      */
     function http_get_response_code_error($code)
     {
-    	if(empty($code)) { return ''; }
+        if(empty($code)) { return ''; }
         $errors = array(
         200 => '<strong>Success</strong> - The request was successful',
         201 => '<strong>Created (Success)</strong> - The request was successful. The requested object/resource was created.',
         400 => '<p><strong>Invalid Request (400)</strong></p><p>There are many possible causes for this error, but most commonly there is a problem with the structure or content of XML your application provided. Please <a href="http://wordpress.org/tags/constant-contact-api?forum_id=10">Let the plugin developers know about the issue</a>, and make sure to mention what you were doing when you got this error.</p>',
         401 => '<p><strong>This plugin is not configured with a valid Constant Contact account.</strong></p>
-				<p>Please enter a valid username and password then press the Save Changes button before continuing.</p>',
+                <p>Please enter a valid username and password then press the Save Changes button before continuing.</p>',
         404 => '<p><strong>URL Not Found (404)</strong></p> <p>The URI which was provided was incorrect.  Please <a href="http://wordpress.org/tags/constant-contact-api?forum_id=10">Let the plugin developers know about the issue</a>, and make sure to mention what you were doing when you got this error.</p>',
         409 => '<p><strong>Conflict (409)</strong></p><p>There is a problem with the action you are trying to perform. Commonly, you are trying to "Create" (POST) a resource which already exists such as a Contact List or Email Address that already exists. In general, if a resource already exists, an application can "Update" the resource with a "PUT" request for that resource.</p>',
         415 => '<p><strong>Unsupported Media Type (415)</strong></p><p>The Media Type (Content Type) of the data you are sending does not match the expected Content Type for the specific action you are performing on the specific Resource you are acting on. Please <a href="http://wordpress.org/tags/constant-contact-api?forum_id=10">Let the plugin developers know about the issue</a>, and make sure to mention what you were doing when you got this error.</p>',
