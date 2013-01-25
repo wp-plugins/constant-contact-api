@@ -5,12 +5,12 @@
 	{
 		// list of all extra fields the API supports
 		$constant_contact_extra_fields = array(
-			'First Name', 
-			'Middle Name', 
+			'First Name',
+			'Middle Name',
 			'Last Name',
-			'Job Title', 
+			'Job Title',
 			'Company Name',
-			'Home Phone', 
+			'Home Phone',
 			'Work Phone',
 			'Addr1','Addr2','Addr3',
 			'City',
@@ -37,14 +37,14 @@
 			'CustomField14',
 			'CustomField15',
 		);
-		
+
 		// build the mappings
 		$fields = array();
 		foreach(str_replace(' ', '', $constant_contact_extra_fields) as $field):
 			$fields[] = "$field:$field";
 		endforeach;
 		$mappings = implode(', ', $fields);
-		
+
 		// set default settings
 		add_option('cc_extra_fields', $constant_contact_extra_fields, '', 'no');
 		add_option('cc_extra_field_mappings', $mappings, '', 'no');
@@ -52,17 +52,9 @@
 		add_option('cc_default_opt_in', 1, '', 'no');
 		add_option('cc_signup_title', __('Newsletter'), '', 'no');
 		add_option('cc_signup_description', 'Subscribe to the Newsletter', '', 'no');
-		add_option('cc_signup_widget_title', 'Newsletter', '', 'no');
-		add_option('cc_signup_widget_description', 'Subscribe to the Newsletter', '', 'no');
 		add_option('cc_list_selection_format','checkbox', '', 'no');
-		add_option('cc_widget_show_list_selection',1, '', 'no');
 		add_option('cc_uninstall_method','keep', '', 'no');
-		add_option('cc_widget_show_firstname',1, '', 'no');
-		add_option('cc_widget_show_lastname',1, '', 'no');
-		add_option('cc_widget_list_selection_format','checkbox', '', 'no');
-		add_option('cc_widget_list_selection_title', 'Contact Lists:', '', 'no');
-		add_option('cc_use_legacy_widget', true, '', 'no');
-		
+
 		if(!get_option('cc_username') || !get_option('cc_password')):
 			function constant_contact_warning() {
 				echo "
@@ -72,12 +64,12 @@
 			add_action('admin_notices', 'constant_contact_warning');
 		endif;
 	}
-	
+
 	// plugin is being deactivated
 	function constant_contact_deactivate()
 	{
 		remove_action('widgets_init', 'constant_contact_load_widgets');
-	
+
 		// define options to delete
 		$options = array(
 			'cc_uninstall_method',
@@ -103,7 +95,7 @@
 			'cc_widget_list_selection_title',
 			'cc_use_legacy_widget'
 		);
-		
+
 		if(get_option('cc_uninstall_method') == 'remove'):
 			// remove username and password aswell
 			if(isset($_SESSION['ccObject'])) { unset($_SESSION['ccObject']); }
@@ -111,11 +103,11 @@
 			$options[] = 'cc_password';
 			delete_transient('cc_object');
 		endif;
-		
+
 		function deleteOptions($options)
 		{
 			$num = count($options);
-		
+
 			if (count($options) > 0)
 			{
 				foreach ($options as $option) {

@@ -1,20 +1,22 @@
 <?php
-	
+
 add_action('load-constant-contact_page_constant-contact-activities', 'constant_contact_download_activity_file');
 // download activity file
 function constant_contact_download_activity_file()
 {
-	$cc = constant_contact_create_object();
-	if(!is_object($cc)) {
+	global $cc;
+
+	constant_contact_create_object();
+	if(!get_option('cc_configured')) {
 		echo '<div id="message" class="error"><p><strong>Download failed:</strong> Could not create Constant Contact object.</p></div>';
 		return false;
 	}
-	
+
 	if(isset($_GET['download'])):
 		$filename = htmlentities($_GET['download']);
-			
+
 		$filext = strtolower(substr($filename, -4));
-			
+
 		if($filext == '.csv'):
 			header('Content-type: text/csv');
 		elseif($filext == '.txt'):
@@ -22,50 +24,50 @@ function constant_contact_download_activity_file()
 		else:
 			header('Content-type: application/octet-stream');
 		endif;
-			
+
 		header('Content-Disposition: attachment; filename="'.$filename.'"');
 		echo $cc->download_activity_file($filename);
 		exit;
-	
+
 	endif;
 }
-		
+
 /**
  * Activity log submenu page callback function
- * 
- * @global <type> $cc
- * @return <type> 
+ *
+ * @global object $cc
+ * @return <type>
  */
 function constant_contact_activities()
 {
 	global $cc;
-	
-	// Create the CC api object for use in this page. 
+
+	// Create the CC api object for use in this page.
 	if(!constant_contact_create_object()) { echo '<div id="message" class="error"><p>Activities Not Available. Check your '.admin_url('admin.php?page=constant-contact-api').' API settings.</p></div>'; return; }
 
 	$activities = array();
 	if(isset($_GET['id'])):
 		$id = htmlentities($_GET['id']);
 		$activity = $cc->get_activity($id);
-		
+
 		// display single activity
 		?>
 		<div class="wrap nosubsub">
 			<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> <a href="<?php echo remove_query_arg(array('id', 'refresh')); ?>">Activities</a> &gt; Activity #<?php echo $id; ?></h2>
-			<?php constant_contact_admin_refresh(); 
-			
+			<?php constant_contact_admin_refresh();
+
 			if(!$activity):
 			echo '<p>Activity Not Found</p></div>';
 			return;
 		endif;
 			?>
-		
+
 		<table class="form-table widefat" cellspacing="0">
-		<?php	
+		<?php
 		$html = '';
-		
+
 		$dateformat = 'jS F Y \- H:i:s';
-		
+
 		$html .= '<tr><th scope="row">ID</th><td>'.$activity['id'].'</td></tr>';
 		$html .= '<tr><th scope="row">Type</th><td>'.$activity['Type'].'</td></tr>';
 		$html .= '<tr><th scope="row">Status</th><td>'.$activity['Status'].'</td></tr>';
@@ -82,7 +84,7 @@ function constant_contact_activities()
 					<tbody>";
 				$errors = $activity['Errors'];
 				foreach($errors['Error'] as $key => $error) {
-#					print_r($error);
+
 					extract($error);
 					$html .= "
 					<tr>
@@ -93,20 +95,26 @@ function constant_contact_activities()
 					</tr>";
 				}
 				$html .= "</tbody></table>";
-			} else { 
+			} else {
 				$html .= 'None';
 			}
 		$html .= '</td></tr>';
-		$html .= '<tr><th scope="row">Transactions</th><td>'.(isset($activity['TransactionCount']) ? $activity['TransactionCount'] : 'None').'</td></tr>';
-		$html .= '<tr><th scope="row">Created</th><td>'.date($dateformat, $cc->convert_timestamp($activity['InsertTime'])).'</td></tr>';
-		
-		if(isset($activity['RunStartTime'], $activity['RunFinishTime'])):
+		$html .= '<tr><th scope="row">';
+		$html .= __('Transactions', 'constant-contact-api');
+		$html .= '</th><td>'.(isset($activity['TransactionCount']) ? $activity['TransactionCount'] : __('None', 'constant-contact-api')).'</td></tr>';
+		$html .= '<tr><th scope="row">';
+		$html .= __('Created', 'constant-contact-api');
+		$html .= '</th><td>'.date($dateformat, $cc->convert_timestamp($activity['InsertTime'])).'</td></tr>';
+
+		if(isset($activity['RunStartTime'], $activity['RunFinishTime'])) {
 			$html .= '<tr><th scope="row">Started</th><td>'.date($dateformat, $cc->convert_timestamp($activity['RunStartTime'])).'</td></tr>';
 			$html .= '<tr><th scope="row">Finished</th><td>'.date($dateformat, $cc->convert_timestamp($activity['RunFinishTime'])).'</td></tr>';
-			
+
 			$runtime = $activity['RunFinishTime']-$activity['RunStartTime'];
-			$html .= '<tr><th scope="row">Runtime</th><td>'.((!$runtime)?'Less than 1 second':"$runtime seconds").'</td></tr>';
-		endif;
+			$html .= '<tr><th scope="row">';
+			$html .= __('Runtime', 'constant-contact-api');
+			$html .= '</th><td>'.((!$runtime) ? __('Less than 1 second', 'constant-contact-api') : sprintf(__("%s seconds", 'constant-contact-api'), $runtime)).'</td></tr>';
+		}
 		$html .= '</table>';
 		$html .= '<p class="submit"><a href="?page=constant-contact-activities" class="button-secondary">Return to Activity Log</a>';
 		if(isset($activity['FileName'])):
@@ -114,40 +122,43 @@ function constant_contact_activities()
 		endif;
 		$html .= '</p>';
 		echo $html;
-	
+
 	else:
-		
+
 		$_activities = $cc->get_activities();
-			
-		if(!empty($_activities)):
-		foreach($_activities as $k => $v):
-			$activities[$v['id']] = $v;
-		endforeach;
-		endif;
-		
+
+		if(!empty($_activities)) {
+			foreach($_activities as $k => $v) {
+				$activities[$v['id']] = $v;
+			}
+		}
+
 		// display all activities
 		?>
 
 		<div class="wrap nosubsub">
-			<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> Activities</h2>
+			<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>"><?php _e('Constant Contact Plugin', 'constant-contact-api'); ?> &gt;</a> <?php _e('Activities', 'constant-contact-api'); ?></h2>
 			<?php constant_contact_admin_refresh(); ?>
-			
-			<table class="form-table widefat" cellspacing="0">
+
+			<table class="widefat fixed ctct_table" cellspacing="0">
 			<thead>
 				<tr>
-					<th scope="col" id="name" class="manage-column column-name" style="">Created</th>
-					<th scope="col" id="type" class="manage-column column-name" style="">Type</th>
-					<th scope="col" id="status" class="manage-column column-name" style="">Status</th>
-					<th scope="col" id="errors" class="manage-column column-name" style="">Errors</th>
-					<th scope="col" id="transactions" class="manage-column column-name" style="">Transactions</th>
-					<th scope="col" id="activity" class="manage-column column-name" style="">&nbsp;</th>
+					<th scope="col" id="name" class="manage-column column-name"><?php _e('Created', 'constant-contact-api'); ?></th>
+					<th scope="col" id="type" class="manage-column column-name"><?php _e('Type', 'constant-contact-api'); ?></th>
+					<th scope="col" id="status" class="manage-column column-name"><?php _e('Status', 'constant-contact-api'); ?></th>
+					<th scope="col" id="errors" class="manage-column column-name"><?php _e('Errors', 'constant-contact-api'); ?></th>
+					<th scope="col" id="transactions" class="manage-column column-name"><?php _e('Transactions', 'constant-contact-api'); ?></th>
+					<th scope="col" id="activity" class="manage-column column-name">&nbsp;</th>
 				</tr>
 			</thead>
 			<tbody>
 			<?php
 			if(empty($_activities)) {
-				echo '<tr><td colspan="6"><h3>No Activities Found</h3>
-					<p class="description" style="font-size:110%;">Activities are events such as importing or exporting contacts. It&rsquo;s usually not a problem if you don&rsquo;t see any activities here.</p></td></tr></table>';
+				echo '<tr><td colspan="6"><h3>';
+				_e('No Activities Found', 'constant-contact-api');
+				echo '</h3><p class="description" style="font-size:110%;">';
+				_e('Activities are events such as importing or exporting contacts. It&rsquo;s usually not a problem if you don&rsquo;t see any activities here.', 'constant-contact-api');
+				echo '</p></td></tr></table>';
 				return;
 			}
 				$alt = '';
@@ -171,7 +182,7 @@ function constant_contact_activities()
 						<?php echo (isset($v['TransactionCount'])?$v['TransactionCount'] : 'None'); ?>
 					</td>
 					<td class="column-name">
-						<a href="<?php echo $_SERVER['REQUEST_URI']?>&id=<?php echo $v['id']; ?>">View Activity</a>
+						<a href="<?php echo add_query_arg(array('id' => $v['id'])); ?>"><?php _e('View Activity', 'constant-contact-api'); ?></a>
 					</td>
 				</tr>
 				<?php
@@ -180,9 +191,8 @@ function constant_contact_activities()
 			</tbody>
 			</table>
 		</div>
-	
+
 		<?php
 	endif;
-	?></div><?php 
+	?></div><?php
 }
-?>

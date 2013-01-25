@@ -15,15 +15,15 @@ $siteName = ($ccStats_ga_profile_id && isset($profiles[$ccStats_ga_profile_id]) 
 </div>
 <?php
 	} else {
-		
+
 		if(empty($ccStats_ga_profile_id)) {
 			echo sprintf(__('<div id="message" class="error"><p>Google Analytics integration is not configured. <a href="%s">Configure your Analytics settings</a>.</p></div></div>', 'constant-contact-api'), admin_url('admin.php?page=constant-analytics')); return;
 		}
-		
+
 		if(!empty($siteName)) {
 			echo '<h2 style="margin-left:1%; padding-top:1px;">';
 			_e(sprintf('Analytics for %s', '<a href="http://'.$siteName.'" target="_blank" title="Visit '.$siteName.'">'.$siteName.'</a>'), 'constant-contact-api');
-			echo ' <a style="font-size:65%; float:right;" href="'.admin_url('admin.php?page=constant-analytics').'">'.__(sprintf('Switch Analytics profile %s', '&rarr;')).'</a>
+			echo ' <a style="font-size:65%; right:30px; top:0; position:absolute;" href="'.admin_url('admin.php?page=constant-analytics').'">'.__(sprintf('Switch Analytics profile %s', '&rarr;')).'</a>
 			</h2>';
 		}
 ?>
@@ -36,12 +36,12 @@ $siteName = ($ccStats_ga_profile_id && isset($profiles[$ccStats_ga_profile_id]) 
 		</div>
 		<div id="ccStats-datepicker-popup">
 			<div id="ccStats-current-date-range">
-				<div id="ccStats-current-start-date"><input style="display:none;" type="text" /><span><?php _e('Loading', 'constant-contact-api'); ?></span></div> - 
+				<div id="ccStats-current-start-date"><input style="display:none;" type="text" /><span><?php _e('Loading', 'constant-contact-api'); ?></span></div> -
 				<div id="ccStats-current-end-date"><input style="display:none;" type="text" /><span></span></div>
 			</div>
 		</div>
 	</div>
-	
+
 	<div class="ccStats-box" id="ccStats-box-site-traffic">
 		<div class="ccStats-box-header"><h3>Site Traffic</h3><div class="ccStats-box-status"></div><div class="ccStats-box-status-text"></div></div>
 		<div class="ccStats-box-content">
@@ -124,9 +124,9 @@ $siteName = ($ccStats_ga_profile_id && isset($profiles[$ccStats_ga_profile_id]) 
 		<div class="ccStats-box-content">
 			<div class="ccStats-table-container" id="ccStats-top-content"></div>
 		</div>
-	</div>	
+	</div>
 </div>
-<?php 
+<?php
 
 	} // End $cc check
 ?>

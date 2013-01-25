@@ -8,12 +8,12 @@ function constant_contact_dashboard_setup() {
 
 function constant_contact_events_dashboard_make_table($title = 'Events', $events = array()) {
 	global $cc;
-	
+
 	if(!constant_contact_create_object()) { return false; }
 
 	?>
 	<p style="color: #777;font-family: Georgia, 'Times New Roman', 'Bitstream Charter', Times, serif;font-size: 13px;font-style: italic;padding: 0;margin: 15px 0 0 0;"><?php echo $title; ?></p>
-	<table class="widefat fixed" cellspacing="0" style="border:0px;">
+	<table class="widefat fixed ctct_table" cellspacing="0" style="border:0px;">
 			<thead>
 				<tr>
 					<td style="text-align:left; padding:8px 0!important; font-weight:bold;" id="title" class="manage-column column-name" style="">Event Name</td>
@@ -31,7 +31,7 @@ function constant_contact_events_dashboard_make_table($title = 'Events', $events
 			<?php
 				return;
 			}
-			foreach($events as $id => $v) {					
+			foreach($events as $id => $v) {
 				$v = $cc->get_event($id); // The cancelled registrants count won't work otherwise...
 			?>
 			<tr class='author-self status-inherit' valign="top">
@@ -55,9 +55,9 @@ function constant_contact_events_dashboard_make_table($title = 'Events', $events
 
 function constant_contact_events_dashboard() {
 	global $cc;
-	
+
 	if(!constant_contact_create_object()) { return false; }
-	
+
 	$_events = $cc->get_events();
 
 	if(!empty($_events) && is_array($_events)) {
@@ -71,7 +71,7 @@ function constant_contact_events_dashboard() {
 		}
 		if(!empty($active)) { constant_contact_events_dashboard_make_table(__('Active Events','constant-contact-api'), $active); }
 		if(!empty($draft)) { constant_contact_events_dashboard_make_table(__('Draft Events','constant-contact-api'), $draft); }
-	?>		
+	?>
 		<p class="textright">
 	        <a class="button" href="<?php echo admin_url('admin.php?page=constant-contact-events'); ?>">View All Events</a>
 	    </p>
@@ -84,22 +84,22 @@ function constant_contact_events_dashboard() {
 	return true;
 }
 
-		
+
 /**
  * event log submenu page callback function
- * 
+ *
  * @global <type> $cc
- * @return <type> 
+ * @return <type>
  */
 function constant_contact_events()
 {
 	global $cc;
-	
-	// Create the CC api object for use in this page. 
+
+	// Create the CC api object for use in this page.
 	if(!constant_contact_create_object()) { return false; }
 
 	$events = array();
-	
+
 	// Single registrant view
 	if(isset($_GET['id']) && isset($_GET['registrant'])) {
 		$id = htmlentities($_GET['id']);
@@ -110,14 +110,14 @@ function constant_contact_events()
 		unset($BusinessInformation['Label']);
 		unset($PersonalInformation['Label']);
 
-		if(!empty($v) && current_user_can('list_users')) { 
+		if(!empty($v) && current_user_can('list_users')) {
 		?>
 		<div class="wrap nosubsub">
 			<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a>  <a href="<?php echo admin_url('admin.php?page=constant-contact-events'); ?>">Events</a> &gt;<?php echo_if_not_empty($event['Title'],'',' <a href="'.admin_url('admin.php?page=constant-contact-events&id='.$event['id']).'">&ldquo;'.$event['Title'].'&rdquo;</a> &gt;') ?> Registrant: <?php echo "{$LastName}, {$FirstName}"; ?></h2>
-			<?php 
-			constant_contact_admin_refresh(); 
+			<?php
+			constant_contact_admin_refresh();
 			?>
-			<h3>Registration Information:</h3>
+			<h3><?php _e('Registration Information:', 'constant-contact-api'); ?></h3>
 			<table class="widefat form-table" cellspacing="0">
 				<tbody>
 					<?php
@@ -130,10 +130,10 @@ function constant_contact_events()
 						$key = preg_replace('/(?!^)[[:upper:]]/',' \0',$key);
 						$reg .= '<tr><th scope="row" id="'.sanitize_title($key).'" class="manage-column column-name" style=""><span>'.$key.'</span></th><td>'.get_if_not_empty($v, '<span class="description">(Empty)</span>').'</td></tr>';
 					}
-					
+
 					if(!empty($Costs)) {
 						$reg .= '<tr><th scope="row" id="costs" class="manage-column column-name" style=""><span>Summary of Costs</span></th><td><ul class="ul-disc">';
-					
+
 						foreach($Costs as $v) {
 							extract($v);
 							$reg .= "<li><strong>{$FeeType}</strong>: {$Count} Guest(s) x {$Rate} = {$Total}</li>";
@@ -144,13 +144,13 @@ function constant_contact_events()
 					?>
 				</tbody>
 			</table>
-			
-			<h3>Personal Information:</h3>
+
+			<h3><?php _e('Personal Information:', 'constant-contact-api'); ?></h3>
 			<table class="widefat form-table" cellspacing="0">
 				<tbody>
 					<?php
 					$per = '';
-					
+
 					$OtherPersonalInformation['LastName'] = $LastName;
 					$OtherPersonalInformation['FirstName'] = $FirstName;
 					$OtherPersonalInformation['EmailAddress'] = get_if_not_empty($EmailAddress,'', "<a href='mailto:{$EmailAddress}'>{$EmailAddress}</a>");
@@ -166,9 +166,9 @@ function constant_contact_events()
 					?>
 				</tbody>
 			</table>
-			
-			
-			<h3>Business Information:</h3>
+
+
+			<h3><?php _e('Business Information:', 'constant-contact-api'); ?></h3>
 			<table class="widefat form-table" cellspacing="0">
 				<tbody>
 					<?php
@@ -181,9 +181,9 @@ function constant_contact_events()
 					?>
 				</tbody>
 			</table>
-			
+
 			<?php if(!empty($CustomInformation1)) {?>
-			<h3>Custom Information:</h3>
+			<h3><?php _e('Custom Information:', 'constant-contact-api'); ?></h3>
 			<table class="widefat form-table" cellspacing="0">
 				<tbody>
 					<?php
@@ -226,9 +226,9 @@ function constant_contact_events()
 				</tbody>
 			</table>
 	<?php	} ?>
-		<p class="submit"><a href="<?php echo remove_query_arg(array('registrant', 'refresh')); ?>" class="button-primary">Return to Event</a> <a href="<?php echo add_query_arg('refresh', 'registrant'); ?>" class="button-secondary alignright" title="Registrant data is stored for 1 hour. Refresh data now.">Refresh Registrant</a></p>
+		<p class="submit"><a href="<?php echo remove_query_arg(array('registrant', 'refresh')); ?>" class="button-primary"><?php _e('Return to Event', 'constant-contact-api'); ?></a> <a href="<?php echo add_query_arg('refresh', 'registrant'); ?>" class="button-secondary alignright" title="Registrant data is stored for 1 hour. Refresh data now."><?php _e('Refresh Registrant', 'constant-contact-api'); ?></a></p>
 		</div>
-	<?php 
+	<?php
 		}
 	} elseif(isset($_GET['id'])) {
 		$id = htmlentities($_GET['id']);
@@ -237,41 +237,43 @@ function constant_contact_events()
 		else { $completed = true; }
 	?>
 		<div class="wrap nosubsub">
-			<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> <a href="<?php echo admin_url('admin.php?page=constant-contact-events'); ?>">Events</a> &gt; Event<?php echo_if_not_empty($v['Title'],'',': &ldquo;'.$v['Title'].'&rdquo;'); ?></h2>			
+			<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> <a href="<?php echo admin_url('admin.php?page=constant-contact-events'); ?>">Events</a> &gt; Event<?php echo_if_not_empty($v['Title'],'',': &ldquo;'.$v['Title'].'&rdquo;'); ?></h2>
 			<?php constant_contact_admin_refresh();  ?>
-			<h3>Event Stats:</h3>
-			<table class="widefat form-table" cellspacing="0">
-				<thead>
-					<th scope="col" class="column-name">Registered</th>
-					<th scope="col" class="column-title"><?php if($completed) { echo 'Attended'; } else { echo 'Attending'; }?></th>
-					<th scope="col" class="column-title">Cancelled</th>
-				</thead>
-				<tbody>
-					<tr valign="top">
-				<?php
-				$html = '';
-					$cols = array('Registered', 'AttendedCount', 'CancelledCount');
-					foreach($cols as $col) {
-						$html .= '<td>'.htmlentities($v["{$col}"]).'</td>';
-					}
-					echo $html;
-				?>	</tr>
-				</tbody>
-			</table>
-		<h3>Event Details:</h3>
-		<table class="form-table widefat" cellspacing="0">
+
+		<h3><?php _e('Event Stats:', 'constant-contact-api'); ?></h3>
+		<table class="ctct_table widefat fixed" cellspacing="0">
+			<thead>
+				<th scope="col" class="column-name"><?php _e('Registered', 'constant-contact-api'); ?></th>
+				<th scope="col" class="column-title"><?php if($completed) { _e('Attended', 'constant-contact-api'); } else { _e('Attending', 'constant-contact-api'); }?></th>
+				<th scope="col" class="column-title"><?php _e('Cancelled', 'constant-contact-api'); ?></th>
+			</thead>
+			<tbody>
+				<tr valign="top">
+			<?php
+			$html = '';
+				$cols = array('Registered', 'AttendedCount', 'CancelledCount');
+				foreach($cols as $col) {
+					$html .= '<td>'.htmlentities($v["{$col}"]).'</td>';
+				}
+				echo $html;
+			?>	</tr>
+			</tbody>
+		</table>
+
+		<h3><?php _e('Event Details:', 'constant-contact-api'); ?></h3>
+		<table class="ctct_table widefat" cellspacing="0">
 			<?php
 			if(!$v) {
 				echo '<tbody><tr><td><p>Event Not Found</p></td></tr></tbody></table><p class="submit"><a href="'.admin_url('admin.php?page=constant-contact-events').'" class="button-primary">Return to Events</a></p></div>';
 				return;
 			}
 			$html = '';
-			
+
 			$dateformat = 'jS F Y \- H:i:s';
-			
+
 			$v['StartDate'] = (int)$cc->convert_timestamp($v['StartDate']);
 			$v['EndDate'] = (int)$cc->convert_timestamp($v['EndDate']);
-			
+
 			?>
 			<tbody>
 				<tr><th scope="row" id="name" class="manage-column column-name" style="">Name</th><td><?php echo $v['Name']; ?></td></tr>
@@ -302,12 +304,12 @@ function constant_contact_events()
 						$list .= '<li><strong>'.$key.'</strong>'.$t.'</li>';
 					}
 					$type = '<ul>'.$list.'</ul>';
-				} 
+				}
 
 				$types .= '<li><strong>'.$k.'</strong>: '.$type.'</li>';
 			}
 			$types = '<ul>'.$types.'</ul>';
-			
+
 			if(!empty($v['RegistrationTypes']['RegistrationType']['EventFees'])) {
 			$fees = '';
 			foreach($v['RegistrationTypes']['RegistrationType']['EventFees']['EventFee'] as $k => $fee) {
@@ -320,7 +322,7 @@ function constant_contact_events()
 						$list .= '<li><strong>'.$key.'</strong>: '.$t.'</li>';
 					}
 					$fee = '<ul>'.$list.'</ul>';
-				} 
+				}
 
 				$fees .= '<li>'.$fee.'</li>';
 			}
@@ -334,14 +336,14 @@ function constant_contact_events()
 			</tbody>
 		</table>
 		<p class="submit"><a href="<?php echo remove_query_arg(array('id','refresh')); ?>" class="button-primary">Return to Events</a>
-		
+
 		<?php
-		
+
 		$_registrants = $cc->get_event_registrants($id);
 		$_cancelled = array();
-#		print_r($_registrants);
 
-		if(!empty($_registrants) && current_user_can('list_users')) { 
+
+		if(!empty($_registrants) && current_user_can('list_users')) {
 		?>
 		<h2>Registrants</h2>
 		<h3>Registered</h3>
@@ -357,9 +359,9 @@ function constant_contact_events()
 					<th scope="col" id="registrant_details" class="manage-column column-name" style="">Details</th>
 			</thead>
 			<tbody>
-				<?php 
+				<?php
 				$alt = '';
-				foreach($_registrants as $v) { 
+				foreach($_registrants as $v) {
 				if($alt == 'alt') { $alt = '';} else { $alt = 'alt'; }
 				if($v['RegistrationStatus'] == 'CANCELLED') {
 					$_cancelled[] = $v;
@@ -380,9 +382,9 @@ function constant_contact_events()
 			</tbody>
 		</table>
 		<p class="submit"><a href="<?php echo add_query_arg('refresh', 'registrants').'#registrants'; ?>" class="button-secondary alignright" title="Event registrants data is stored for 1 hour. Refresh data now.">Refresh Registrants</a></p>
-		<?php } 
-		
-		if(!empty($_cancelled) && current_user_can('list_users')) { 
+		<?php }
+
+		if(!empty($_cancelled) && current_user_can('list_users')) {
 		?>
 		<h3>Cancelled</h3>
 		<table class="widefat form-table" cellspacing="0" id="cancelled">
@@ -397,9 +399,9 @@ function constant_contact_events()
 					<th scope="col" id="registrant_details" class="manage-column column-name" style="">Details</th>
 			</thead>
 			<tbody>
-				<?php 
+				<?php
 				$alt = '';
-				foreach($_cancelled as $v) { 
+				foreach($_cancelled as $v) {
 				if($alt == 'alt') { $alt = '';} else { $alt = 'alt'; }
 				?>
 				<tr <?php echo $alt; ?>>
@@ -417,69 +419,33 @@ function constant_contact_events()
 		<p class="submit"><a href="<?php echo add_query_arg('refresh', 'registrants').'#registrants'; ?>" class="button-secondary alignright" title="Event registrants data is stored for 1 hour. Refresh data now.">Refresh Cancelled</a></p>
 		<?php } ?>
 	</div>
-<?php	
+<?php
 	} else {
-		
+
 		$_events = $cc->get_events();
-		
-		if(!empty($_events)):
-		foreach($_events as $k => $v):
-			$events[$v['id']] = $v;
-		endforeach;
-		endif;
+
+		if(!empty($_events) && is_array($_events)) {
+			foreach($_events as $k => $v) {
+				$events[$v['id']] = $v;
+			}
+		}
 		// display all events
 		?>
 
 		<div class="wrap nosubsub">
-			<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>">Constant Contact Plugin &gt;</a> Events</h2>
-			<?php constant_contact_admin_refresh(); ?>
-			
-			<?php if(empty($_events)) {?>	
-				<style type="text/css">
-				#free_trial {
-				background: url(<?php echo CC_FILE_URL; ?>admin/images/btn_free_trial_green.png) no-repeat 0px 0px;
-				margin: 0px 5px 0px 0px;
-				width: 246px;
-				}
-				a#free_trial,
-				a#see_how {
-					display:block;
-					text-indent:-9999px;
-					overflow:hidden;
-					float:left;
-					height: 80px;
-				}
-				
-				a#free_trial:hover,
-				a#see_how:hover {
-					background-position: 0px -102px;
-				}
-				#see_how {
-					background: url(<?php echo CC_FILE_URL; ?>admin/images/btn_see_how_blue.png) no-repeat 0px 0px;
-					margin: 0px 10px 0px 0px;
-					width: 216px;
-				}
-				</style>
-				
-				<div class="widefat">
-				<div class="wrap"  style="padding:10px;"><h2 class="clear">Did you know that Constant Contact offers <a href="http://conta.cc/hB5lnC" title="Learn more about Constant Contact Event Marketing">Event Marketing</a>?</h2>
-				<a id="see_how" href="http://conta.cc/eIt0gy" target="winHTML">See How it Works!</a>
-				<a id="free_trial" href="http://conta.cc/guwuYh">Start Your Free Trial</a>
-				<ul class="ul-disc clear">
-					<li>Affordable, priced for small business, discount for nonprofits. <a href="http://conta.cc/guwuYh">Start for FREE!</a></li>
-					<li>Easy-to-use tools and templates for online event registration and promotion</li>
-					<li>Professional &#8212; you, and your events, look professional</li>
-					<li>Secure credit card processing &#8212; collect event fees securely with PayPal processing</li>
-					<li>Facebook, Twitter links make it easy to promote your events online</li>
-					<li>Track and see results with detailed reports on invitations, payments, RSVP's, <a href="http://conta.cc/f62LG7">and more</a></li>
-				</ul></div>
-				</div>
-			<?php 
-			
-			constant_contact_events_list_make_table($_events, __('Events','constant-contact-api'));
-			
-			} else { 
+			<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>"><?php _e('Constant Contact Plugin', 'constant-contact-api'); ?> &gt;</a> <?php _e('Events', 'constant-contact-api'); ?></h2>
 
+			<?php if(empty($events) || !is_array($events)) {
+				constant_contact_get_signup_message('events');
+				constant_contact_admin_refresh();
+			?>
+				</div>
+			<?php
+
+			constant_contact_events_list_make_table($_events, __('Events','constant-contact-api'));
+
+			} else {
+				constant_contact_admin_refresh();
 				$Active = $Complete = $Draft = $Cancelled = array();
 				foreach($events as $id => $v) {
 					$v['Status'] = ucwords(strtolower(esc_html($v['Status'])));
@@ -509,15 +475,15 @@ function constant_contact_events()
 					echo '
 					</ul>';
 				}
-				
+
 				if(!isset($_GET['event_status']) || $_GET['event_status'] == 'all') { constant_contact_events_list_make_table($events); }
-				
+
 				if(!empty($Active) && isset($_GET['event_status']) && $_GET['event_status'] == 'active') { constant_contact_events_list_make_table($Active, __('Active','constant-contact-api')); }
 				if(!empty($Draft) && isset($_GET['event_status']) && $_GET['event_status'] == 'draft') { constant_contact_events_list_make_table($Draft, __('Draft','constant-contact-api')); }
 				if(!empty($Cancelled) && isset($_GET['event_status']) && $_GET['event_status'] == 'cancelled') { constant_contact_events_list_make_table($Cancelled, __('Cancelled','constant-contact-api')); }
 				if(!empty($Complete) && isset($_GET['event_status']) && $_GET['event_status'] == 'complete') { constant_contact_events_list_make_table($Complete, __('Completed','constant-contact-api')); }
-					
-?>			
+
+?>
 	<?php } // end if empty $_events ?>
 	</div>
 	<?php }
@@ -525,21 +491,21 @@ function constant_contact_events()
 
 function constant_contact_events_list_make_table($events = array(), $title = '') {
 	global $cc;
-	
-	// Create the CC api object for use in this page. 
+
+	// Create the CC api object for use in this page.
 	if(!constant_contact_create_object()) { return false; }
 ?>
-	<table class="post fixed widefat" cellspacing="0">
+	<table class="ctct_table widefat" cellspacing="0">
 			<thead>
 				<tr>
-					<th scope="col" id="name" class="manage-column column-title" style="">Name</th>
-					<th scope="col" id="title" class="manage-column column-title" style="">Title</th>
-					<th scope="col" id="eventid" class="manage-column column-id" style="">ID <span class="help cc_qtip" title="Use the ID inside the [ccevents] shortcode to display a single event in your post or page content; for example: [ccevents id='abc1244']" style="display:inline-block; background: url(<?php echo str_replace('/admin/', '/', plugin_dir_url(__FILE__)).'images/help.png'; ?>) left top no-repeat; width:16px; height:16px; overflow:hidden; text-indent:-99999px; text-align:left;">What is this for?</span></th>
+					<th scope="col" id="name" class="manage-column column-title" style=""><?php _e('Name', 'constant-contact-api'); ?></th>
+					<th scope="col" id="title" class="manage-column column-title" style=""><?php _e('Title', 'constant-contact-api'); ?></th>
+					<th scope="col" id="eventid" class="manage-column column-id" style=""><?php _e('Shortcode', 'constant-contact-api'); ?> <span class="help cc_qtip" title="<?php _e('Use the ID inside the [eventspot] shortcode to display a single event in your post or page content; for example: [eventspot id=\'abc1244\']', 'constant-contact-api'); ?>" style="display:inline-block; background: url(<?php echo str_replace('/admin/', '/', plugin_dir_url(__FILE__)).'images/help.png'; ?>) left top no-repeat; width:16px; height:16px; overflow:hidden; text-indent:-99999px; text-align:left;"><?php _e('What is this for?', 'constant-contact-api'); ?></span></th>
 					<?php if(!isset($_GET['event_status']) || $_GET['event_status'] == 'all') {?>
-					<th scope="col" id="status" class="manage-column column-date" style="">Status</th>
+					<th scope="col" id="status" class="manage-column column-date" style=""><?php _e('Status', 'constant-contact-api'); ?></th>
 					<?php } ?>
-					<th scope="col" id="start" class="manage-column column-author" style="">Start</th>
-					<th scope="col" id="registered" class="manage-column column-date" style=""># Registered</th>
+					<th scope="col" id="start" class="manage-column column-author" style=""><?php _e('Start', 'constant-contact-api'); ?></th>
+					<th scope="col" id="registered" class="manage-column column-date" style=""><?php _e('# Registered', 'constant-contact-api'); ?></th>
 					<!-- <th scope="col" id="cancelled" class="manage-column column-date" style=""># Cancelled</th> -->
 				</tr>
 			</thead>
@@ -547,12 +513,12 @@ function constant_contact_events_list_make_table($events = array(), $title = '')
 			<?php
 			if(empty($events)) {?>
 				<tr><td colspan="6">
-				<h3>No events found&hellip;</h3>
+				<h3><?php _e('No events found&hellip;', 'constant-contact-api'); ?></h3>
 				</td></tr></table>
 			<?php
 				return;
 			}
-			
+
 				$alt = 'alt';
 				foreach($events as $id => $v) {
 					if($alt == 'alt') { $alt = '';} else { $alt = 'alt'; }
@@ -565,7 +531,7 @@ function constant_contact_events_list_make_table($events = array(), $title = '')
 							<?php echo $v['Title']; ?>
 						</td>
 						<td class="column-title post-title" style="padding:8px;">
-							<?php echo $v['id']; ?>
+							<?php _e(sprintf('[eventspot id="%s"]', $v['id']), 'constant-contact-api'); ?>
 						</td>
 				<?php if(!isset($_GET['event_status']) || $_GET['event_status'] == 'all') {?>
 						<td class="column-role" style="padding:8px;">
