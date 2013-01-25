@@ -1,0 +1,42 @@
+a.toplevel_page_constant-contact-api {
+	white-space: nowrap;
+}
+.toplevel_page_constant-contact-api div.widefat {
+	background-color: white;
+}
+.toplevel_page_constant-contact-api .widefat .wrap {
+	padding: 10px;
+}
+.wrap h2.cc_logo {
+	min-height: 130px; /* logo height + 20px; */
+	line-height:129px; /* logo height + 20px; */
+	padding-left:140px; /* logo width + 30px; */
+	position:relative;
+	background: url(images/logo.jpg) left 20px no-repeat;
+	width: 50%;
+}
+.wrap a.cc_logo,
+a.cc_logo {
+	position:absolute;
+	width:110px;
+	left:0;
+	top:20px;
+	height:109px;
+	text-indent:-9999px;
+	overflow:hidden;
+	line-height: 1;
+}
+.constant-contact_page_constant-contact-contacts div.wrap {
+	margin-bottom: 3em!important;
+}
+
+.ui-tooltip-content .constant_contact_plugin_page_list {
+	font-size: 1.2em!important;
+	line-height: 1.2;
+}
+.ctct_table td {
+	margin-bottom: 9px;
+	padding: 8px 10px;
+	line-height: 20px;
+	font-size: 12px;
+}
