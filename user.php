@@ -1,11 +1,11 @@
 <?php // $Id$
 /**
  * This file contains actions for the user functions, for example:
- * 
- * register_form, register_post, show_user_profile, 
+ *
+ * register_form, register_post, show_user_profile,
  * profile_update, delete_user and constant_contact_signup_widget
  */
-	
+
 /**
  * Hook into delete_user action to remove the user from Constant Contact if necessary
  *
@@ -42,16 +42,16 @@ function constant_contact_delete_user($user_id)
 function constant_contact_profile_update($user)
 {
 	global $cc;
-	
+
 	#echo '<pre>';
-	
+
 	#print_r($_POST);
-	
+
 	$email = get_user_option( 'user_email', $user );
 
 	// Get our "User Subscription Method" option value.
 	$subscribe_method = get_option('cc_register_page_method');
-	
+
 	// If it is disabled exit this function
 	if($subscribe_method == 'none'):
 		return; /* disabled */
@@ -69,7 +69,7 @@ function constant_contact_profile_update($user)
 
 		// get contact and selected lists
 		$contact = $cc->query_contacts($email);
-		
+
 		if($subscribe_method == 'checkbox' && isset($_POST['cc_newsletter']) && !is_array($_POST['cc_newsletter'])) {
 			$lists = get_option('cc_lists');
 		}
@@ -84,10 +84,10 @@ function constant_contact_profile_update($user)
 				}
 			}
 		}
-		
+
 		// Kind of sanitize the input
 		foreach($lists as $key => $list) { if(!is_numeric($list)) { unset($lists["{$key}"]); } }
-		
+
 		$cc->set_action_type('contact');
 
 		if($contact) {
@@ -108,18 +108,18 @@ function constant_contact_profile_update($user)
 		}
 	}
 }
-	
+
 /**
  * Hook into show_user_profile action to display our user subscription settings if necessary
- * 
+ *
  * @global  $cc
  * @param <type> $user
- * @return <type> 
+ * @return <type>
  */
 function constant_contact_show_user_profile($user)
 {
 	global $cc;
-	
+
 	$register_page_method = get_option('cc_register_page_method');
 
 	if($register_page_method == 'none') {
@@ -135,7 +135,7 @@ function constant_contact_show_user_profile($user)
 	if (!constant_contact_create_object()) { return false; }
 
 	$contact = $cc->query_contacts($user->data->user_email);
-	
+
 	if($cc_lists) {
 		// show only the lists they have selected
 		$new_lists = array();
@@ -161,12 +161,12 @@ function constant_contact_show_user_profile($user)
 	}
 
 	if($contact) {
-		if(isset($_GET['updated'])) { 
+		if(isset($_GET['updated'])) {
 			$contact = $cc->get_contact($contact['id'], 0);
 		} else {
 			$contact = $cc->get_contact($contact['id']);
 		}
-		
+
 		if($contact && $contact['Status'] == 'Active') {
 			if($register_page_method == 'checkbox') {
 				$cc_newsletter = 1;
@@ -188,7 +188,7 @@ function constant_contact_show_user_profile($user)
 	<?php echo $signup_description;?>
 
 	<p>
-	
+
 		<?php
 		// Checkbox display for Single Checkbox method
 		if($register_page_method == 'checkbox') {
@@ -240,12 +240,12 @@ function constant_contact_show_user_profile($user)
 	<br />
 <?php
 }
-	
-	
+
+
 /**
- * The multisite registration process for logged-in users seems to lack a 'register_post'-like solution. This 
+ * The multisite registration process for logged-in users seems to lack a 'register_post'-like solution. This
  * attempts to mimic it by processing on 'wpmu_signup_user_notification', which only is called on successful registration.
- * 
+ *
  * @global  $pagenow
  * @param array $user
  * @return bool
@@ -262,7 +262,7 @@ function constant_contact_register_post_multisite($user = array()) {
 }
 /**
  * Hook into 'register_post' action to manage subscription of new users during user registration
- * 
+ *
  * @global  $cc
  * @param <type> $login
  * @param <type> $email
@@ -272,7 +272,7 @@ function constant_contact_register_post_multisite($user = array()) {
 function constant_contact_register_post($login,$email,$errors)
 {
 	global $cc;
-	
+
 	if(get_option('cc_register_page_method') == 'none'):
 		return; /* disabled */
 	endif;
@@ -340,18 +340,18 @@ function constant_contact_register_post($login,$email,$errors)
 
 /**
  * Hook into 'register_form' action to show our subscription form to users while they are registering themselves
- * 
+ *
  * @return <type>
  */
 function constant_contact_register_form()
 {
 	global $cc;
-	
+
 	// If global $cc doesn't work, then let's exit
 	if (!constant_contact_create_object()) { return false; }
-	
+
 	$register_page_method = get_option('cc_register_page_method');
-	
+
 	if($register_page_method == 'none'){ return;}
 
 	$cc_lists = get_option('cc_lists');
@@ -386,40 +386,39 @@ function constant_contact_register_form()
 	if(get_option('cc_default_opt_in') && $register_page_method == 'lists') {
 		$_POST['cc_newsletter'] = array_keys($lists);
 	}
-	
-	
-	// Prepare the description from the settings screen
-	$signup_description =  get_option('cc_signup_description');
-	if ($signup_description)	:
-		$signup_description = wpautop ($signup_description);
-		$signup_description = "<div class='description'>$signup_description</div>";
-	endif;
-	
+
+
 /*
 *
 * Begin the registration form
 *
 */
-	
+
 	$reg = '';
-	$regform = '<div style="margin-bottom:1em;">';
-	
+	$regform = '<div style="margin-bottom:16px">';
+
 		if($register_page_method == 'checkbox') {
-			$reg = '	<label for="cc_newsletter"><span class="cc_signup_title">'.get_option('cc_signup_title').'</span>';
-			$reg .= '	<input type="hidden" name="cc_newsletter[]" value="0" />
-						<input type="checkbox" id="cc_newsletter"'.checked((isset($_POST['cc_newsletter']) && $_POST['cc_newsletter'] || !isset($_POST['cc_newsletter']) && get_option('cc_default_opt_in')), true, false).' name="cc_newsletter[]" class="checkbox" value="1" />';
+
+			$checkbox = ' <input type="checkbox" id="cc_newsletter"'.checked((isset($_POST['cc_newsletter']) && $_POST['cc_newsletter'] || !isset($_POST['cc_newsletter']) && get_option('cc_default_opt_in')), true, false).' name="cc_newsletter[]" class="checkbox" value="1" /> ';
+
+			$reg = '<label for="cc_newsletter">';
+
+			$reg .= apply_filters( 'constant_contact_register_checkbox_before', true ) ? '<span class="cc_signup_title">'.get_option('cc_signup_title').'</span><input type="hidden" name="cc_newsletter[]" value="0" />'.$checkbox : $checkbox.'<span class="cc_signup_title">'.get_option('cc_signup_title').'</span><input type="hidden" name="cc_newsletter[]" value="0" />';
 			$reg .= '</label>';
-			$reg .= $signup_description;
+
 			$reg = apply_filters('constant_contact_register_checkbox', $reg);
-			
+
+			$reg .= '<div>';
+			// We loop through the lists that are set for registration
 			foreach($lists as $k => $v) {
 				$reg .= '<input type="hidden" name="cc_newsletter[]" value="'.$v['id'].'" />';
 			}
-			
+			$reg .= '</div>';
+
 		} elseif($register_page_method == 'lists') {
 			if(get_option('cc_list_selection_format') == 'select' || get_option('cc_list_selection_format') == 'dropdown') {
 				$reg = '<label style="display: block; margin-bottom: 5px;" for="cc_newsletter">
-				<span class="cc_signup_title" style="display:block;">'.get_option('cc_signup_title').'</span>
+				<span class="cc_signup_title">'.get_option('cc_signup_title').'</span>
 				<select name="cc_newsletter[]" id="cc_newsletter"'; if(get_option('cc_list_selection_format') == 'select') { $reg .= ' multiple size="5"'; } $reg .= '>';
 				if($lists) {
 					foreach($lists as $k => $v){
@@ -431,11 +430,10 @@ function constant_contact_register_form()
 					}
 				}
 				$reg .= '</select></label>';
-				$reg .= $signup_description;
 				$reg = apply_filters('constant_contact_register_select', apply_filters('constant_contact_register_dropdown',$reg));
 			} elseif($lists) {
 				$reg = '<label style="display: block; margin-bottom: 5px;"><span class="cc_signup_title" style="display:block;">'.get_option('cc_signup_title').'</span></label>';
-	
+
 				foreach($lists as $k => $v) {
 					if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])) {
 						$reg .= '<label for="cc_newsletter_'.$v['id'].'" style="display:block; margin:.25em 0;"><input checked="checked" id="cc_newsletter_'.$v['id'].'" type="checkbox" name="cc_newsletter[]" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '</label>';
@@ -443,24 +441,32 @@ function constant_contact_register_form()
 						$reg .= '<label for="cc_newsletter_'.$v['id'].'" style="display:block; margin:.25em 0;"><input type="checkbox" id="cc_newsletter" name="cc_newsletter[]" class="checkbox" value="'.$v['id'].'" /> ' . $v['Name'] . '</label>';
 					}
 				}
-				$reg .= $signup_description;
 				$reg = apply_filters('constant_contact_register_checkboxes',$reg);
 			}
 		}
-		
+
 		if(!empty($exclude_lists) && $register_page_method !== 'checkbox') {
 			foreach($exclude_lists as $k => $v) {
 				$reg .= "\n".'<input type="hidden" name="cc_newsletter[]" value="'.$v['id'].'" />';
 			}
 		}
-		
-	$regform .= $reg;
-	
-	$regform .= '</div>';	
-	
+
+	// Prepare the description from the settings screen
+	$signup_description =  get_option('cc_signup_description');
+	if(!empty($signup_description)) {
+		$signup_description = wpautop($signup_description);
+		$signup_description = "<div class='description'>$signup_description</div>";
+	}
+
+	$regform .= (get_option('cc_signup_description_position') === 'before') ? $signup_description . $reg : $reg . $signup_description;
+
+	$regform .= '</div>';
+
 	$regform = apply_filters('constant_contact_register_form',$regform);
-	
+
 	echo $regform;
-	
+
 }
+
+
 ?>

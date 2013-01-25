@@ -13,7 +13,7 @@ class constant_contact_form_widget extends WP_Widget {
 			return false;
 		}
 		$this->debug = false;
-		
+
 		require_once CC_FILE_PATH . 'form-designer-functions.php';
 
 		$widget_options = array(
@@ -21,12 +21,12 @@ class constant_contact_form_widget extends WP_Widget {
 			'classname' => 'constant-contact-form',
 		);
 		$control_options = array('width'=>690); // Min-width of widgets config with expanded sidebar
-        parent::WP_Widget(false, $name = 'Constant Contact Form Designer', $widget_options, $control_options);	
-        
+        parent::WP_Widget(false, $name = 'Constant Contact Form Designer', $widget_options, $control_options);
+
         add_action('wp_print_styles', array(&$this, 'print_styles'));
     }
-	
-	
+
+
 	function update( $new_instance, $old_instance ) {
 		delete_transient('cc_api');
 		return $new_instance;
@@ -42,29 +42,34 @@ class constant_contact_form_widget extends WP_Widget {
 				$usedStyles[] = $formid; // We don't need to echo the same styles twice
 			}
 	}
-	
+
    /** @see WP_Widget::widget */
     function widget($args = array(), $instance = array(), $echo = true)
 	{
 
 		$form = constant_contact_public_signup_form($instance, false);
-		
+
 		if(!$form) {
 			if((is_user_logged_in() && current_user_can('install_plugins'))) {
-				_e('<div style="background-color: #FFEBE8; padding:10px 10px 0 10px; font-size:110%; border:3px solid #c00; margin:10px 0;"><h3><strong>Admin-only Notice</strong></h3><p>The Form Designer is not working because of server configuration issues.</p><p>Contact your web host and request that they "whitelist your domain for ModSecurity"</p></div>');
+				_e(sprintf('<div style="background-color: #FFEBE8; padding:10px 10px 0 10px; font-size:110%%; border:3px solid #c00; margin:10px 0;">
+				   <h3><strong>Admin-only Notice</strong></h3>
+				   <p>The Form Designer is not working.</p>
+				   <p>Your form may not exist. The widget is trying to find a form with the ID "<code>%s</code>" (that should be a number!). Please visit your <a href="%s">Widgets page</a> and re-save the widget.</p>
+				   <p>Alternatively, this may be because of server configuration issues. Contact your web host and request that they "whitelist your domain for ModSecurity".</p>
+				  </div>', $instance['formid'], admin_url('widgets.php')));
 			} else {
 				_e('<!-- Form triggered error. Log in and refresh to see additional information. -->');
 			}
 			return false;
 		}
-		
+
 		$output = '';
-		
+
 		/**
 		 * Extract $args array into individual variables
 		 */
     		extract( $args );
-    	
+
     	/**
 		 * Extract $instance array into individual variables
 		 */
@@ -82,37 +87,37 @@ class constant_contact_form_widget extends WP_Widget {
 		$output .= (isset($before_title, $after_title)) ? $before_title : '<h2>';
 		$output .= (isset($widget_title)) ? $widget_title : '';
 		$output .= (isset($after_title, $before_title)) ? $after_title : '</h2>';
-	
+
 		$output .= apply_filters('cc_widget_description', $description);
-		
+
 		/**
 		 * Display the public signup form
 		 * Pass in widget $args, they should match the ones expected by constant_contact_public_signup_form()
 		 */
-		
+
 		$output .= $form;
-		
+
 
 		$output .= (isset($after_widget)) ? $after_widget : '';
 
-		
+
 		echo $output;
     }
-	
-	
+
+
 	function r($content, $kill = false) {
 		echo '<pre>'.print_r($content,true).'</pre>';
 		if($kill) { die(); }
 	}
-	
+
 	function get_value($field, $instance) {
 		if (isset ( $instance[$field])) { return esc_attr( $instance[$field] );}
 		return false;
 	}
-	
+
 	function get_form_list_select($instance) {
 		$forms = get_option('cc_form_design');
-		
+
 		$output = '';
 		$output .= '<select name="'.$this->get_field_name('formid').'" id="'.$this->get_field_id('formid').'">';
 		$output .= '<option value="">Select a Form Design</option>';
@@ -123,53 +128,53 @@ class constant_contact_form_widget extends WP_Widget {
 #			$output .= '<optgroup label="Your Custom Forms">';
 			$previous_names = array();
 			foreach($forms as $form) {
-				
+
 				$name = isset($form['form-name']) ? $form['form-name'] : 'Form '+$key;
-				
+
 				$form['truncated_name'] = stripcslashes(trim( wp_html_excerpt( $name, 50 ) ));
 				if ( isset($form['form-name']) && $form['truncated_name'] != $form['form-name'])
 					$form['truncated_name'] .= '&hellip;';
-				
-				if(!in_array(sanitize_key( $name ), $previous_names)) { 
+
+				if(!in_array(sanitize_key( $name ), $previous_names)) {
 					$previous_names[] = sanitize_key( $name );
 				} else {
 					$namekey = sanitize_key( $name );
 					$previous_names[$namekey] = isset($previous_names[$namekey]) ? ($previous_names[$namekey] + 1) : 1;
 					$form['truncated_name'] .= ' ('.$previous_names[$namekey].')';
 				}
-				
+
 				if(!empty($form)) {
-					$output .= "<option value=\"{$form['cc-form-id']}\"".selected($this->get_value('formid', $instance), $form['cc-form-id'], false).">{$form['truncated_name']}</option>";	
+					$output .= "<option value=\"{$form['cc-form-id']}\"".selected($this->get_value('formid', $instance), $form['cc-form-id'], false).">{$form['truncated_name']}</option>";
 				}
 			}
 		}
 #		$output .= '</optgroup>';
 		$output .= '</select>';
-		
+
 		return $output;
 	}
-	
+
     /** @see WP_Widget::form */
     function form($instance)
 	{
 		$instance = wp_parse_args( (array) $instance, array( 'show_firstname' => 1, 'show_lastname' => 1, 'description' => false, 'title' => 'Sign Up for Our Newsletter', 'list_selection_title' => 'Sign me up for:', 'list_selection_format' => 'checkbox', 'formid' => 0, 'show_list_selection' => false, 'lists' => array(), 'exclude_lists' => array() ) );
-		
+
 #		$this->r(array($this, $instance));
 		@include_once('functions-form.php');
 		$cc = constant_contact_create_object();
-		
+
 		$title = isset( $instance['title'] ) ? $instance['title'] : '';
 		$description = isset( $instance['description'] ) ? $instance['description'] : '';
 	?>
-	<?php 
+	<?php
 	if(!get_option('cc_form_design')) {
 	?>
-	<h2>You're in the right spot, but&hellip;</h2>
-	<h3>You must create a form on the <a href="<?php echo admin_url('admin.php?page=constant-contact-forms'); ?>">Form Design page</a> first.</h3>
-	<p class="description">This widget displays forms created on the <a href="<?php echo admin_url('admin.php?page=constant-contact-forms'); ?>">Form Design page</a>. Go there, create a form, then come back here.</p>
+	<h2><?php _e("You're in the right spot, but&hellip;", 'constant-contact-api'); ?></h2>
+	<h3><?php echo sprintf(__('You must create a form on the <a href="%s">Form Design page</a> first.', 'constant-contact-api'), admin_url('admin.php?page=constant-contact-forms')); ?></h3>
+	<p class="description"><?php echo sprintf(__('This widget displays forms created on the <a href="%s">Form Design page</a>. Go there, create a form, then come back here.', 'constant-contact-api'), admin_url('admin.php?page=constant-contact-forms')); ?></p>
 	<?php
 	return;
-	} 
+	}
 	?>
 	<h3>Signup Widget Settings</h3>
 	<a name="widget"></a>
@@ -210,12 +215,12 @@ class constant_contact_form_widget extends WP_Widget {
 			</td>
 		</tr>
 <?php
-	
+
 		$selected_lists = (!is_array($instance['lists'])) ? array() : $instance['lists'];
 		$exclude_lists = (!is_array($instance['exclude_lists'])) ? array() : $instance['exclude_lists'];
-		
+
 #		$lists_all = constant_contact_get_transient('lists_all');
-	
+
 		$lists_all = constant_contact_get_lists(isset($_REQUEST['fetch_lists']));
 /*
 		if(empty($lists_all)) {
@@ -223,29 +228,32 @@ class constant_contact_form_widget extends WP_Widget {
 			constant_contact_set_transient('lists_all', $lists_all);
 		}
 */
-		$hidecss = isset($instance['show_list_selection']) ? ' style="display:none;"' : '';
+
+		$hidecss = !$this->get_value('show_list_selection', $instance) ? ' style="display:none;"' : '';
 
 		?>
 
 		<tr valign="top" class="contact-lists">
-			<th scope="row"><p><label><span>Contact Lists</span></label></p><p><a href="<?php echo admin_url('widgets.php?fetch_lists=true'); ?>" class="button">Refresh Lists</a></p></th>
+			<th scope="row"><p><label><span><?php _e('Contact Lists', 'constant-contact-api'); ?></span></label></p><p><a href="<?php echo admin_url('widgets.php?fetch_lists=true'); ?>" class="button">Refresh Lists</a></p></th>
 			<td>
+			<div style="overflow:auto; height:250px;">
 			<?php
-			if($lists_all):
-#			$this->r($lists_all);
-			$selectList = $checkList = '';
-			foreach($lists_all as $k => $v):
-				if(in_array($v['id'], $selected_lists) || sizeof($selected_lists) == 0 && $k == 0):
-					$checkList .= '<label for="'.$this->get_field_id('lists_'.$v['id']).'"><input name="'.$this->get_field_name('lists').'[]" type="checkbox" checked="checked" value="'.$v['id'].'" id="'.$this->get_field_id('lists_'.$v['id']).'" /> '.$v['Name'].'</label><br />';
-					$selectList .= '<option>'.$v['Name'].'</option>'; 
-				else:
-					$checkList .= '<label for="'.$this->get_field_id('lists_'.$v['id']).'"><input name="'.$this->get_field_name('lists').'[]" type="checkbox" value="'.$v['id'].'" id="'.$this->get_field_id('lists_'.$v['id']).'"  /> '.$v['Name'].'</label><br />';
-					$selectList .= '<option>'.$v['Name'].'</option>'; 
-				endif;
-			endforeach;
-			echo $checkList;
-			endif;
+			if($lists_all && is_array($lists_all)) {
+				$selectList = $checkList = '';
+				foreach($lists_all as $k => $v) {
+					if(!isset($v['id'])) { continue; }
+					if(in_array($v['id'], $selected_lists) || sizeof($selected_lists) == 0 && $k == 0) {
+						$checkList .= '<label for="'.$this->get_field_id('lists_'.$v['id']).'"><input name="'.$this->get_field_name('lists').'[]" type="checkbox" checked="checked" value="'.$v['id'].'" id="'.$this->get_field_id('lists_'.$v['id']).'" /> '.$v['Name'].'</label><br />';
+						$selectList .= '<option>'.$v['Name'].'</option>';
+					} else {
+						$checkList .= '<label for="'.$this->get_field_id('lists_'.$v['id']).'"><input name="'.$this->get_field_name('lists').'[]" type="checkbox" value="'.$v['id'].'" id="'.$this->get_field_id('lists_'.$v['id']).'"  /> '.$v['Name'].'</label><br />';
+						$selectList .= '<option>'.$v['Name'].'</option>';
+					}
+				}
+				echo $checkList;
+			}
 			?>
+			</div>
 			<p class="description">If you show the list selection you can select which lists are available above, alternatively if you disable the list selection you should select which lists the user is automatically subscribed to (if you show the list selection and don't select any lists above all lists will be available to the user including newly created ones).</p>
 			</td>
 		</tr>
@@ -275,8 +283,9 @@ class constant_contact_form_widget extends WP_Widget {
 		<tr valign="top" class="list-selection contact-lists-hide"<?php echo $hidecss; ?>>
 			<th scope="row"><p><label><span>Hide Contact Lists</span></label></p></th>
 			<td>
+				<div style="overflow:auto; height:250px;">
 			<?php
-			if($lists_all):
+			if($lists_all) {
 			foreach($lists_all as $k => $v):
 				if(in_array($v['id'], $exclude_lists)):
 					echo '<label for="'.$this->get_field_id('exclude_lists_'.$v['id']).'"><input name="'.$this->get_field_name('exclude_lists').'[]" type="checkbox" checked="checked" value="'.$v['id'].'" id="'.$this->get_field_id('exclude_lists_'.$v['id']).'" /> '.$v['Name'].'</label><br />';
@@ -284,8 +293,9 @@ class constant_contact_form_widget extends WP_Widget {
 					echo '<label for="'.$this->get_field_id('exclude_lists_'.$v['id']).'"><input name="'.$this->get_field_name('exclude_lists').'[]" type="checkbox" value="'.$v['id'].'" id="'.$this->get_field_id('exclude_lists_'.$v['id']).'" /> '.$v['Name'].'</label><br />';
 				endif;
 			endforeach;
-			endif;
+			}
 			?>
+			</div>
 			<p class="description">If you show the list selection you can select which lists to always exclude from the selection.</p>
 			</td>
 		</tr>
@@ -294,5 +304,5 @@ class constant_contact_form_widget extends WP_Widget {
     }
 
 } // class constant_contact_api_widget
-	
+
 ?>

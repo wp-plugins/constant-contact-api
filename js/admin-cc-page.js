@@ -1,12 +1,12 @@
 jQuery(document).ready(function($) {
-	
+
 	$('.cc_qtip').qtip({
 		style: {
 	      classes: 'ui-tooltip-light ui-tooltip-shadow',
 	      width: '280px'
 	 	}
 	 });
-	
+
 	$('a.cc_logo').qtip({
 	   content: {
 	      text: $('.constant_contact_plugin_page_list.cc_hidden')
@@ -36,5 +36,5 @@ jQuery(document).ready(function($) {
 	      delay: 500
 	   }
 	});
-	
+
 });

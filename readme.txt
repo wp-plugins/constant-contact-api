@@ -3,8 +3,8 @@ Contributors: katzwebdesign, katzwebservices, jamesbenson
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackkatz%40gmail%2ecom&item_name=Constant%20Contact%20API%20Plugin&no_shipping=0&no_note=1&tax=0&currency_code=USD&lc=US&bn=PP%2dDonationsBF&charset=UTF%2d8
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 2.9
-Tested up to: 3.5
-Stable tag: 2.3.12
+Tested up to: 3.5.1
+Stable tag: 2.4
 
 Integrate Constant Contact into your website with this full-featured plugin.
 
@@ -14,7 +14,7 @@ Integrate Constant Contact into your website with this full-featured plugin.
 
 <h4>Fully integrate Constant Contact with your WordPress website.</h4>
 
-The Constant Contact for Wordpress plugin is the best email marketing plugin for WordPress: integrate your website seamlessly with Constant Contact.
+The Constant Contact for Wordpress plugin is the best email marketing plugin for WordPress: integrate your website seamlessly with your Constant Contact account.
 
 You can place a signup checkbox or list selection on your register page or use the signup widget anywhere in your website sidebar or PHP templates.
 
@@ -69,6 +69,27 @@ To install the plugin follow the steps below:
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
 == Changelog ==
+
+= 2.4 =
+* Fixed some potential XSS vulnerabilities. Thanks to <a href="http://ultimorender.com.ar/funkascript">Manuel</a> for making them known.
+* Form Designer
+	* Updated to the latest TinyMCE codebase for the Form Editor. Unfortunately, the plugin still can't use the WP editor due to technical limitations.
+	* Switched to using built-in jQuery and jQuery UI scripts for better speed and support going forward
+	* Fixed lots of bugs
+	* Fixed scrollFollow
+	* Added some authentication to prevent hacking
+* Fixed link to import FAQ
+* Improved internationalization support plugin-wide
+* Fixed: "View Activity" link now works to view individual activity items.
+* Fixed Form Designer Widget extra options visibiltiy bug
+* Improved admin styling for WordPress 3.5
+* Removed Export page. Didn't make sense to have in there.
+
+= 2.3.12 =
+* Fixed issue introduced in 2.3.11 where settings were printed in the legacy widget.
+
+= 2.3.11 =
+* Fixed issue introduced in 2.3.10 where First Name and Last Name checkboxes don't stay checked in the Legacy Form Widget
 
 = 2.3.10 =
 * Form Designer Updates:
@@ -273,6 +294,24 @@ To install the plugin follow the steps below:
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
+
+= 2.4 =
+* Fixed some potential XSS vulnerabilities. Thanks to <a href="http://ultimorender.com.ar/funkascript">Manuel</a> for making them known.
+* Form Designer
+	* Updated to the latest TinyMCE codebase for the Form Editor. Unfortunately, the plugin still can't use the WP editor due to technical limitations.
+	* Switched to using built-in jQuery and jQuery UI scripts for better speed and support going forward
+	* Fixed lots of bugs
+	* Fixed scrollFollow
+	* Added some authentication to prevent hacking
+* Fixed link to import FAQ
+* Improved internationalization support plugin-wide
+* Fixed: "View Activity" link now works to view individual activity items.
+* Fixed Form Designer Widget extra options visibiltiy bug
+* Improved admin styling for WordPress 3.5
+* Removed Export page. Didn't make sense to have in there.
+
+= 2.3.11 =
+* Fixed issue introduced in 2.3.10 where First Name and Last Name checkboxes don't stay checked in the Legacy Form Widget
 
 = 2.3.10 =
 * Form Designer Updates:
@@ -592,3 +631,11 @@ This plugin uses <a href="http://planetozh.com/blog/my-projects/images-php-gd-gr
 
 = What is the plugin license? =
 Good news, this plugin is free for everyone! The plugin is [licensed under the GPL](http://www.gnu.org/licenses/gpl-3.0.txt "View the GPL License").
+
+
+= Registration form =
+To make the checkbox appear after the "Signup Title", add the following to your theme's `functions.php` file:
+
+`
+add_filter( 'constant_contact_register_checkbox_before', '__return_false' );
+`

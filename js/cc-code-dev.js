@@ -1,16 +1,19 @@
 jQuery.noConflict();
 
 jQuery(document).ready(function($) {
+
+	$('#message.fade').delay(3000).fadeOut('slow', function() { $(this).remove(); });
+
 	$('#examplewrapper').scrollFollow({
 		speed: 10,
 		offset: 30,
 		container: 'nav-menus-frame',
 		killSwitch: 'stopFollowingMe'
 	});
- 
-	$('input.colorwell').each(function() { 
+
+	$('input.colorwell').each(function() {
 		var $input = $(this);
-		var intcolor = '#000'; 
+		var intcolor = '#000';
 		$(this).ColorPicker({
 			color: jQuery(this).val(),
 			livePreview: false,
@@ -47,18 +50,19 @@ jQuery(document).ready(function($) {
 	});
 
 $('textarea.tinymce').live('keyup change', function() {
-	if($('.mceEditor').length > 0) { return; }
-//	triggerTextUpdate();
+	if($('.mceEditor').length > 0 || empty (tinyMCE)) { return; }
 	tinyMCE.execCommand('mceAddControl', false,'intro_default');
+	triggerTextUpdate();
 }).tinymce({
 	// Location of TinyMCE script
 	script_url : ScriptParams.path + 'tiny_mce/tiny_mce.js',
 	theme : "advanced",
 	plugins : "spellchecker,advhr,tabfocus",
 	// Theme options - button# indicated the row# only
-	theme_advanced_buttons1 : "bold,italic,|,justifyleft,justifycenter,justifyright,|,link,unlink,bullist,numlist,formatselect,|,code",
+	theme_advanced_buttons1 : "bold,italic,forecolor,|,justifyleft,justifycenter,justifyright,|,link,unlink,bullist,numlist,formatselect,|,code",
 	theme_advanced_buttons2 : false,
-	theme_advanced_buttons3 : false,	
+	theme_advanced_buttons3 : false,
+	theme_advanced_more_colors : true,
 	theme_advanced_toolbar_location : "top",
 	theme_advanced_toolbar_align : "left",
 	theme_advanced_statusbar_location : "bottom", //(n.b. no trailing comma in last line of code)
@@ -74,9 +78,8 @@ $('textarea.tinymce').live('keyup change', function() {
 
 function triggerTextUpdate(inst) {
 	if($('.kws_form .cc_intro').length > 0) {
-		$('.kws_form .cc_intro').html($('#intro_default').html());
+		$('.kws_form .cc_intro').html(tinyMCE.activeEditor.getContent({format : 'raw'}));
 	}
-	updateFormFields(true, $('#intro_default'), 'triggerTextUpdate');
 }
 
 
@@ -98,12 +101,12 @@ $('#paddingwidth').bind('change', function() { /* updateBoxWidthandPadding(); */
 $('#lpad').bind('change', function() { updateLabelPadding(); });
 $('#gradheight').bind('change', function() { updateBackgroundType(); });
 
-$('#lpad').bind('change', function() { 
+$('#lpad').bind('change', function() {
 	updateLabelPadding($('#lpad').val());
 });
 
 $('#size').change(function() { updateTextInputSize($('#size').val()); });
-$('#tfont,#tsize,input[name=talign]').bind('click change', function() { 
+$('#tfont,#tsize,input[name=talign]').bind('click change', function() {
 	updateStyleAndColors();
 });
 
@@ -121,7 +124,7 @@ $('#color6').bind('colorchange', function() { updateBackgroundType(); });
 $('#lcolor').bind('colorchange', function() { updateLabelColor($(this).val()); });
 $('#lpad').change(function() { updateLabelPadding($(this).val()); });
 
-$('#presets').change(function() { 
+$('#presets').change(function() {
 	var x = window.confirm("Selecting a preset form design will overwrite all of your form customizations. Continue?");
 	if (x)	{
 		updatePresets();
@@ -133,74 +136,69 @@ $('#presets').change(function() {
 $('#bgpos,#bgrepeat').change(function() { updateBackgroundURL(); });
 
 // Radio Buttons & Checkboxes
-// Doing this prevents us from having to do bind('click change'), which runs twice and slows things down.
-$('input:checkbox[name^="formfields"]').bind('change', function() { showHideFormFields($(this)); });
+$('input:checkbox[name^="formfields"]').bind('change', function() { showHideFormFields($(this)); $('textarea.tinymce').trigger('change'); });
+$('input:checkbox[name^="lists"]').bind('change', function() { updateFormLists($(this)); });
 $('input[name=safesubscribe]').bind('change', function() { updateSafeSubscribe(); });
 $('input[name="backgroundtype"]').bind('change', function() { updateBackgroundStyle(); updateBackgroundType(); });
 $('input:checkbox[name^="f"]').bind('change', function() { updateFormFields(false, false, 'input:checkbox[f] bind'); });
 $('input[id^=lus]').bind('change', function() { updateLabelSame(); });
+$('input[name=formalign]').bind('change', function() { updateBoxAlign($(this).val()); });
 
-$('label.labelStyle').bind('click', function() {
+$('label.labelStyle').live('click', function() {
 	if($('input[type=checkbox]:checked', $(this)).length > 0) { $(this).addClass('checked'); } else { $(this).removeClass('checked'); }
 });
 
 
-$('#form-fields ul.menu').bind('sortstop', function() { updateFormFields(false, false, 'formfields drop'); triggerTextUpdate(); });
+$('#form-fields ul.menu').bind('sortstop', function() { updateFormFields(false, false, 'formfields drop'); });
 
 // Text inputs
-//$("#email_address_default").bind('change keyup', function() { updateEmailInput(); });
-//$("#uid").bind('change keyup', function() { updateUID(); });
-//$("#intro_default").bind('change keyup', function() { updateFormText($(this).val());});
 $("input#bgimage").bind('change keyup', function() { updateBackgroundURL($(this).val()); /* updateCode('style'); */ });
-$('input.labelValue,input.labelDefault', $('#form-fields')).live('change keyup', function() { 
-	updateFormFields(true, $(this), 'labelDefault change keyup'); 
+$('input.labelValue,input.labelDefault', $('#form-fields')).live('change keyup', function() {
+	updateFormFields(true, $(this), 'labelDefault change keyup');
 });
 
 $("#defaultbuttontext,input[name=submitdisplay],input[name=submitposition]").bind('change keyup', function() { updateDefaultButton(); });
 
 // Pattern selection
-$("ul#patternList li").click(function(){ 
+$("ul#patternList li").click(function(){
 	updatePattern($(this));
 });
 
-$("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', function(e) { 
-	if(eventKeys(e) || e.keyCode === 46 || e.keyCode === 8) { 
+$("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', function(e) {
+	if(eventKeys(e) || e.keyCode === 46 || e.keyCode === 8) {
 		// If it's not an arrow, tab, etc. and not delete or backspace, process the sucker!
-		/* updateBoxWidthandPadding();   */
-		updateWidthCalculator(); 
-		$('#cc-form-settings').trigger('stylechange'); //updateCode('style');
+		updateWidthCalculator();
+		$('#cc-form-settings').trigger('stylechange');
 	}
 });
-//$('input[name=widthtype]').click(function() { /* updateBoxWidthandPadding(); */ updateWidthCalculator(); /* updateCode('style'); */  });
 
-	
 	$('input.menu-save').live('click submit', function() {
 		$('#examplewrapper').hide();
 	});
-	
+
 	$('li.menu-item .item-edit').live('click', function(e) {
 		e.preventDefault();
-		$('.menu-item-settings', $(this).parents('li.formfield')).toggle()
+		$('.menu-item-settings', $(this).parents('li.formfield')).toggle();
 		return false;
 	});
-	
+
 	function updatePattern($clickedLI) {
 		var val = '';
 		if(empty($clickedLI)) {
 			if($("ul#patternList li.selected").length > 0) {
 				$clickedLI = $("ul#patternList li.selected");
-				val = $clickedLI.attr('title'); 
-			} else {				
-				val = $('#patternurl').val(); 
+				val = $clickedLI.attr('title');
+			} else {
+				val = $('#patternurl').val();
 				$clickedLI = $("ul#patternList li[title*="+val+"]");
 			}
 		}
-		$("ul#patternList li").removeClass('selected'); 
-		$clickedLI.addClass('selected'); 
-		var url = $clickedLI.attr("title"); 
+		$("ul#patternList li").removeClass('selected');
+		$clickedLI.addClass('selected');
+		var url = $clickedLI.attr("title");
 		$('#patternurl').val(url);
-		
-		updateBackgroundURL(url); 
+
+		updateBackgroundURL(url);
 		updateCode('style', $('#patternurl'), 'updatePattern');
 	}
 
@@ -216,19 +214,21 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 			}
 		});
 		if($changed && $($changed,$('.grabber')).length > 0) {	changedLink = '&changed='+$changed.attr('id'); }
-		
+
 		if(textOnly === 'style') {
 			textOnlyLink = '&styleOnly='+textOnly;
 			styleOnly = true;
 			textOnly = false;
 			formFields = false;
-		} else if(textOnly) {	
-			textOnlyLink = '&textOnly='+textOnly; 
+		} else if(textOnly) {
+			textOnlyLink = '&textOnly='+textOnly;
 		}
 		var fullFormFields = $('form#cc-form-settings').serialize();
-		
-		var dataString = 'rand='+ScriptParams.rand+'&'+formFields+'&'+styleFields+textOnlyLink+changedLink+'&path='+ScriptParams.path; //+'&action=cc_get_form
-		
+
+		var date = Date.now();
+		var verify = ScriptParams.rand + $('#cc-form-id').val() + date;
+		var dataString = 'rand='+ScriptParams.rand+'&'+formFields+'&'+styleFields+textOnlyLink+changedLink+'&path='+ScriptParams.path+'&verify='+verify+'&date='+date+'&text='+JSON.stringify(ScriptParams.text); //+'&action=cc_get_form
+
 		$.ajax({
 			type: 'POST',
 			url: ScriptParams.path + 'form.php', // ScriptParams.adminajax was too slow!
@@ -240,19 +240,19 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 					var css = false;
 					var input = false;
 					var pre = false;
-					
+
 					data = jQuery.parseJSON(data);
-					
+
 					// If we want to pass debug info, this works
 					if(!empty(data.pre)) {
 						$('body').prepend(data.pre);
 					}
-					
+
 					if(!empty(data.input)) {
 						input = $(data.input);
-						
+
 						if(input[0].length) {
-							inputclass = input[1];	
+							inputclass = input[1];
 						} else {
 							inputclass = input;
 						}
@@ -261,7 +261,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 						return;
 					}
 					if(!empty(data.form)) {
-						form = data.form; 
+						form = data.form;
 						if($('.grabber .kws_form').length > 0) {
 							$('.grabber .kws_form').replaceWith(form);
 						} else {
@@ -270,7 +270,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 						if(textOnly) { return; }
 					}
 					if(!empty(data.css)) {
-						css = data.css; 
+						css = data.css;
 						if($('.grabber style').length > 0) {
 							$('.grabber style').addClass('remove').after(css);
 							$('.grabber style.remove').remove();
@@ -279,10 +279,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 						}
 						if(styleOnly) { return; }
 					}
-					
-				} else {
-					$('.grabber').html('<p>Form generation error: something went wrong!</p>');
-					return false;
+
 				}
 			},
 			error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -291,49 +288,49 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 			},
 			dataType: 'text'
 		});
-		
+
 		return false;
-		
+
 	}
-	
+
 	// When we're changing multiple settings, we don't want to run the process each time.
 	function unbindSettings() {
 		$("#form-fields ul.menu input, #cc-form-settings .formfields textarea").unbind('change');
 		$("#cc-form-settings input, #cc-form-settings textarea, #cc-form-settings select").not('#form-fields ul.menu input').not('#form-fields ul.menu textarea').unbind('change');
 	}
-	
+
 	function bindSettings() {
 		//unbindSettings();
-		
+
 		// For text only
 		$("#form-fields ul.menu input, #cc-form-settings .inside textarea").bind('change', function() {
-			updateFormFields(true, $(this), '#cc-form-settings text - '+$(this).attr('id')); 
+			updateFormFields(true, $(this), '#cc-form-settings text - '+$(this).attr('id'));
 		});
 //		$("#settings:not(.formfields input,.formfields textarea)").bind('change', function() {  updateCode(false, false, '#settings'); });
-		
+
 		$("#cc-form-settings").bind('stylechange', function() {
 			updateCode(false, false, 'stylechange trigger');
 		});
-		
+
 		$("#cc-form-settings input, #cc-form-settings textarea, #cc-form-settings select")
 		.not('.inside input')
 		.not('.inside textarea')
-		.bind('change',	
-			function() {  
-				updateFormFields('style', false, '#cc-form-settings style - '+$(this).attr('id')); 
+		.bind('change',
+			function() {
+				updateFormFields('style', false, '#cc-form-settings style - '+$(this).attr('id'));
 			}
 		);
 	}
-	
+
 	function updatePresets(preset) {
 		if(!preset) {
 			preset = $('#presets').val();
 		}
-		
+
 		//unbindSettings();
-		
+
 		switch(preset) {
-				
+
 			case 'Army':
 				updateTextColor('#f2d99f','#000000');
 				updateBorderColor('#400f0f','#FFFFFF');
@@ -349,7 +346,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 				updateEmailInput('soldier@yourdivision.com');
 				updateDefaultButton('Enlist');
 				break;
-			
+
 			case 'Apple':
 				updateTextColor('#333333','#000000');
 				updateBorderColor('#ccc','#FFFFFF');
@@ -365,7 +362,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 				updateEmailInput('john.appleseed@apple.com');
 				updateDefaultButton('iSignUp');
 				break;
-			
+
 			case 'Jazz':
 				updateTextStyle('palatino', '20', 'normal');
 				updateLabelStyle('palatino', '16', 'normal');
@@ -381,7 +378,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 				updateDefaultButton('Yeah');
 				updateSafeSubscribe('white');
 				break;
-				
+
 			case 'Impact':
 				updateTextStyle('impact', '30', 'normal');
 				updateLabelStyle('impact', '20', 'normal');
@@ -396,7 +393,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 				updateEmailInput('uknowuwanna@signup.com');
 				updateDefaultButton('ADD ME');
 				break;
-				
+
 			case 'Barbie':
 				updateTextStyle('comicsans', '24', 'bold');
 				updateLabelStyle('comicsans', '16', 'bold');
@@ -412,7 +409,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 				updateSafeSubscribe('white');
 				updateDefaultButton('Totally!');
 				break;
-			
+
 			case 'NYC':
 				updateTextStyle('georgia', '24', 'normal');
 				updateLabelStyle('georgia', '16', 'normal');
@@ -428,7 +425,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 				updateSafeSubscribe('black');
 				updateDefaultButton('Beep!');
 				break;
-				
+
 			default:
 				updateTextStyle('helvetica', '20', 'normal');
 				updateLabelStyle('helvetica', '16', 'normal');
@@ -444,10 +441,10 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		}
 		//updateBackgroundType();
 		//updateFormFields('style', false, 'updatePresets');
-		
+
 		//bindSettings();
 	}
-	
+
 	function eventKeys(e) {
 		var code = (e.keyCode ? e.keyCode : e.which);
 		if (code === 37 || code === 38 || code === 39 || code === 40 || code === 46 || code === 8 || code === 16) {
@@ -456,19 +453,25 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 			return true;
 		}
 	}
-		
+
 	function updateCode(textOnly, $changed, from) {
 		$('#codeSwapLink').remove();
 		updateWidthCalculator();
 		updateDisabled();
+
 		generateForm(textOnly, $changed);
 	}
-	
+
 	function updateBoxAlign(align) {
 		if(empty(align)) {
 			align = $('input[name=formalign]:checked').val();
 		}
-		
+		if(align == 'center') {
+			$('.kws_form').css({ float: 'none', margin : '0 auto'});
+		} else {
+			$('.kws_form').css({ float: align, margin : 'auto'});
+		}
+
 	}
 
 	function updateBoxWidthandPadding(padding) {
@@ -480,7 +483,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		}
 		return;
 	}
-	
+
 	function updateWidthCalculator() {
 		if($('input[name=widthtype]:checked').val() === 'px') {
 		var borderwidth = $('#borderwidth').val() * 2;
@@ -493,49 +496,68 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 			$('#actualwidth').html('');
 		}
 	}
-	
+
 	function updateInputSize($inputID, size) {
 		$inputID.attr('size', size);
 	}
-		
-	function mySorter(a,b){  
+
+	function mySorter(a,b){
 		return $(a).find("input.position").val() > $(b).find("input.position").val() ? 1 : -1;
 	}
-	
+
 	function sortFieldMenu() {
 		$('#form-fields ul.menu li.menu-item').sort(mySorter).appendTo('#form-fields ul.menu');
 	}
+
+	function updateFormLists() {
+
+		lists = [];
+		$('input:checkbox[name^="lists"]:checked').each(function() {
+			lists.push($(this).val());
+		});
+
+		var code = '[constantcontactapi formid="'+$('#cc-form-id').val()+'"';
+		if(lists.length >= 1) {
+			code = code + ' lists="'+lists.join(',')+'"';
+		}
+		code = code + ']';
+		$('.delete-action code').text(code);
+	}
+
+/**
+ * Show and hide the form fields in the main editor div based on whether Form Fields checkboxes are checked.
+ * @param  jQuery Object $clicked You can pass an object or array of objects that are the ones you want to analyze. Otherwise, it grabs all the checkboxes.
+ */
 	function showHideFormFields($clicked) {
-		
+
 		if(!$clicked) {
 			$clicked = $('#formfields_select input:checkbox');
 		}
-		
-		$clicked.each(function() {
-				//$('#form-fields .menu li').has('#'+$(this).val()).find('input.checkbox').attr('checked', $(this).attr('checked'));
-				var targetLI = $('#form-fields .menu li').has('#'+$(this).val());
-				var checked = $(this).attr('checked');
-				if(checked === true) {
-					targetLI.remove().appendTo($('#form-fields .menu')).show()
-					.find('input.checkbox').attr('checked', checked)
-					.find('input').each(function() { $(this).attr('disabled', false); })
-				} else {
-					targetLI.hide()
-					.find('input.checkbox').attr('checked', checked)
-					.find('input').each(function() { $(this).attr('disabled', true); });
-				}
-		});
 
-		// console.log($clicked);
+		$clicked.each(function() {
+			//$('#form-fields .menu li').has('#'+$(this).val()).find('input.checkbox').attr('checked', $(this).attr('checked'));
+			var targetLI = $('#form-fields .menu li').has('#'+$(this).val());
+			var checked = ($(this).checked || $(this).attr('checked') || $(this).is(':checked'));
+			if(!empty(checked)) {
+				targetLI.remove().appendTo($('#form-fields .menu')).show();
+
+				targetLI.find('input,textarea').each(function() { $(this).removeAttr('disabled'); })
+					.find('input.checkbox').attr('checked', checked);
+			} else {
+				targetLI.hide()
+					.find('input.checkbox').attr('checked', checked)
+					.find('input,textarea').each(function() { $(this).attr('disabled', true); });
+			}
+		});
 
 		//$('#formfields_select').trigger('change');
 	}
-	
+
 	function updateFormFields(textOnly, $changed, from) {
 		/* console.log('textOnly: '+textOnly + ', changed: '+$changed +', from: '+ from); */
 		if(empty(textOnly) || textOnly === 'style') {
 			updateStyleAndColors();
-		} 
+		}
 		if(textOnly !== 'style') {
 			if(empty($changed)) {
 				$('ul.menu li.formfield').each(function() {
@@ -545,26 +567,26 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 				updateFormField(textOnly, $changed);
 			}
 		}
-		
+
 		updateCode(textOnly, $changed, 'updateFormFields');
 	}
-	
+
 	function updateFormField(textOnly, $item) {
 		// Get the <li> we're working within.
 		if($item.not('li')) { $item = $item.parents('li.formfield'); }
-		
+
 		var checkbox = $('input.checkbox', $item);
-		if(checkbox.attr('checked')) {
+		if(checkbox.is(':checked')) {
 			$('.menu-item-settings', $item).show();
-			
+
 			// Set values
-			check = new Object();
+			check = {};
 				check.id = checkbox.attr('id');
 				check.val = checkbox.val();
 				check.name = checkbox.attr('name');
 				check.rel = checkbox.attr('rel');
-			
-			input = new Object();
+
+			input = {};
 				input.textarea = '';
 				input.label = '';
 				input.value = '';
@@ -574,31 +596,33 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 				input.required = '';
 				input.labelHTML = '';
 				input.size = $('input.labelSize', $item).val();
-							
+
 			if($('input.labelValue', $item).length > 0) {
-				var tempInput = $('input.labelValue', $item);	
+				var tempInput = $('input.labelValue', $item);
 				input.label = tempInput.val();
 			}
-						
-			if(check.rel === 'textarea' || $item.hasClass('tinymce') || $('textarea.labelValue', $item).length > 0 || $('body.mceContentBody', $item).length > 0) { 
-				input.textarea = true; 
+
+			if(check.rel === 'textarea' || $item.hasClass('tinymce') || $('textarea.labelValue', $item).length > 0 || $('body.mceContentBody', $item).length > 0) {
+				input.textarea = true;
 			}
-			
+
 			// Update classes
 			$item.addClass('checked').addClass('ui-state-active');
-			
+
 			// For textareas, we need to do it differently
 			if($('input.labelDefault', $item).length > 0) {
 				input.value = $('input.labelDefault', $item).val();
 			} else {
-				input.value = $('textarea.labelDefault', $item).html();
+				if(empty(tinyMCE)) {
+					input.value = $('textarea.labelDefault', $item).html();
+				}
 			}
-			
+
 			//alert(check.id);
 			if($('#'+check.id+'_bold').is(':checked')) { input.bold = true; }
 			if($('#'+check.id+'_italic').is(':checked')) { input.italic = true; }
 			if($('#'+check.id+'_required').is(':checked')) { input.required = true; }
-			
+
 			//console.debug(input);
 			if(check.rel === 'text') {
 				input.html = '<input type="text" value="'+input.value+'" size="' + input.size + '" name="'+check.name+'" class="text" id="cc_'+check.id+'" />';
@@ -607,30 +631,43 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 				input.html = '<input type="submit" value="'+input.value+'" name="'+check.name+'" id="cc_'+check.id+'" />';
 			}
 			if(check.rel === 'textarea') {
-				input.html = $('<textarea>'+input.value+'</textarea>').attr('name', check.name).attr('id', check.id).attr('disabled', false);
+				input.html = $('<textarea>'+input.value+'</textarea>').attr('name', check.name).attr('id', check.id).removeAttr('disabled');
 			}
-						
+
 		} else { // If not checked
 			//console.debug('Not checked');
 			if(textOnly !== 'style' || empty(textOnly)) { // This might save some time?
 				$item.removeClass('checked').removeClass('ui-state-active');
-				$('.menu-item-settings',$item).hide();
 			}
 		}
 	}
-	
+
+	// In field section
+	// <input type="checkbox" class="menu-item-checkbox" name="formfields[first_name]" value="first_name" checked="checked">
+	// In .formfield:
+	// <input type="checkbox" name="f[2][n]" id="first_name" value="f[2]" 1="" class="checkbox hide-if-js" rel="text">
+	/**
+	 * Update which form fields are disabled and which are enabled. This prevents non-active form fields from being posted to the form.php script.
+	 */
 	function updateDisabled() {
+
+		// First, process all form fields
 		$('ul.menu li.formfield').each(function() {
-			if($('input.checkbox', $(this)).attr("checked") === true) {
-				$('input[type=hidden],li input, li textarea', $(this)).attr('disabled', false);
-			} else {
-				$('input[type=hidden],li input, li textarea', $(this)).attr('disabled', true);
-			}
+			// Set the position index
+			// Each form field has a hidden input.position that is used to sort the fields in the editor
 			$('input.position[type=hidden]', $(this)).val($('ul.menu li.formfield input.position').index($('input.position', $(this))));
+
+			// Disable the inputs
+			$('input,textarea', $(this)).attr('disabled', true);
 		});
-	}		
-	
-		
+
+		// Loop through the checked fields
+		$('#formfields_select input[type=checkbox]:checked').each(function() {
+			$('input,textarea', $('ul.menu li.formfield').has('input#'+$(this).val())).removeAttr('disabled');
+		});
+	}
+
+
 	$('#form-fields ul.menu').sortable({
 		handle: '.menu-item-handle',
 		forceHelperSize: true,
@@ -645,14 +682,14 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		},
 		change: function(e, ui) {
 			if( ! ui.placeholder.parent().hasClass('menu') ) {
-				(prev.length) ? prev.after( ui.placeholder ) : api.menuList.prepend( ui.placeholder );
+				if(prev.length) { prev.after( ui.placeholder ); } else { api.menuList.prepend( ui.placeholder ); }
 			}
 			updateSharedVars( ui );
 		},
-		update: function(e, ui) {   
+		update: function(e, ui) {
 			tinyMCE.execCommand('mceAddControl', false,'intro_default');
-			$('textarea', $(this)).css('display','none').width('90%').attr('disabled', false);
-			//updateAll();  
+			$('textarea', $(this)).css('display','none').width('90%').removeAttr('disabled');
+			//updateAll();
 		},
 		sort: function(e, ui) {
 			updateSharedVars( ui );
@@ -661,10 +698,10 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 			$('body,#menu-to-edit').enableSelection();
 			$(this).enableSelection();
 			generateForm(true, false, '.sortable');
-			$('textarea', $(this)).attr('disabled', false);
+			$('textarea', $(this)).removeAttr('disabled');
 		}
 	});
-	
+
 	function updateSharedVars(ui) {
 		var depth;
 
@@ -676,26 +713,26 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		if( next[0] === ui.item[0] ) next = next.next();
 
 	}
-	
+
 	function updateFormText(defaultformtext, preset) {
 		if((preset && $('#pupt').is(':checked')) || (empty(preset) && !empty(defaultformtext))) {
 			$('#intro_default').html(defaultformtext);
 		}
 		return;
 	}
-	
+
 	function updateDefaultButton(defaultbuttontext) {
 		$('#Go_default').val(defaultbuttontext);
 	}
-	
+
 	function updateEmailInput(defaulttext) {
 		if(!defaulttext) {
-			var defaulttext = $("#email_address_default").val();
+			defaulttext = $("#email_address_default").val();
 		}
 		$('#ea').val(defaulttext).attr('defaultValue', defaulttext);
 		$('#email_address_default').val(defaulttext);
 	}
-	
+
 	function updateLabelStyle(textfont,textsize,fontweight,textpadding,textalign) {
 		if(!textfont) { textfont = $('input[name="lfont"]').val();}
 		if(!textsize) { textsize = $('input[name="lsize"]').val();}
@@ -705,40 +742,40 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		//console.debug('label align: '+textalign);
 		updateTextStyle(textfont,textsize,fontweight,textpadding,textalign,'l');
 	}
-	
+
 	function updateTextStyle(textfont,textsize,fontweight,textpadding,textalign,prefix) {
-		if(!prefix) { var prefix = 't';}
+		if(!prefix) { prefix = 't';}
 		if(!textfont) {
-			var textfont = $('#'+prefix+'font').val();
+			textfont = $('#'+prefix+'font').val();
 		} else {
-			var textfont = $('select[name="'+prefix+'font"] option[id="'+textfont+'"]').val();
-			$('select[name="'+prefix+'font"] option[value="'+textfont+'"]').attr('selected','selected');
+			textfont = $('select[name="'+prefix+'font"] option[id="'+textfont+'"]').val();
+			$('select[name="'+prefix+'font"] option[value="'+textfont+'"]').attr('selected',true);
 		}
 		textfont = findFont(textfont);
-		if(!textsize) {	var textsize = $('#'+prefix+'size').val(); } else {
-			$('select#'+prefix+'size option[value="'+textsize+'"]').attr('selected','selected');
+		if(!textsize) {	textsize = $('#'+prefix+'size').val(); } else {
+			$('select#'+prefix+'size option[value="'+textsize+'"]').attr('selected',true);
 		}
-		
+
 		if(!textalign) {
-			var textalign = $('input[name="'+prefix+'align"]').val();
+			textalign = $('input[name="'+prefix+'align"]').val();
 		}
-		
+
 		if(!fontweight){
-			var fontweight = $('input[name="'+prefix+'weight"]').val();
+			fontweight = $('input[name="'+prefix+'weight"]').val();
 		} else {
-			$('input[name="'+prefix+'weight"][value="'+fontweight+'"]').attr('checked','checked');
+			$('input[name="'+prefix+'weight"][value="'+fontweight+'"]').attr('checked',true);
 		}
-		if($('#textfont option:selected:contains("*")').length > 0) { 
+		if($('#textfont option:selected:contains("*")').length > 0) {
 			$('#'+prefix+'options .asterix').show();
 		} else {
 			$('#'+prefix+'options .asterix').hide();
 		}
 	}
-	
-	
+
+
 	function findFont(id) {
 		switch(id) {
-		
+
 			case 'times':
 				return "'Times New Roman', Times, Georgia, serif";
 			case 'georgia':
@@ -779,23 +816,23 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 				return "Papyrus,'Palatino Linotype', Palatino, Bookman, fantasy";
 		}
 	}
-	
+
 	function updateTextInputSize(textinputsize) {
-		if(textinputsize != 0) {
+		if(textinputsize !== 0) {
 			$('#defaulttext, label[for=defaulttext], li.defaulttext').show();
 			if($('.grabber .kws_form input[type=text]').length > 0) {
 				$('.grabber .kws_form input[type=text]').attr('size',textinputsize);
 			}
 		}
 	}
-	
+
 	function updateBorderStyle(borderstyle) {
 		if(!borderstyle || borderstyle === '') {
-			var borderstyle =  $('#borderstyle option:selected').val();
+			borderstyle =  $('#borderstyle option:selected').val();
 		} else {
-			 $('#borderstyle option[value='+borderstyle+']').attr('selected','selected');
+			$('#borderstyle option[value='+borderstyle+']').attr('selected',true);
 		}
-		
+
 //		$('#kwd-constant-contact').css('background-clip','border-box').css("border-style", borderstyle);
 	}
 	function updateBorderWidth(borderwidth) {
@@ -806,28 +843,28 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		$('.kws_form').css({'border-width':$('#borderwidth').val()+'px'});
 		return;
 	}
-	
+
 	$('#menu-settings-column').bind('click', function(e) {
 		var selectAreaMatch, panelId, wrapper, items,
 			target = $(e.target);
 		if ( target.hasClass('nav-tab-link') ) {
 			panelId = /#(.*)$/.exec(e.target.href);
 			if ( panelId && panelId[1] )
-				panelId = panelId[1]
+				panelId = panelId[1];
 			else
 				return false;
-	
+
 			wrapper = target.parents('.inside').first();
-	
+
 			// upon changing tabs, we want to uncheck all checkboxes
 			//$('input', wrapper).removeAttr('checked');
-	
+
 			$('.tabs-panel-active', wrapper).removeClass('tabs-panel-active').addClass('tabs-panel-inactive');
 			$('#' + panelId, wrapper).removeClass('tabs-panel-inactive').addClass('tabs-panel-active');
-	
+
 			$('.tabs', wrapper).removeClass('tabs');
 			target.parent().addClass('tabs');
-	
+
 			return false;
 		} else if ( target.hasClass('select-all') ) {
 			selectAreaMatch = /#(.*)$/.exec(e.target.href);
@@ -836,12 +873,12 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 				if( items.length === items.filter(':checked').length )
 					items.removeAttr('checked');
 				else
-					items.attr('checked', 'checked');
+					items.attr('checked', true);
 				return false;
 			}
 		} else if ( target.hasClass('submit-add-to-menu') ) {
 			api.registerChange();
-	
+
 			if ( e.target.id && -1 != e.target.id.indexOf('submit-') )
 				$('#' + e.target.id.replace(/submit-/, '')).addSelectedToMenu( api.addMenuItemToBottom );
 			return false;
@@ -850,43 +887,43 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 				function( resp ) {
 					if ( -1 === resp.indexOf('replace-id') )
 						return;
-	
+
 					var metaBoxData = $.parseJSON(resp),
 					toReplace = document.getElementById(metaBoxData['replace-id']),
 					placeholder = document.createElement('div'),
 					wrap = document.createElement('div');
-	
+
 					if ( ! metaBoxData['markup'] || ! toReplace )
 						return;
-	
+
 					wrap.innerHTML = metaBoxData['markup'] ? metaBoxData['markup'] : '';
-	
+
 					toReplace.parentNode.insertBefore( placeholder, toReplace );
 					placeholder.parentNode.removeChild( toReplace );
-	
+
 					placeholder.parentNode.insertBefore( wrap, placeholder );
-	
+
 					placeholder.parentNode.removeChild( placeholder );
-	
+
 				}
 			);
-	
+
 			return false;
 		}
 	});
-	
+
 	function updateBackgroundColor(bordercolor, color2,textbordercolor,textcolor2) {
-		if(empty(bordercolor)) { var bordercolor = $('#color6').val().replace(/#/g,''); }
+		if(empty(bordercolor)) { bordercolor = $('#color6').val().replace(/#/g,''); }
 		bordercolor.replace(/#/g,'');
 		$('#color6').val('#'+bordercolor).css('background-color','#'+bordercolor).ColorPickerSetColor(bordercolor);
-		
-		if(empty(color2)) { var color2 = $('#color2').val(); }
-		
+
+		if(empty(color2)) { color2 = $('#color2').val(); }
+
 		$('#color2').val(color2).css('background-color',color2).ColorPickerSetColor(color2);
-		
+
 		if(empty(textbordercolor)) { $('#color6').css('color',textbordercolor); }
 		if(empty(textcolor2)) { $('#color2').css('color',textcolor2); }
-		
+
 		if($("input[name=backgroundtype]").val() === 'gradient') {
 			$('#safesubscribelightimg,#safesubscribedarkimg,#safesubscribeblackimg').css("background-color", color2).css("background-image", 'none');
 		} else {
@@ -895,7 +932,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	}
 	function updateBackgroundStyle(style) {
 		if(style) {
-			$('input[name=backgroundtype][value='+style+']').attr('checked','checked').parents('label').click();
+			$('input[name=backgroundtype][value='+style+']').attr('checked',true).parents('label').click();
 			//updateCode('style', false, 'updateBackgroundStyle');
 		}
 		return;
@@ -908,7 +945,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 //			console.debug('gradient');
 			$("#bgtop,#gradheightli,#gradtypeli").show();
 			$("#bgpattern,#bgurl").hide();
-			if($('#gradtype').val() === 'vertical') { 
+			if($('#gradtype').val() === 'vertical') {
 				$("#bgbottom label").text('Bottom Color:');
 				$("#bgtop label").text('Top Color:');
 				$("#gradheightli label span").text('Gradient Height:');
@@ -918,7 +955,7 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 				$("#gradheightli label span").text('Gradient Width:');
 			}
 			$('#patternurl,#bgimage').attr('disabled', true);
-			$('#color2,#gradheight,#gradwidth,#gradtype,#bgrepeat,#bgpos').attr('disabled', false);
+			$('#color2,#gradheight,#gradwidth,#gradtype,#bgrepeat,#bgpos').removeAttr('disabled');
 			updateBackgroundColor(bordercolor,color2,textbordercolor,textcolor2);
 			updateGradient(bordercolor,color2,textbordercolor,textcolor2,url,height,gradtype);
 		} else if(selection === 'solid') {
@@ -928,24 +965,25 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 			$("#bgbottom").show();
 			$("#bgbottom label").text('Background Color:');
 			$('#patternurl,#bgimage,#gradwidth,#gradtype,#gradheight,#bgrepeat,#bgpos').attr('disabled', true);
-			$('#color2').attr('disabled', false);
+			$('#color2').removeAttr('disabled');
 		} else if(selection === 'pattern') {
 			$("#bgtop,#gradheightli,#gradtypeli,#bgbottom,#bgurl").hide();
 			$("#bgpattern").show();
 			$('#color2,#bgimage').attr('disabled', true);
-			$('#patternurl,#bgrepeat,#bgpos').attr('disabled', false);
-			
+			$('#patternurl,#bgrepeat,#bgpos').removeAttr('disabled');
+
+			var bgTitle = '';
 			// If the saved input has a value, use it
-			if($('#patternurl').val() != '') { bgTitle = $('#patternurl').val();}
-			else if($("#bgpattern ul li.selected").length > 0) { var bgTitle = $("#bgpattern ul li.selected").attr('title'); }
-			else { var bgTitle = $("#bgpattern ul li:first").attr('title'); }
+			if($('#patternurl').val() !== '') { bgTitle = $('#patternurl').val(); }
+			else if($("#bgpattern ul li.selected").length > 0) { bgTitle = $("#bgpattern ul li.selected").attr('title'); }
+			else { bgTitle = $("#bgpattern ul li:first").attr('title'); }
 				updatePattern();
 				updateBackgroundURL(bgTitle, 'transparent', 'repeat');
 		} else if(selection === 'url') {
 			//console.debug('url');
 			$('#patternurl').attr('disabled', true);
-			$('#color2,#bgimage,#bgrepeat,#bgpos').attr('disabled', false);
-			
+			$('#color2,#bgimage,#bgrepeat,#bgpos').removeAttr('disabled');
+
 			$("#bgtop,#gradheightli,#bgpattern").hide();
 			$("#bgurl,#bgbottom").show();
 			$("#bgbottom label").text('Background Color:');
@@ -954,53 +992,53 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		updateCode('style');
 		// alert('c1: '+typeof(bordercolor) + ', c2: '+typeof(color2) + ', tc1: '+typeof(textbordercolor) + ', tc2: '+typeof(textcolor2));
 	}
-	
-	
+
+
 	function updateBackgroundURL(url, color, repeat, position) {
-		if(!repeat) { var repeat = $('#bgrepeat').val();}
+		if(!repeat) { repeat = $('#bgrepeat').val();}
 		if(!url || url === 'undefined') {
 			//console.debug('we are undefined');
-			var url = $('input#bgimage').val(); 
-		} 
+			url = $('input#bgimage').val();
+		}
 		if(url === '' || url === 'http://') { url = ''; } else { url = 'url('+url+')'; }
-		
-		if(!color) { var color = $('#color2').val(); }
-		if(!position) { var position = $('#bgpos').val(); }
-		if($('#backgroundurl').is(':checked')) { 
+
+		if(!color) { color = $('#color2').val(); }
+		if(!position) { position = $('#bgpos').val(); }
+		if($('#backgroundurl').is(':checked')) {
 			$('.kws_form').css("background", color+' '+url+' '+position+' '+repeat);
 		}
 	}
 	function ajaxGradient(bordercolor, color2) {
-		
-		
+
+
 		$.ajax({
-		  type: "POST",
-		  url: ScriptParams.path + 'ozhgradient.php',
-		  dataType: "text",
-		  data: 'start='+bordercolor+'&end='+color2+'&height='+$('#gradheight').val(),
-		  async: true,
-		  error: function() { /* console.error('error generating gradient'); */ return false; },
-		  success: function(msg){
-			var getImage = msg;
-//			var bgRule = '#'+color2+' url(gradients/'+getImage+') left top repeat-x';
-			var bgRule = '#'+color2+' url('+getImage+') left top repeat-x';
-//			updateCode('style', false, 'ajaxGradient');
-			$('#gradtype').trigger('stylechange');
-			return true;
-//			 $('.kws_form').css('background', bgRule);
-		   }
+			type: "POST",
+			url: ScriptParams.path + 'ozhgradient.php',
+			dataType: "text",
+			data: 'start='+bordercolor+'&end='+color2+'&height='+$('#gradheight').val(),
+			async: true,
+			error: function() { /* console.error('error generating gradient'); */ return false; },
+			success: function(msg){
+				var getImage = msg;
+	//			var bgRule = '#'+color2+' url(gradients/'+getImage+') left top repeat-x';
+				var bgRule = '#'+color2+' url('+getImage+') left top repeat-x';
+	//			updateCode('style', false, 'ajaxGradient');
+				$('#gradtype').trigger('stylechange');
+				return true;
+//			$('.kws_form').css('background', bgRule);
+			}
 		});
 	}
-	
+
 	function updateGradient(bordercolor,color2,textbordercolor,textcolor2,url,gradheight, gradtype) {
 		if(bordercolor === '1') { return false; }
 			if(!bordercolor) {
-				var bordercolor = $('#color6').val().replace(/#+?/g,'');	
+				bordercolor = $('#color6').val().replace(/#+?/g,'');
 			} else {
 				$('#color6').val(bordercolor).css('background-color',bordercolor).ColorPickerSetColor(bordercolor);
 			}
 			if(!color2) {
-				var color2 = $('#color2').val().replace(/#+?/g,'');	
+				color2 = $('#color2').val().replace(/#+?/g,'');
 			} else {
 				$('#color2').val(color2).css('background-color',color2).ColorPickerSetColor(color2);
 			}
@@ -1024,24 +1062,13 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 			if($('#gradtype').val() === 'vertical') {
 				gradwidth = 1;
 				$('#gradwidth').val(1);
-			} else {	
+			} else {
 				gradwidth =$('.kws_form').width();
 				$('#gradwidth').val(gradwidth);
 			}
-		
-//		$('.kws_form').css('background', '#'+color2+' url(ozhgradient.php?start='+bordercolor+'&end='+color2+'&height='+gradheight+'&type='+gradtype+'&width='+gradwidth+') left top repeat-x')
-		
-		if(!empty($('.kws_form').css('backgroundColor')) && rgb2hex($('.kws_form').css('backgroundColor')) != color2) { 
-//			updateBackgroundType(bordercolor,color2,textbordercolor,textcolor2,url,gradheight);
-//			updateBackgroundType(bordercolor,color2,textbordercolor,textcolor2);
-			//updateGradient(); 
-			//updateCode('style');
-//			console.debug('Before Refresh: CSS: '+rgb2hex($('.kws_form').css('backgroundColor'))+' / '+$('#color2').val()); 
-//			updateBackgroundType(bordercolor,color2,textbordercolor,textcolor2,url,gradheight);
+
+		if(!empty($('.kws_form').css('backgroundColor')) && rgb2hex($('.kws_form').css('backgroundColor')) != color2) {
 			ajaxGradient(bordercolor, color2);
-//			console.debug('After Refresh: CSS: '+rgb2hex($('.kws_form').css('backgroundColor'))+' / '+$('#color2').val()); 
-			
-			//updateGradient(); 
 		} else {
 			ajaxGradient(bordercolor, color2);
 			return;
@@ -1053,27 +1080,27 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 			if(safesubscribe === 'gray' || safesubscribe === 'grey') { safesubscribe = 'light'; }
 			$('input[name="safesubscribe"][value='+safesubscribe+']').click().attr('checked', true);
 		}
-		else { 
+		else {
 			$('#cc-form-settings').trigger('stylechange');
 		}
 	}
-	
-	
-	function updateExampleWrapper(examplebgcolor){ 
+
+
+	function updateExampleWrapper(examplebgcolor){
 		$('#examplewrapper').css('background-color', examplebgcolor);
 	}
-		
+
 	function updateLabelSame() {
-		
+
 		// Same Color
 		if($('input#lusc').is(':checked')) {
 			$('#labelcolorli').hide();
 			$('#labelcolorli input').attr('disabled', true);
 		} else {
 			$('#labelcolorli').show();
-			$('#labelcolorli input').attr('disabled', false);
+			$('#labelcolorli input').removeAttr('disabled');
 		}
-		
+
 		// Same Font
 		if($('input#lusf').is(':checked')) {
 			$('#lfontli').hide();
@@ -1081,68 +1108,68 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 		} else {
 			$('#lfontli').show();
 		}
-		
+
 		//updateStyleAndColors();
 		//updateLabelStyle();
 		//updateTextStyle();
 		//updateLabelStyle();
 	}
-	
+
 /*
 	$('input#lusp').bind('change', function() { updateLabelPaddingHide(); });
 	$('input#labelsusesamealign').bind('change', function() { updateLabelAlignHide(); });
 	$('input#labelsusesamefont').bind('change', function() { updateLabelFontHide(); });
 */
-	
+
 	function updateLabelColor(color) {
 		if(!color) {
-			color = $('#lcolor').val();	
+			color = $('#lcolor').val();
 		} else {
 			$('#lcolor').val(color).css('background-color',color).ColorPickerSetColor(color);
 			$('.kws_form .kws_input_container label').css('color', color);
 		}
 	}
-		
-	
+
+
 	function updateLabelPadding(val) {
 		if(empty(val)) {
-			val = $('#lpad').val(); 
-		} 
+			val = $('#lpad').val();
+		}
 		$('.kws_form .kws_input_container label').css("padding-top",val+'em');
 	}
-	
+
 /*
 	function updateTextPadding(val) {
 		if(val) {
 			$('.kws_form div.cc_intro').css("padding-bottom",val+'px');
 			return;
 		}
-		var rawtextpaddingwidth = $('#tpad').val(); 
-		var textpaddingwidth = $('#tpad').val() + 'px'; 
-		
+		var rawtextpaddingwidth = $('#tpad').val();
+		var textpaddingwidth = $('#tpad').val() + 'px';
+
 		if($('#lusp').is(":checked")) {
 			updateLabelPadding(rawtextpaddingwidth);
 		}
-		
+
 		$('.kws_form div.cc_intro').css("padding-bottom",textpaddingwidth);
 	}
 */
-	
+
 	function updateTextColor(color,textcolor) {
 		if(!color) {
-			color = $('#tcolor').val();	
-		} 
+			color = $('#tcolor').val();
+		}
 		$('#tcolor').val(color).css('background-color',color).ColorPickerSetColor(color);
-		
-//		$('.kws_form .cc_intro').css('color', color);
-		
+
+		$('.kws_form .cc_intro,.kws_form .cc_intro *').css('color', color);
+
 		if(textcolor) {
 			$('#tcolor').css('color',textcolor);
 		}
-		
+
 		if($('#lusc').is(":checked")) {
-			updateLabelColor(color); 
-			if(textcolor) { $('#lcolor').css('color', textcolor); } 
+			updateLabelColor(color);
+			if(textcolor) { $('#lcolor').css('color', textcolor); }
 		}
 	}
 	function updateBorderRadius(borderradius) {
@@ -1159,17 +1186,17 @@ $("#paddingwidth,.input input[name=widthtype],#width").bind('change keyup', func
 	}
 	function updateBorderColor(bordercolor,textcolor) {
 		if(!bordercolor) {
-			bordercolor = $('#bordercolor').val();	
+			bordercolor = $('#bordercolor').val();
 		}
-		
+
 		$('#bordercolor').val(bordercolor).css('background-color',bordercolor).ColorPickerSetColor(bordercolor);
-		$('.kws_form').css('border-color', bordercolor)
-		
+		$('.kws_form').css('border-color', bordercolor);
+
 		if(textcolor) {
 			$('#bordercolor').css('color',textcolor);
 		}
-	};
-	
+	}
+
 function setPatterns() {
 	$('#patternList li').each(function() {
 		$(this).css('background', 'url('+ScriptParams.path+$(this).attr('title')+') left top repeat');
@@ -1187,7 +1214,8 @@ function updateStyleAndColors() {
 	updateLabelSame();
 	updateBorderColor();
 	updateBorderStyle();
-}	
+	updateBoxAlign();
+}
 
 function updateAll() {
 	setPatterns();
@@ -1198,7 +1226,7 @@ function updateAll() {
 	sortFieldMenu();
 	updateFormFields(false, false, 'updateAll');
 }
-
+updateFormLists();
 updateAll();
 bindSettings();
 
@@ -1210,19 +1238,19 @@ $('form label.error').hide();
    $('label img').click(function(){
 		$(this).closest('input[type=radio]').click();
    });
-   
-   
-	$("a.toggleMore").live('click', function() { 
-		$(this).parents('ul').find('.toggleMore:not(a):not(:has(input[type=checkbox]:checked))').toggle('fast'); 
-		
+
+
+	$("a.toggleMore").live('click', function() {
+		$(this).parents('ul').find('.toggleMore:not(a):not(:has(input[type=checkbox]:checked))').toggle('fast');
+
 		var text = $(this).text();
 		var text2 = text.replace('Show', 'Hide');
-		if(text2 === text) {$(this).text(text.replace('Hide', 'Show'))} else { $(this).text(text2); }
-		return false; 
+		if(text2 === text) {$(this).text(text.replace('Hide', 'Show')); } else { $(this).text(text2); }
+		return false;
 	});
-   
+
    jQuery('.toggleMore:not(a)').hide();
-		
+
 });
 
 	jQuery.fn.clearText = function() {
@@ -1236,10 +1264,10 @@ $('form label.error').hide();
 		}
 		});
 	};
-	
+
 	jQuery.fn.processColor = function(black, sat) {
 	if(sat > 40) { black = black - 10;}
-	
+
 	if(black < 25) {
 		jQuery(this).css('color', 'white');
 	} else if(black < 50) {
@@ -1249,11 +1277,11 @@ $('form label.error').hide();
 	} else {
 		jQuery(this).css('color', 'black');
 	}
-	
+
 	};
-	
+
 	(function (jQuery) {
-		
+
 		jQuery.fn.vAlign = function() {
 			return this.each(function(i){
 			var ah = jQuery(this).height();
@@ -1263,9 +1291,9 @@ $('form label.error').hide();
 			});
 		};
 	})(jQuery);
-	
+
 	(function (jQuery) {
-		
+
 		jQuery.fn.hAlign = function() {
 			return this.each(function(i){
 			var ah = jQuery(this).width();
@@ -1275,7 +1303,7 @@ $('form label.error').hide();
 			});
 		};
 	})(jQuery);
-	
+
 	(function(jQuery) {
   jQuery.fn.stripHtml = function() {
 	var regexp = /<("[^"]*"|'[^']*'|[^'">])*>/gi;
@@ -1285,18 +1313,19 @@ $('form label.error').hide();
 		);
 	});
 	return jQuery(this);
-  }
+  };
 	})(jQuery);
 function empty (mixed_var) {
 	// http://kevin.vanzonneveld.net
-		
+
 	var key;
-	
+
 	if (mixed_var === "" ||
 		mixed_var === 0 ||
 		mixed_var === "0" ||
 		mixed_var === null ||
 		mixed_var === false ||
+		mixed_var === 'false' ||
 		typeof mixed_var === 'undefined'
 	){
 		return true;
@@ -1322,12 +1351,12 @@ if(typeof window.console!="undefined"&&typeof console.log==="function"){
 function rgb2hex(rgb) {
 	rgb = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?\)$/);
 	function hex(x) {
-		return ("0" + parseInt(x).toString(16)).slice(-2);
+		return ("0" + parseInt(x, 0).toString(16)).slice(-2);
 	}
 	return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
 }
 
 
-jQuery.fn.sort = function() {  
-	return this.pushStack( [].sort.apply( this, arguments ), []);  
+jQuery.fn.sort = function() {
+	return this.pushStack( [].sort.apply( this, arguments ), []);
 };
