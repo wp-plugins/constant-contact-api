@@ -70,6 +70,9 @@ To install the plugin follow the steps below:
 
 == Changelog ==
 
+= 2.4.0.2 - January 28, 2013 =
+* Possibly fixed issue with "You do not have sufficient permissions to access this page." error <a href="http://wordpress.org/support/topic/you-do-not-have-sufficient-permissions-to-access-this-page-136?replies=4">as reported in the support forum</a>.
+
 = 2.4.0.1 =
 * Possibly fixed issue with login not working on IIS sites
 
@@ -297,6 +300,9 @@ To install the plugin follow the steps below:
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
+
+= 2.4.0.2 =
+* Possibly fixed issue with "You do not have sufficient permissions to access this page." error <a href="http://wordpress.org/support/topic/you-do-not-have-sufficient-permissions-to-access-this-page-136?replies=4">as reported in the support forum</a>.
 
 = 2.4.0.1 =
 * Possibly fixed issue with login not working on IIS sites
