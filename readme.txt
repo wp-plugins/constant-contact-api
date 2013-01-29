@@ -536,9 +536,9 @@ This version fixes a major bug and all users should upgrade immediately.
 == Frequently Asked Questions ==
 
 = Do I need a Constant Contact account for this plugin? =
-This plugin requires a <a href="http://www.constantcontact.com/index.jsp" rel="nofollow" title="Sign up for Constant Contact">Constant Contact account</a>  (affiliate link).
+This plugin requires a <a href="http://www.constantcontact.com/index.jsp" rel="nofollow" title="Sign up for Constant Contact">Constant Contact account</a>.
 
-Constant Contact is a great email marketing company -- their rates are determined by the number of contacts in your list, not how many emails you send. This means you can send unlimited emails per month for one fixed rate! <a href="http://www.constantcontact.com/features/signup.jsp" title="Try out Constant Contact today" rel="nofollow">Give it a test run</a>  (affiliate link).
+Constant Contact is a great email marketing company -- their rates are determined by the number of contacts in your list, not how many emails you send. This means you can send unlimited emails per month for one fixed rate! <a href="http://www.constantcontact.com/features/signup.jsp" title="Try out Constant Contact today" rel="nofollow">Give it a test run</a>.
 
 = Is there shortcode support? =
 
