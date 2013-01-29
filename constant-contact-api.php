@@ -2,9 +2,9 @@
 /*
 Plugin Name: Constant Contact API
 Plugin URI: http://integrationservic.es/constant-contact/wordpress-plugin.php
-Description: Powerfully integrates <a href="http://conta.cc/bRojlN" target="_blank">Constant Contact</a> into your WordPress website.
+Description: Powerfully integrates <a href="http://katz.si/6e" target="_blank">Constant Contact</a> into your WordPress website.
 Author: Katz Web Services, Inc. & James Benson
-Version: 2.4.0.2
+Version: 2.4.0.3
 Author URI: http://www.katzwebservices.com
 */
 
@@ -19,7 +19,7 @@ function constant_contact_setup_plugin() {
 	define('CC_FILE_URL', plugin_dir_url(__FILE__)); // @ Added 2.0 The full URL to this file
 
 	// To store the object in a session, start a session if not initiated already.
-	if(!session_id()) { add_action( 'init', 'session_start' ); }
+	add_action('init', 'constant_contact_init_sessions', 1);
 
 	require_once CC_FILE_PATH . 'functions.php';
 	require_once CC_FILE_PATH . 'user.php';
@@ -58,9 +58,6 @@ function constant_contact_setup_plugin() {
 		add_action('admin_print_scripts', 'constant_contact_enquque_core_scripts');
 		add_action('admin_print_styles', 'constant_contact_enquque_core_styles');
 	}
-
-	// Setup session if not yet set
-	add_action('init', 'constant_contact_init_sessions', 1);
 
 	// register legacy widget
 	add_action('widgets_init', 'constant_contact_load_legacy_widget');

@@ -2655,19 +2655,23 @@ xmlns:cctd="http://www.constantcontact.com/cctd">
      *
      * @access     private
      */
-    function http_get_response_code_error($code)
+    function http_get_response_code_error($code = '')
     {
+
         if(empty($code)) { return ''; }
+
         $errors = array(
-        200 => '<strong>Success</strong> - The request was successful',
-        201 => '<strong>Created (Success)</strong> - The request was successful. The requested object/resource was created.',
-        400 => '<p><strong>Invalid Request (400)</strong></p><p>There are many possible causes for this error, but most commonly there is a problem with the structure or content of XML your application provided. Please <a href="http://wordpress.org/tags/constant-contact-api?forum_id=10">Let the plugin developers know about the issue</a>, and make sure to mention what you were doing when you got this error.</p>',
-        401 => '<p><strong>This plugin is not configured with a valid Constant Contact account.</strong></p>
-                <p>Please enter a valid username and password then press the Save Changes button before continuing.</p>',
-        404 => '<p><strong>URL Not Found (404)</strong></p> <p>The URI which was provided was incorrect.  Please <a href="http://wordpress.org/tags/constant-contact-api?forum_id=10">Let the plugin developers know about the issue</a>, and make sure to mention what you were doing when you got this error.</p>',
-        409 => '<p><strong>Conflict (409)</strong></p><p>There is a problem with the action you are trying to perform. Commonly, you are trying to "Create" (POST) a resource which already exists such as a Contact List or Email Address that already exists. In general, if a resource already exists, an application can "Update" the resource with a "PUT" request for that resource.</p>',
-        415 => '<p><strong>Unsupported Media Type (415)</strong></p><p>The Media Type (Content Type) of the data you are sending does not match the expected Content Type for the specific action you are performing on the specific Resource you are acting on. Please <a href="http://wordpress.org/tags/constant-contact-api?forum_id=10">Let the plugin developers know about the issue</a>, and make sure to mention what you were doing when you got this error.</p>',
-        500  => '<p><strong>Server Error (500)</strong></p><p>Constant Contact is likely having server issues. Even though it is likely a Constant Contact issue, please <a href="http://wordpress.org/tags/constant-contact-api?forum_id=10">Let the plugin developers know about the issue</a>, and make sure to mention what you were doing when you got this error.</p>',
+            200 => __('<strong>Success</strong> - The request was successful', 'constant-contact-api'),
+            201 => __('<strong>Created (Success)</strong> - The request was successful. The requested object/resource was created.', 'constant-contact-api'),
+            400 => __('<p><strong>Invalid Request (400)</strong></p><p>There are many possible causes for this error, but most commonly there is a problem with the structure or content of XML your application provided. Please <a href="http://wordpress.org/tags/constant-contact-api?forum_id=10">Let the plugin developers know about the issue</a>, and make sure to mention what you were doing when you got this error.</p>', 'constant-contact-api'),
+            401 => __('<p><strong>This plugin is not configured with a valid Constant Contact account.</strong></p>
+                    <p>Please enter a valid username and password then press the Save Changes button before continuing.</p>', 'constant-contact-api'),
+            403 => __('<p><strong>The Constant Contact account has been locked.</strong></p>
+                    <p>User account is locked due to too many bad login attempts. Please reset <a href="http://katz.si/6d">follow these instructions to reset account access</a>.</p>', 'constant-contact-api'),
+            404 => __('<p><strong>URL Not Found (404)</strong></p> <p>The URI which was provided was incorrect.  Please <a href="http://wordpress.org/tags/constant-contact-api?forum_id=10">Let the plugin developers know about the issue</a>, and make sure to mention what you were doing when you got this error.</p>', 'constant-contact-api'),
+            409 => __('<p><strong>Conflict (409)</strong></p><p>There is a problem with the action you are trying to perform. Commonly, you are trying to "Create" (POST) a resource which already exists such as a Contact List or Email Address that already exists. In general, if a resource already exists, an application can "Update" the resource with a "PUT" request for that resource.</p>', 'constant-contact-api'),
+            415 => __('<p><strong>Unsupported Media Type (415)</strong></p><p>The Media Type (Content Type) of the data you are sending does not match the expected Content Type for the specific action you are performing on the specific Resource you are acting on. Please <a href="http://wordpress.org/tags/constant-contact-api?forum_id=10">Let the plugin developers know about the issue</a>, and make sure to mention what you were doing when you got this error.</p>', 'constant-contact-api'),
+            500  => __('<p><strong>Server Error (500)</strong></p><p>Constant Contact is likely having server issues. Even though it is likely a Constant Contact issue, please <a href="http://wordpress.org/tags/constant-contact-api?forum_id=10">Let the plugin developers know about the issue</a>, and make sure to mention what you were doing when you got this error.</p>', 'constant-contact-api'),
         );
 
         if(array_key_exists($code, $errors)):
@@ -2678,4 +2682,3 @@ xmlns:cctd="http://www.constantcontact.com/cctd">
     }
 // ENDOF CLASS
 }
-?>

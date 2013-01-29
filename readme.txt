@@ -70,6 +70,12 @@ To install the plugin follow the steps below:
 
 == Changelog ==
 
+= 2.4.0.3 - January 29, 2013 =
+* The "You do not have sufficient permissions to access this page." error was caused by the plugin not reporting Error 403: Account Locked on the settings page. This release adds that error code.
+* Consolidated dupe `session_start()` function
+* Form Designer menu option now does not display if the plugin is not properly configured
+* Updated Form Designer page permissions to `manage_options` instead of `administrator`
+
 = 2.4.0.2 - January 28, 2013 =
 * Possibly fixed issue with "You do not have sufficient permissions to access this page." error <a href="http://wordpress.org/support/topic/you-do-not-have-sufficient-permissions-to-access-this-page-136?replies=4">as reported in the support forum</a>.
 
@@ -300,6 +306,12 @@ To install the plugin follow the steps below:
 * Fixed a bug relating to chunked http encoding in class.cc.php
 
 == Upgrade Notice ==
+
+= 2.4.0.3 =
+* The "You do not have sufficient permissions to access this page." error was caused by the plugin not reporting Error 403: Account Locked on the settings page. This release adds that error code.
+* Consolidated dupe `session_start()` function
+* Form Designer menu option now does not display if the plugin is not properly configured
+* Updated Form Designer page permissions to `manage_options` instead of `administrator`
 
 = 2.4.0.2 =
 * Possibly fixed issue with "You do not have sufficient permissions to access this page." error <a href="http://wordpress.org/support/topic/you-do-not-have-sufficient-permissions-to-access-this-page-136?replies=4">as reported in the support forum</a>.
