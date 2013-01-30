@@ -10,7 +10,7 @@ Integrate Constant Contact into your website with this full-featured plugin.
 
 == Description ==
 
-> __This plugin requires a <a href="http://www.constantcontact.com/index.jsp" title="Sign up for a free Constant Contact trial" rel="nofollow">Constant Contact account</a>.__ <br />*Don't have an account?* Constant Contact offers a <a href="http://www.constantcontact.com/email-marketing/index.jsp" rel="nofollow">free 60 day trial</a>, so sign up and give this plugin a whirl!
+> __This plugin requires a <a href="http://wordpress.constantcontact.com" title="Sign up for a free Constant Contact trial" rel="nofollow">Constant Contact account</a>.__ <br />*Don't have an account?* Constant Contact offers a <a href="http://wordpress.constantcontact.com/email-marketing/index.jsp" rel="nofollow">free 60 day trial</a>, so sign up and give this plugin a whirl!
 
 <h4>Fully integrate Constant Contact with your WordPress website.</h4>
 
@@ -19,7 +19,7 @@ The Constant Contact for Wordpress plugin is the best email marketing plugin for
 You can place a signup checkbox or list selection on your register page or use the signup widget anywhere in your website sidebar or PHP templates.
 
 <h3>Event Marketing</h3>
-The plugin features <a href="http://www.constantcontact.com/event-marketing/index.jsp" title="Learn more about Constant Contact Event Marketing" rel="nofollow">Constant Contact Event Marketing</a> functionality by allowing you to track events, registration, and registrants using the plugin. Simply navigate to Constant Contact > Events. Manage your events from inside WordPress!
+The plugin features <a href="http://wordpress.constantcontact.com/event-marketing/index.jsp" title="Learn more about Constant Contact Event Marketing" rel="nofollow">Constant Contact Event Marketing</a> functionality by allowing you to track events, registration, and registrants using the plugin. Simply navigate to Constant Contact > Events. Manage your events from inside WordPress!
 
 <h3>Built-in Form Designer</h3>
 <strong>The Constant Contact Form Designer</strong> is a form generation and design tool. The Form Designer allows users to generate unlimited number of unique forms and gives a wide variety of options that can be configured, including what fields to show in the signup form. There and tons of design options, including custom background images, border width, colors, fonts and much more.
@@ -536,9 +536,9 @@ This version fixes a major bug and all users should upgrade immediately.
 == Frequently Asked Questions ==
 
 = Do I need a Constant Contact account for this plugin? =
-This plugin requires a <a href="http://www.constantcontact.com/index.jsp" rel="nofollow" title="Sign up for Constant Contact">Constant Contact account</a>.
+This plugin requires a <a href="http://wordpress.constantcontact.com/index.jsp" rel="nofollow" title="Sign up for Constant Contact">Constant Contact account</a>.
 
-Constant Contact is a great email marketing company -- their rates are determined by the number of contacts in your list, not how many emails you send. This means you can send unlimited emails per month for one fixed rate! <a href="http://www.constantcontact.com/features/signup.jsp" title="Try out Constant Contact today" rel="nofollow">Give it a test run</a>.
+Constant Contact is a great email marketing company -- their rates are determined by the number of contacts in your list, not how many emails you send. This means you can send unlimited emails per month for one fixed rate! <a href="http://wordpress.constantcontact.com/features/signup.jsp" title="Try out Constant Contact today" rel="nofollow">Give it a test run</a>.
 
 = Is there shortcode support? =
 
