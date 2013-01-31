@@ -618,14 +618,16 @@ function constant_contact_public_signup_form($args, $echo = true) {
         /**
          * Show Multi-select format if it was chosen in options
          */
-        if($list_selection_format == 'select' || $list_selection_format == 'dropdown') {
+        if($list_selection_format === 'select' || $list_selection_format === 'dropdown') {
 
             $listoutput .= '<label for="cc_newsletter_select">'.$list_selection_title .'</label>
             <div class="cc_newsletter kws_input_container input-text-wrap">
             <select name="cc_newsletter[]" id="cc_newsletter_select" ';
                 if($list_selection_format !='dropdown') { $listoutput .= ' multiple size="5"'; }$listoutput .= '>';
                 if($lists_to_show) {
-                    if($list_selection_format =='dropdown') { $listoutput .= '<option selected value="">Select a List</option>'; }
+                    if($list_selection_format === 'dropdown') {
+                        $listoutput .= '<option selected value="">'.apply_filters('constant_contact_dropdown_select_option', __('Select a List', 'constant-contact-api')).'</option>';
+                    }
                     foreach($lists_to_show as $k => $v) {
                         if(isset($_POST['cc_newsletter']) && in_array($v['id'], $_POST['cc_newsletter'])) {
                             $listoutput .=  '<option selected value="'.$v['id'].'">'.$v['Name'].'</option>';

@@ -25,20 +25,26 @@ function constant_contact_registration_settings()
 				return false;
 			});
 
-			$('.wrap form input[name=cc_register_page_method]').live('load click change', function() {
+			$('.wrap form input[name=cc_register_page_method],.wrap form input[name=cc_list_selection_format]').live('load click change', function() {
 				updateListSelectionVisibility();
 			});
 
 			function updateListSelectionVisibility() {
-				if($('input[name=cc_register_page_method]:checked').val() == 'none') {
+				if($('input[name=cc_register_page_method]:checked').val() === 'none') {
 					$('.wrap form table.form-table tr').not('.alwaysshow').hide();
+					$('tr.cc_default_select_option_text').hide();
 				} else {
 					$('.wrap form table.form-table tr').not('.alwaysshow,.list_selection').show();
 
-					if($('input[name=cc_register_page_method]:checked').val() == 'lists') {
-						$('tr.list_selection').fadeIn('fast');
+					if($('input[name=cc_register_page_method]:checked').val() === 'lists') {
+						$('tr.list_selection').show();
+						if($('input[name=cc_list_selection_format]:checked').val() === 'dropdown') {
+							$('tr.cc_default_select_option_text').show();
+						} else {
+							$('tr.cc_default_select_option_text').hide();
+						}
 					} else {
-						$('tr.list_selection').fadeOut('fast');
+						$('tr.list_selection, tr.cc_default_select_option_text').hide();
 					}
 				}
 			}
@@ -49,7 +55,7 @@ function constant_contact_registration_settings()
 
 	<div class="wrap">
 		<h2 class="cc_logo"><a class="cc_logo" href="<?php echo admin_url('admin.php?page=constant-contact-api'); ?>"><?php _e('Constant Contact Plugin', 'constant-contact-api' ); ?> &gt;</a> <?php _e('Registration &amp; User Profile Settings', 'constant-contact-api'); ?></h2>
-			<?php constant_contact_admin_refresh(); ?>
+			<?php constant_contact_admin_refresh('lists'); ?>
 	<form method="post" action="options.php">
 	<?php settings_fields( 'constant-contact-registration' ); ?>
 	<div class="alignright" style="width:510px; display:none;" id="registrationScreenshots">
@@ -93,7 +99,7 @@ function constant_contact_registration_settings()
 		<tr valign="top" class="list_selection hide-if-js" <?php if(get_option('cc_register_page_method')!=='lists') { echo ' style="display:none;"';} ?>>
 			<th scope="row">
 				<p>
-					<label for="cc_list_selection_format_checkbox">
+					<label>
 						<span><?php _e('List Selection Format', 'constant-contact-api'); ?></span>
 					</label>
 				</p>
@@ -120,6 +126,21 @@ function constant_contact_registration_settings()
 					<strong>Checkboxes</strong> will offer separate checkboxes.
 					<strong>Multi-Select</strong> will offer the list as a multi-select drop-down.', 'constant-contact-api'); ?>
 				</p>
+			</td>
+		</tr>
+		<tr valign="top" class="cc_default_select_option_text">
+			<th scope="row">
+				<p>
+					<label for="cc_default_select_option_text">
+						<span><?php _e('Default Option Text', 'constant-contact-api'); ?></span>
+					</label>
+				</p>
+			</th>
+			<td>
+			<p><label for="cc_default_select_option_text"><input type="text" class="text" size="50" id="cc_default_select_option_text" name="cc_default_select_option_text" value="<?php $option = get_option('cc_default_select_option_text'); echo ($option === false) ? __('Select a List&hellip;', 'constant-contact-api') : $option; ?>" /></label></p>
+			<p class="description">
+				<?php _e('If "Opt-in users by default" (below) is not checked, this will be the default option in the dropdown menu. Leave blank to not show this option.', 'constant-contact-api'); ?>
+			</p>
 			</td>
 		</tr>
 		<tr valign="top">
@@ -287,4 +308,3 @@ function constant_contact_registration_settings()
 	</div>
 <?php
 }
-?>

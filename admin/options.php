@@ -20,6 +20,7 @@ function constant_contact_register_settings()
 	register_setting('constant-contact-registration', 'cc_register_page_method');
 	register_setting('constant-contact-registration', 'cc_default_opt_in');
 	register_setting('constant-contact-registration', 'cc_list_selection_format');
+	register_setting('constant-contact-registration', 'cc_default_select_option_text');
 }
 
 // show the admin settings page
