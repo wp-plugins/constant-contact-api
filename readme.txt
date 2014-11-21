@@ -1,10 +1,10 @@
 === Constant Contact for Wordpress ===
-Contributors: katzwebdesign, katzwebservices, jamesbenson
+Contributors: katzwebdesign, katzwebservices
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackkatz%40gmail%2ecom&item_name=Constant%20Contact%20API%20Plugin&no_shipping=0&no_note=1&tax=0&currency_code=USD&lc=US&bn=PP%2dDonationsBF&charset=UTF%2d8
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
-Requires at least: 2.9
-Tested up to: 3.5.1
-Stable tag: 2.4.1
+Requires at least: 3.3
+Tested up to: 4.0.1
+Stable tag: 3.1.3
 
 Integrate Constant Contact into your website with this full-featured plugin.
 
@@ -49,7 +49,7 @@ If you use the plugin and find it useful please make sure to come back and vote 
 
 To install the plugin follow the steps below:
 
-1. Upload `constant-contact-api` to the `/wp-content/plugins/` directory.
+1. Upload `ctct` to the `/wp-content/plugins/` directory.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
 3. Activate the Constant Contact API: Form Designer plugin (optional)
 4. Click the new main menu item called "Constant Contact".
@@ -69,6 +69,99 @@ To install the plugin follow the steps below:
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
 == Changelog ==
+
+= Version 3 Requires PHP 5.3 =
+__Version 3.x changes requirements for your server. If you upgrade and the upgrade doesn't work for you, you can downgrade to the previous version of the plugin.__
+
+= 3.1.3 = 
+* Update translation textdomain to `ctct` from `constant-contact-api`
+* Hide the custom content editor until checked
+* Fix default label size
+
+= 3.1.2 =
+* Delete old username and password on activation
+* When plugin is de-activated, delete stored token and transients
+* Update InlineEdit script
+* Verify plugin status for Akismet and WangGuard plugins
+* Update DataValidation.com API integration
+* Add `blank` parameter to `KWSContactList::outputHTML()` for select dropdowns that need an empty option
+* Update strings
+
+= 3.1.1 =
+* Redesigned Form Designer to match WP 4.0 look & feel
+	* Added input sliders to Form Designer - easier than dropdowns
+	* Used accordion instead of metaboxes
+	* Use Dashicons for Bold/Italic instead of images
+* Use Dashicons for Edit pencil
+* Updated translation strings
+* Converted much CSS to LESS
+* Refactored `form-designer-functions.php` as `CTCT_Form_Designer_Helper` class
+
+= 3.1 = 
+* Rewrote form designer
+* Rewrote form output
+* Tons of updates
+
+= 3.0.4 = 
+* Added JS localization to fix inline edit screens
+* Fixed: Error 500 with form live preview
+* Fixed: many PHP warnings
+* Fixed: Added security validation when updating / deleting forms.
+* Fixed: logging toggle not toggling
+* Moved SafeSubscribe to Form Fields metabox in Form Designer
+* Removed Exceptional.io integration
+* Only load `CTCT_Admin_Page` in admin. Saves memory and improves speed.
+* Added: Zebra-striping on tables
+* Improved: Design for WP 3.8+
+* Removed: Menu when hovering-over logo
+* Changed icon images to dashicons
+* Fixed: Converted jQuery `.live()` to `.on()`
+* Added: Internationalization strings & improvements
+* Added: Disabled `<input>` fields to select events shortcode, instead of text. Should make it easier to grab the code.
+* Converted plugin version constant to class constants
+* Fixed: Campaigns limit fatal error: 50 not 500 are allowed.
+* Fixed: "Nothing changed" message when ajax editing Contact fields
+* Added: Improved logging with new Activity Log page
+	- Use actions `ctct_debug` for helpful debugging output, `ctct_error` for errors or caught exceptions, and `ctct_activity` for Constant Contact REST calls.
+	- Added logging settings to main settings page to specify which types of actions get logged
+* Fixed: `.updated` `div`s were being removed by the plugin's help tabs 
+* Fixed: Removed extra help tabs
+* Fixed: Help tab labels now start with "Constant Contact:" when not on the plugin pages
+* Fixed: CSS / JS loading on all admin pages
+* Removed `/docs/` directory
+* Add `no_events_text` parameter for shortcode (and widget setting) - allows you to define what text is shown when there are no events.
+* Added option to define `0` as the `limit` parameter to show all events
+* Sanitized widget output
+* Fixed: Insert events widget code would add lots of extra spaces to the shortcode
+* Added: `onlyactive` checkbox to widget (previously it was always on)
+* Added: Multiple event support, event limit selector, and `onlyactive` checkbox to insert event shortcode generator
+
+= 3.0.3 =
+* Now uses Composer to auto-load classes
+* Updated to fix compatibility issues with changes to CTCT PHP SDK
+* Improved deleting of settings and de-authentication
+* Fixed Events shortcode echoing output instead of returning output
+* Removed Pointers implementation for now.
+
+= 3.0.1 =
+### Completely re-written plugin
+
+* The biggest thing: moves the plugin over to the new Constant Contact API.
+	* Now uses oAuth 2 authentication instead of passwords
+* Inline editing of Contact & List details
+* Improved documentation
+	* Plugin now supports the WordPress "Help" tab
+	* There are some intro tour pointers to show new users how to use the plugin
+* Subscribe to Newsletter checkbox on Comment forms
+* Removed Extra Field Mappings
+* Lots of Form Designer functionality
+	- New option for using style or not
+	- Now respects Submit form position
+	- Includes options for transparent backgrounds and no borders
+	- Includes better theme support
+		- Includes classes for themes that support Gravity Forms
+		- Includes support for WooThemes, Pagelines and Genesis frameworks
+* Requires WordPress 3.3 or Higher
 
 = 2.4.1 - January 31, 2013 =
 * Fixed: issue with WordPress registration: the "Hidden Contact Lists" lists were not being properly added (the list IDs were incorrect), causing issues.
@@ -311,6 +404,10 @@ To install the plugin follow the steps below:
 
 == Upgrade Notice ==
 
+= 2.4.1 =
+* Fixed: issue with WordPress registration: the "Hidden Contact Lists" lists were not being properly added (the list IDs were incorrect), causing issues.
+* Added: "Default Option Text" registration option, visible when using a Dropdown List "List Selection Format". Allows you to set the default text of the dropdown list.
+
 = 2.4.0.3 =
 * The "You do not have sufficient permissions to access this page." error was caused by the plugin not reporting Error 403: Account Locked on the settings page. This release adds that error code.
 * Consolidated dupe `session_start()` function
@@ -529,15 +626,20 @@ This version fixes a major bug and all users should upgrade immediately.
 
 == Screenshots ==
 1. The administration screen is the landing page for all the functionality of the plugin.
-2. Form Designer - New to 2.0, this bad boy is a custom form designer built right into WordPress.
-3. An example of a form you can create with the custom form designer.
-4. Add users to your registration process
-5. View campaign details on the Campaigns screen
-6. Example events widget display on the default WordPress theme, twentyten
-7. Event widget configuration
-8. A view of Constant Analytics - there are many delicious-looking graphs and charts
+2. Form Designer - custom form designer built right into the plugin
+3. View campaign details on the Campaigns screen
+4. Edit Contacts inside the plugin
+5. Update list names
+6. Embed Events inline and view EventSpot event details
 
 == Frequently Asked Questions ==
+
+= The plugin Requires PHP 5.3 =
+__Version 3.x changes requirements for your server. If you upgrade and the upgrade doesn't work for you, you can downgrade to the previous version of the plugin.__
+
+Why? Because [Constant Contact's official code](https://github.com/constantcontact/php-sdk) requires PHP 5.3. 
+
+Ask your host about upgrading your server to 5.3. If they say no, chances are you should find a new host; 5.3 has long been available.
 
 = Do I need a Constant Contact account for this plugin? =
 This plugin requires a <a href="http://wordpress.constantcontact.com/index.jsp" rel="nofollow" title="Sign up for Constant Contact">Constant Contact account</a>.
