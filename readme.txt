@@ -3,8 +3,8 @@ Contributors: katzwebdesign, katzwebservices
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackkatz%40gmail%2ecom&item_name=Constant%20Contact%20API%20Plugin&no_shipping=0&no_note=1&tax=0&currency_code=USD&lc=US&bn=PP%2dDonationsBF&charset=UTF%2d8
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 3.3
-Tested up to: 4.1
-Stable tag: 3.1.6
+Tested up to: 4.2
+Stable tag: 3.1.7
 License: GPLv2 or later
 
 Integrate Constant Contact into your website with this full-featured plugin.
@@ -79,6 +79,16 @@ To install the plugin follow the steps below:
 
 = Version 3 Requires PHP 5.3 =
 __Version 3.x changes requirements for your server. If you upgrade and the upgrade doesn't work for you, you can downgrade to the previous version of the plugin.__
+
+= 3.1.7 on April 24, 2015 =
+* Fixed: Security update: properly sanitize URLs.
+* Fixed: short `<?` opening PHP tag in `nameparse.php`
+* Fixed: Error when adding contacts without any lists specified
+* Fixed: Converting `WP_Error` to a string and `trim()` errors
+* Fixed: Static PHP warnings
+* Fixed: Fatal Error preventing Edit Post page from fully loading (due to EventSpot embed form)
+* Updated: Phone number validating library
+
 
 = 3.1.6 on December 17 =
 * Fixed: Support redirection to Thank You URL in Widget setting
