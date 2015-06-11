@@ -1,238 +1,94 @@
 <?php
+use Ctct\ConstantContact;
+use Ctct\Components\Contacts\Contact;
+use Ctct\Components\Contacts\Address;
+use Ctct\Components\Contacts\CustomField;
+use Ctct\Components\Contacts\Note;
+use Ctct\Components\Contacts\ContactList;
+use Ctct\Components\Contacts\EmailAddress;
+use Ctct\Exceptions\CtctException;
 
-// Retrofitted to make much more WordPressy 10/27/2010 by katzwebdesign
 
-// lists
-function constant_contact_lists()
-{
-	global $cc;
+class CTCT_Admin_Lists extends CTCT_Admin_Page {
 
-	// Create the CC api object for use in this page.
-	constant_contact_create_object();
+    var $errors;
+    var $id;
+    var $can_add = false;
+    var $can_edit = false;
+    var $component = 'ContactList';
 
-	$lists = array();
-	
-	if(isset($_GET['add'])):
-		// add List
-		
-		$list_name = '';
-		$sort_order = 99;
-		
-		?>
-		<div class="wrap nosubsub">
-			<h2>Constant Contact - Add New List</h2>
-			
-			<form name="addlist" id="addlist" method="post" action="<?php echo remove_query_arg(array('add', 'edit', 'delete', 'refresh_lists'));?>">
-			<input type="hidden" name="add" value="1" />
-			<div id="poststuff" class="metabox-holder">
-			<div id="post-body">
-			<div id="post-body-content">
-			
-			<div id="linkadvanceddiv" class="postbox " >
-			<div class="handlediv" title="Click to toggle"><br /></div>
-			<h3 class='hndle'><span>Options</span></h3>
-			<div class="inside">
-			
-			<table class="form-table" cellspacing="0">
-				<tr>
-					<th valign="top"  scope="row"><p><label for="link_image"><span>List Name</span></label></p></th>
-					<td>
-						<input type="text" name="list_name" value="<?php echo $list_name; ?>" size="50" />
-					</td>
-				</tr>
-				<tr>
-					<th valign="top"  scope="row"><p><label for="link_image"><span>Sort Order</span></label></p></th>
-					<td>
-						<input type="text" name="sort_order" value="<?php echo $sort_order; ?>" size="10" />
-					</td>
-				</tr>
-			</table>
-			</div>
-			</div>
-			</div>
-			
-			<p class="submit">
-				<input type="submit" name="submit" class="button-primary" value="<?php _e('Create List') ?>" />
-				<a href="<?php echo remove_query_arg(array('add', 'edit', 'delete', 'refresh_lists'));?>" class="button-secondary">Cancel</a>
-			</p>
-			
-			</div>
-			</div>
-			</form>
+    protected function getKey() {
+        return "constant-contact-lists";
+    }
 
-		</div>
-		
-		<?php
-	
-		
-	elseif(isset($_GET['edit'])):
-		// edit list
-		
-		$id = (int) $_GET['edit'];
-		$list = constant_contact_get_list($id);
-		
-		if(!$list):
-			return '<p>Contact List Not Found</p></div>';
-		endif;
-		
-		$list_name = $list['Name'];
-		$sort_order = $list['SortOrder'];
-			
-		?>
-		<div class="wrap nosubsub">
-			<h2>Constant Contact - Edit List</h2>
-			
-			<form name="editlist" id="editlist" method="post" action="<?php echo remove_query_arg(array('add', 'edit', 'delete', 'refresh_lists'));?>">
-			<input type="hidden" name="edit" value="<?php echo $id; ?>" />
-			<div id="poststuff" class="metabox-holder">
-			<div id="post-body">
-			<div id="post-body-content">
-			
-			<div id="linkadvanceddiv" class="postbox " >
-			<div class="handlediv" title="Click to toggle"><br /></div>
-			<h3 class='hndle'><span>Options</span></h3>
-			<div class="inside">
-			
-			<table class="form-table" cellspacing="0">
-				<tr>
-					<th valign="top"  scope="row"><label for="link_image">List Name</label></th>
-					<td>
-						<input type="text" name="list_name" value="<?php echo $list_name; ?>" size="50" />
-					</td>
-				</tr>
-				<tr>
-					<th valign="top"  scope="row"><label for="link_image">Sort Order</label></th>
-					<td>
-						<input type="text" name="sort_order" value="<?php echo $sort_order; ?>" size="10" />
-					</td>
-				</tr>
-			</table>
-			</div>
-			</div>
-			</div>
-			
-			<p class="submit">
-			<input type="submit" name="submit" class="button-primary" value="<?php _e('Save List') ?>" />
-			<a href="<?php echo remove_query_arg(array('add', 'edit', 'delete', 'refresh_lists'));?>" class="button-secondary">Cancel</a>
-			</p>
-			
-			</div>
-			</div>
-			</form>
+    protected function getNavTitle() {
+        return __('Lists', 'ctct');
+    }
 
-		</div>
-		
-		<?php
-	
-	else:
-		$force = false;
-		if(isset($_REQUEST['delete'])):
-		// delete list		
-			$id = (int) $_REQUEST['delete'];
-			$list = constant_contact_get_list($id);
-			
-			if(!$list):
-				_e('<div id="message" class="error"><p><strong>Failed to delete contact list:</strong> Contact List Not Found</p></div>');
-			else:			
-				$status = $cc->delete_list($id);
-				
-				if($status):
-					_e('<div id="message" class="updated"><p>The contact list <strong>has been deleted</strong>.</p></div>');
-				else:
-					_e('<div id="message" class="error"><p><strong>Failed to delete contact list:</strong> ' .  constant_contact_last_error($cc->http_response_code).'</p></div>');
-				endif;
-			endif;
-		endif;
-		
-		if(isset($_POST['edit'])):
-			$list_name = $_POST['list_name'];
-			$sort_order = (int)$_POST['sort_order'];
-			$id = (int) $_POST['edit'];
-			
-			$status = $cc->update_list($id, $list_name, 'false', $sort_order);
-			
-			if($status):
-				_e('<div id="message" class="updated"><p>The contact list '.$list_name.' <strong>has been edited</strong>.</p></div>');
-			else:
-				_e('<div id="message" class="error"><p>Failed to edit contact list: ' .  constant_contact_last_error($cc->http_response_code).'</p></div>');
-			endif;
-		endif;
-		
-		if(isset($_POST['add'])):
-			$list_name = $_POST['list_name'];
-			$sort_order = $_POST['sort_order'];
-			
-			$status = $cc->create_list($list_name, 'false', $sort_order);
-			
-			if($status):
-				_e('<div id="message" class="updated"><p>The contact list '.$list_name.' <strong>has been created</strong>.</p></div>');
-			else:
-				_e('<div id="message" class="error"><p><strong>Failed to create contact list:</strong> ' .  constant_contact_last_error($cc->http_response_code).'</p></div>');
-			endif;
-		endif;
-		
-		// If you've changed your lists, let's get rid of the cached version.
-		if(isset($_POST['add']) || isset($_POST['edit']) || isset($_POST['delete']) || isset($_GET['refresh_lists'])) { $force = true; }
-		
-		// view all lists
-		$_lists = constant_contact_get_lists($force);
-			
-		if($_lists):
-		foreach($_lists as $k => $v):
-			$lists[$v['id']] = $v;
-		endforeach;
-		endif;
-		
-		if(!$_lists):
-			return '<p>No Contact Lists Found</p>';
-		endif;
-		
-		// display all lists
-		?>
+    protected function getTitle($type = '') {
+        if($this->isEdit()) { return "Edit Lists"; }
+        if($this->isSingle() || $type === 'single') { return "List #".intval(@$_GET['view']); }
+        return __('Lists', 'ctct');
+    }
 
-		<div class="wrap nosubsub">
-			<h2>Constant Contact - Lists</h2>
+	protected function add() {
 
-			<p class="alignright"><label class="howto" for="refresh_lists"><span>Are the displayed lists inaccurate?</span> <a href="<?php echo add_query_arg('refresh_lists', true, remove_query_arg(array('add', 'edit', 'delete', 'refresh_lists'))); ?>" class="button-secondary action" id="refresh_lists">Refresh Lists</a></label></p>
+	}
 
-			<table class="form-table widefat" cellspacing="0">
-				<thead>
-					<tr>
-						<th scope="col" id="name" class="manage-column column-id">ID</th>
-						<th scope="col" id="url" class="manage-column column-name">Name</th>
-						<th scope="col" id="sort-order" class="manage-column column-id">Sort Order</th>
-						<th scope="col" id="visible" class="manage-column column-date">Edit</th>
-					</tr>
-				</thead>
-				<tbody>
-				<?php
-					$alt ='';
-					foreach($lists as $id => $v):
-					if($alt == 'alt') { $alt = '';} else { $alt = 'alt'; }
-					?>
-					<tr class="<?php echo $alt; ?>">
-						<td class="column-id">
-							<?php echo $v['id']; ?>
-						</td>
-						<td class="column-title">
-							<?php echo $v['Name']; ?>
-						</td>
-						<td class="column-id">
-							<?php echo $v['SortOrder']; ?>
-						</td>
-						<td class="column-date">
-							<a href="<?php echo add_query_arg(array('edit'=>$v['id']), remove_query_arg(array('add', 'edit', 'delete', 'refresh_lists'))); ?>">Edit</a> |	<a onclick="return confirm('Really delete this contact list?');" href="<?php echo add_query_arg(array('delete'=>$v['id']), remove_query_arg(array('add', 'edit', 'delete', 'refresh_lists'))); ?>">Delete</a>
-						</td>
-					</tr>
-					<?php
-					endforeach;
-				?>
-				</tbody>
-			</table>
-			<p class="submit"><a href="<?php echo add_query_arg('add', true, remove_query_arg(array('add', 'edit', 'delete', 'refresh_lists'))); ?>" class="button-primary">Add New List</a></p>
-		</div>
-		<?php
-	endif;
-	
+    protected function processForms() {
+    }
+
+    protected function edit() {
+
+        $id = intval(@$_GET['edit']);
+
+        if(!isset($id) || empty($id)) {
+            esc_html_e('You have not specified a List to edit', 'ctct');
+            return;
+        }
+
+        $List = $this->cc->getList(CTCT_ACCESS_TOKEN, $id);
+
+        include(CTCT_DIR_PATH.'views/admin/view.list-edit.php');
+    }
+
+    /**
+     * Show all the contacts for a single list
+     * @return [type] [description]
+     */
+    protected function single() {
+
+        $id = intval(@$_GET['view']);
+
+        if(!isset($id) || empty($id)) {
+            esc_html_e('You have not specified a List to view.', 'ctct');
+            return;
+        }
+
+        // We define the transient key that is used so we can force-flush it
+        add_filter('ctct_cachekey', function() { return 'ctct_contacts_from_list_'.intval(@$_GET['view']); });
+
+        $Contacts = $this->cc->getAll('ContactsFromList', $id, 50 );
+
+        include(CTCT_DIR_PATH.'views/admin/view.contacts-view.php');
+
+    }
+
+    protected function view() {
+
+        // We define the transient key that is used so we can force-flush it
+        add_filter('ctct_cachekey', function() { return 'ctct_all_lists'; });
+
+        $Lists = $this->cc->getAllLists();
+
+    	if(empty($Lists)) {
+    		esc_html_e( 'Your account has no lists.', 'ctct');
+    	} else {
+
+            include(CTCT_DIR_PATH.'views/admin/view.lists-view.php');
+
+    	}
+    }
 }
-?>
+
+new CTCT_Admin_Lists;

@@ -1,123 +1,102 @@
 <?php
+use \KWSContactList;
+use Ctct\ConstantContact;
+use Ctct\Components\Contacts\Contact;
+use Ctct\Components\Contacts\Address;
+use Ctct\Components\Contacts\CustomField;
+use Ctct\Components\Contacts\Note;
+use Ctct\Components\Contacts\ContactList;
+use Ctct\Components\Contacts\EmailAddress;
+use Ctct\Exceptions\CtctException;
 
-// campaigns
-function constant_contact_campaigns()
-{
-	global $cc;
-	
-	if(!constant_contact_create_object()) { echo '<div id="message" class="error"><p>Campaigns Not Available. Check your '.admin_url('admin.php?page=constant-contact-api').' API settings.</p></div>'; return; }
-	
-	$campaigns = array();
-	if(isset($_GET['id'])):
-		$id = htmlentities($_GET['id']);
-		$campaign = $cc->get_campaign($id);
-		
-		if(!$campaign):
-			echo '<p>Campaign Not Found</p></div>';
-		endif;
-		
-		
-		// display single activity
-		?>
-		<div class="wrap nosubsub">
-			<h2>Constant Contact Campaigns - <?php echo $id; ?></h2>
-			
-			<h3>Campaign Stats:</h3>
-			<table class="widefat form-table" cellspacing="0">
-				<thead>
-					<th scope="col" class="column-name">Sent</th>
-					<th scope="col" class="column-title">Opens</th>
-					<th scope="col" class="column-title">Clicks</th>
-					<th scope="col" class="column-title">Bounces</th>
-					<th scope="col" class="column-title">Forwards</th>
-					<th scope="col" class="column-title">OptOuts</th>
-					<th scope="col" class="column-title">Spam Reports</th>
-				</thead>
-				<tbody>
-					<tr valign="top">
-				<?php
-				$html = '';
-					$cols = array('Sent', 'Opens', 'Clicks', 'Bounces', 'Forwards', 'OptOuts', 'SpamReports');
-					foreach($cols as $col) {
-						$html .= '<td>'.htmlentities($campaign[$col]).'</td>';
-					}
-					echo $html;
-				?>	</tr>
-				</tbody>
-			</table>
-			<h3>Campaign Details:</h3>
-			<table class="widefat form-table" cellspacing="0">
-				<thead>
-					<th scope="col" class="column-name">Name</th>
-					<th scope="col" class="column-title">Data</th>
-				</thead>
-				<tbody>
-				<?php
-				$html = $alt = '';
-					foreach($campaign as $id => $v) {
-						if($alt == 'alt') { $alt = '';} else { $alt = 'alt'; }
-						if(!is_array($v)) {
-							$id = preg_replace('/([A-Z])/',' $1', $id);
-							$html .= '<tr class="'.$alt.'"><th scope="row" valign="top" class="column-name">'.$id.'</th><td>'.htmlentities($v).'</td></tr>';
-						}
-					}
-					echo $html;
-				?>
-				</tbody>
-			</table>
-			<p class="submit"><a href="<?php echo admin_url('admin.php?page=constant-contact-campaigns'); ?>" class="button-primary">Return to Campaigns</a></p>
-		</div>
-	<?php 
-	else:
-		$_campaigns = $cc->get_campaigns();
-		if($_campaigns):
-		foreach($_campaigns as $k => $v):
-			$campaigns[$v['id']] = $v;
-		endforeach;
-		endif;
-		
-		// display all campaigns
-		?>
+class CTCT_Admin_Campaigns extends CTCT_Admin_Page {
 
-		<div class="wrap nosubsub">
-			<h2>Constant Contact Campaigns</h2>
-		<?php
-		if(!$_campaigns):
-			echo '<div id="message" class="updated"><p>No Campaigns Found</p></div>';
-			return;
-		endif;
-		?>
-		<table class="widefat fixed" cellspacing="0">
-			<thead>
-				<tr>
-					<th scope="col" id="name" class="manage-column column-name" style="">Name</th>
-					<th scope="col" id="date" class="manage-column column-name" style="">Type</th>
-					<th scope="col" id="status" class="manage-column column-name" style="">Last Edited</th>
-					<th scope="col" id="id" class="manage-column column-name" style="">Status</th>
-					<th scope="col" id="view" class="manage-column column-name" style="">&nbsp;</th>
-				</tr>
-			</thead>
-			<tbody>
-	
-		<?php
-			$alt = $html = '';
-			foreach($campaigns as $id => $v) {
-				if($alt == 'alt') { $alt = '';} else { $alt = 'alt'; }
-				$html .= '
-				<tr class="'.$alt.'">
-					<td class="column-name">'.htmlentities($v['Name']).'</td>
-					<td class="column-name">'.htmlentities($v['Status']).'</td>
-					<td class="column-name">'.date('jS F Y \- H:i', (int)$cc->convert_timestamp($v['Date'])).'</td>
-					<td class="column-name">'.htmlentities($v['id']).'</td>
-					<td class="column-name"><a href="'.admin_url('admin.php?page=constant-contact-campaigns&id='.$v['id']).'">View Campaign Details</a></td>
-				</tr>';
-			}
-			echo $html;
-		?>
-			</tbody>
-		</table>
-		<?php
-	endif;
-	
+    var $errors;
+    var $id;
+    var $can_edit = false;
+    var $can_add = false;
+
+    protected function getKey() {
+        return "constant-contact-campaigns";
+    }
+
+    protected function getNavTitle() {
+    	return $this->getTitle('views');
+    }
+    protected function getTitle($value = '') {
+        if(empty($value) && $this->isEdit() || $value == 'edit')
+            return "Edit Campaign";
+        if(empty($value) && $this->isSingle() || $value == 'single')
+            return sprintf('Campaign #%s', $_GET['view']);
+
+        return 'Campaigns';
+    }
+
+    /**
+     * @todo Implement adding campaigns. Needs better CTCT support.
+     */
+	protected function add() {}
+
+    protected function processForms() {}
+
+    protected function edit() {
+
+        $id = intval(@$_GET['edit']);
+
+        if(!isset($id) || empty($id)) {
+            esc_html_e('You have not specified a Campaign to edit', 'ctct');
+            return;
+        }
+
+        $CC_Campaign = $this->cc->getEmailCampaign(CTCT_ACCESS_TOKEN, $id);
+
+        $Campaign = new KWSCampaign($CC_Campaign);
+
+        if($Campaign->status === 'DRAFT') {
+        	foreach(array('last_run_date', 'next_run_date', 'tracking_summary', 'sent_to_contact_lists', 'click_through_details') as $key) {
+        		unset($Campaign->{$key});
+        	}
+        }
+
+        include(CTCT_DIR_PATH.'views/admin/view.campaign-edit.php');
+    }
+
+    protected function single() {
+
+        $id = intval(@$_GET['view']);
+
+        if(!isset($id) || empty($id)) {
+            esc_html_e('You have not specified a Campaign to view', 'ctct');
+            return;
+        }
+
+        $CC_Campaign = $this->cc->getEmailCampaign(CTCT_ACCESS_TOKEN, $id);
+        $Campaign = new KWSCampaign($CC_Campaign);
+
+        include(CTCT_DIR_PATH.'views/admin/view.campaign-view.php');
+
+    }
+
+    protected function view() {
+
+    	$status = isset($_GET['status']) ? $_GET['status'] : null;
+
+        add_filter('ctct_cachekey', function() {
+            return isset($_GET['status']) ? false : 'ctct_all_campaigns';
+        });
+
+    	$Campaigns = $this->cc->getAllEmailCampaigns($status);
+
+        kws_print_subsub('status', array(
+            array('val' => '', 'text' => 'All'),
+            array('val' => 'DRAFT', 'text' => 'Draft'),
+            array('val' => 'RUNNING', 'text' => 'Running'),
+            array('val' => 'SCHEDULED', 'text' => 'Scheduled'),
+            array('val' => 'SENT', 'text' => 'Sent'),
+        ));
+
+        include(CTCT_DIR_PATH.'views/admin/view.campaigns-view.php');
+    }
 }
-?>
+
+new CTCT_Admin_Campaigns;
