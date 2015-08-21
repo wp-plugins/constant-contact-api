@@ -82,7 +82,7 @@ class CTCT_Form_Designer_Output {
 		}
 
 		// Some very basic verification. Not secure, but better than nothing.
-		else if( $data['verify'] !== ( $data['rand'] . $data['cc-form-id'] . $data['date'] ) ) {
+		elseif( $data['verify'] !== ( $data['rand'] . $data['cc-form-id'] . $data['date'] ) ) {
 			$valid = false;
 		}
 
@@ -185,7 +185,7 @@ class CTCT_Form_Designer_Output {
 		$placeholder = '';
 		if( !empty( $this->form['cc_request'] ) && isset($this->form['cc_request']['fields'][$field['id']]['value']) && $this->is_current_form() ) {
 			$val = esc_html( $this->form['cc_request']['fields'][$field['id']]['value'] );
-		} else if( !empty( $field['val'] ) ) {
+		} elseif( !empty( $field['val'] ) ) {
 			$placeholder = " placeholder='".esc_attr( $field['val'] )."'";
 		}
 
@@ -493,11 +493,10 @@ class CTCT_Form_Designer_Output {
 	        ));
 
 	        // If you're showing list selection, show the label and wrap it in a container.
-	        if( $list_selection_format !== 'hidden' ) {
-	            $listsOutput = '<div class="cc_newsletter input-text-wrap">
-	                '.$listsOutput.'
-	            </div>';
-	        }
+
+            $listsOutput = '<div class="cc_newsletter input-text-wrap cc-input-type-'. esc_attr( $list_selection_format ) .'">
+                '.$listsOutput.'
+            </div>';
 
 	        $form = str_replace('<!-- %%LISTSELECTION%% -->', $listsOutput, $form);
 
@@ -704,6 +703,8 @@ EOD;
 		ob_start();
 		include 'css.php';
 		$css = ob_get_clean();
+
+		$css = $this->strip_whitespace( $css );
 
 		$css = apply_filters( 'ctct_form_css', $css, $this );
 

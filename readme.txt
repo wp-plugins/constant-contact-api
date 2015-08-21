@@ -3,8 +3,8 @@ Contributors: katzwebdesign, katzwebservices
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zackkatz%40gmail%2ecom&item_name=Constant%20Contact%20API%20Plugin&no_shipping=0&no_note=1&tax=0&currency_code=USD&lc=US&bn=PP%2dDonationsBF&charset=UTF%2d8
 Tags: mail, email, newsletter, Constant Contact, plugin, sidebar, widget, mailing list, API, email marketing, newsletters, form, forms, event, events, event marketing
 Requires at least: 3.3
-Tested up to: 4.2.2
-Stable tag: 3.1.8
+Tested up to: 4.3
+Stable tag: 3.1.12
 License: GPLv2 or later
 
 Integrate Constant Contact into your website with this full-featured plugin.
@@ -76,6 +76,24 @@ To install the plugin follow the steps below:
 10. To edit the form, return the the Form Designer page (from Step 3) and click on the form tab with the name of the form you would like to edit. Edit the form, then click Update Form. The form will show as updated on your website.
 
 == Changelog ==
+
+= 3.1.12 on August 21 =
+* Fixed: Compatibility with WordPress 4.3
+
+= 3.1.11 on July 15 =
+* Fixed: Submissions not being processed properly for lists being selected using `<select>` inputs
+* Fixed (second try!): Invalid Header issue on activation
+* Fixed: List selection inputs were sometimes being hidden in the form
+
+= 3.1.10 on June 22 =
+* Fixed: Invalid Header issue on activation for certain server configurations
+
+= 3.1.9 on June 19 =
+* Fixed: Issue with Add Event button (affecting users with no events) that prevented Edit Post/Page functionality is now **fully solved**. Sorry for the frustration!
+* Fixed: Error when saving user profile forms
+* Fixed: Re-enable caching events data
+* Fixed: When switching accounts, delete all cached data
+* Tweak: Improve Admin tab styles
 
 = 3.1.8 on June 10 =
 * Fixed: Fatal error in "Add Event" button that would prevent Edit Post/Page pages from loading

@@ -1,4 +1,9 @@
 <?php
+/**
+ * @package CTCT
+ * @version 3.0
+ */
+
 use Ctct\Util\Config;
 use Ctct\Auth;
 use Ctct\Auth\CtctOAuth2;
@@ -55,7 +60,7 @@ class KWSOAuth2 extends CtctOAuth2 {
 
 				wp_redirect($url);
 
-				die();
+				exit();
 			}
 
 			// Returned a OAuth code. Let's fetch the access token based on that code.
@@ -91,7 +96,7 @@ class KWSOAuth2 extends CtctOAuth2 {
 				// Go to the settings page
 				wp_redirect( $admin_url );
 
-				die();
+				exit();
 			}
 		}
 	}
